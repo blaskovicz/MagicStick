@@ -19,24 +19,24 @@ Follow the instructions on the ruby-build page to install ruby 2.1.X.
 
 ### Install Bundler
 
-    ~~~ sh
-    $ gem install bundler
-    $ rbenv rehash
-    ~~~
+```sh
+$ gem install bundler
+$ rbenv rehash
+```
 
 
 ## Download the code
 
-    ~~~ sh
-    $ git clone https://github.com/blaskovicz/MagicStick && cd MagicStick
-    ~~~
+```sh
+$ git clone https://github.com/blaskovicz/MagicStick && cd MagicStick
+```
 
 ## Install Dependencies
 
-    ~~~ sh
-    $ bundle install
-    $ npm install
-    ~~~
+```sh
+$ bundle install
+$ npm install
+```
 
 If you run into issues with `$ bundle install` and are using `rbenv`, please
 consult [this post on stackoverflow](http://stackoverflow.com/a/11146496/626810).
@@ -45,14 +45,14 @@ consult [this post on stackoverflow](http://stackoverflow.com/a/11146496/626810)
 
 This will compile all front-end site files and watch them for changes.
 
-    ~~~ sh
-    $ grunt
-    ~~~
+```sh
+$ grunt
+```
 
-## Run Rake
+## Run the Server
 
 This will compile the server files, watch them for changes, and take care of (re)starting the server.
 
-    ~~~ sh
-    $ bundle exec unicorn config.ru
-    ~~~
+```sh
+$ bundle exec unicorn config.ru
+```
