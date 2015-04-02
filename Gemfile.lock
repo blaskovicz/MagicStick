@@ -10,6 +10,8 @@ GEM
     rack-test (0.6.3)
       rack (>= 1.0)
     raindrops (0.13.0)
+    shotgun (0.9.1)
+      rack (>= 1.0)
     sinatra (1.4.6)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -31,6 +33,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  shotgun
   sinatra
   sinatra-contrib
   unicorn

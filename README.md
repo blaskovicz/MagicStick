@@ -35,6 +35,7 @@ $ git clone https://github.com/blaskovicz/MagicStick && cd MagicStick
 
 ```sh
 $ bundle install
+$ gem install sass
 $ npm install
 ```
 
@@ -51,8 +52,13 @@ $ grunt
 
 ## Run the Server
 
-This will compile the server files, watch them for changes, and take care of (re)starting the server.
+This will start the server in development mode and reload it for each request
+(ie changes made will be picked up on subsequent requests).
 
 ```sh
-$ bundle exec unicorn config.ru
+$ bundle exec shotgun config.ru
 ```
+
+## View
+
+The server should be running at [http://localhost:9393](http://localhost:9393)
