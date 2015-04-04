@@ -15,7 +15,8 @@ If you already have ruby 2.0 installed, then you can proceed to the _Download th
 
 ### Install ruby
 
-Follow the instructions on the ruby-build page to install ruby 2.1.X.
+Follow the instructions on the ruby-build page to install ruby 2.1.5.
+Note that if you want readline support, you can take a look at [this guide](http://vvv.tobiassjosten.net/ruby/readline-in-ruby-with-rbenv/).
 
 ### Install Bundler
 
@@ -41,6 +42,13 @@ $ npm install
 
 If you run into issues with `$ bundle install` and are using `rbenv`, please
 consult [this post on stackoverflow](http://stackoverflow.com/a/11146496/626810).
+
+## Seed the Database
+
+```sh
+$ bundle exec rake db:migrate
+$ bundle exec rake db:seed[roles]
+```
 
 ## Run Grunt
 

@@ -5,6 +5,8 @@ path/
 node_modules/
 npm-debug.log
 public/js/app.js
+public/bower_components
 public/css/app.css
 public/css/app.css.map
 public/js/templates.js
+*.db

@@ -1,6 +1,7 @@
 # app dependency config
 app = angular.module("MagicStick", [
   "ngRoute"
+  "toastr"
   "ui.bootstrap"
   "MagicStick.controllers"
   "MagicStick.services"

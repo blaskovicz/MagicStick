@@ -1,0 +1,8 @@
+# See http://www.sinatrarb.com/contrib/config_file.html for more info
+# to change server environment, set the RACK_ENV environement variable (-E arg to rackup)
+development:
+  level: development
+test:
+  level: test
+production:
+  level: production

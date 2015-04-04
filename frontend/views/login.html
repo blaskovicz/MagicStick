@@ -1,0 +1,51 @@
+<div class="login-view" ng-if="!user.loggedIn">
+  <tabset>
+    <tab heading="Log In">
+      <div class="login-dialog">
+        <form ng-submit="attemptLogin()">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input class="form-control" id="username" type="text" ng-model="login.username">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input class="form-control" id="password" type="password" ng-model="login.password">
+          </div>
+          <button
+            ng-disabled="login.password == '' || login.password == null || login.username == '' || login.username == null"
+            class="btn" type="submit">
+            Login
+          </button>
+        </form>
+      </div>
+    </tab>
+    <tab heading="Sign Up">
+      <form ng-submit="attemptSignup()">
+        <div class="form-group" ng-class="{'has-error': signupError.username != null}">
+          <label for="username-s">Username</label>
+          <input class="form-control" id="username-s" type-"text" ng-model="signup.username">
+          <span class="help-block" ng-if="signupError.username != null" ng-bind="signupError.username.join(',')"></span>
+        </div>
+        <div class="form-group" ng-class="{'has-error': signupError.password != null}">
+          <label for="password-s">Password</label>
+          <input class="form-control" id="password-s" type="password" ng-model="signup.password">
+          <span class="help-block" ng-if="signupError.password != null" ng-bind="signupError.password.join(',')"></span>
+        </div>
+        <div class="form-group">
+          <label for="password-s-confirm">Confirm-Password</label>
+          <input class="form-control" id="password-s-confirm" type="password" ng-model="signup.passwordConfirmation">
+        </div>
+        <div class="form-group" ng-class="{'has-error': signupError.email != null}">
+          <label for="email">Email</label>
+          <input class="form-control" id="email" type="text" ng-model="signup.email">
+          <span class="help-block" ng-if="signupError.email != null" ng-bind="signupError.email.join(',')"></span>
+        </div>
+        <button
+          ng-disabled="signup.passwordConfirmation != signup.password || signup.password == '' || signup.password == null || signup.username == '' || signup.username == null || signup.email == '' || signup.email == null"
+          class="btn" type="submit">
+          Sign Up
+        </button>
+      </form>
+    </tab>
+  </tabset>
+</div>
