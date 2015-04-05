@@ -12,9 +12,14 @@ angular.module("MagicStick.directives").directive "loginView", ->
       $scope.signup = {}
       $scope.signupError = {}
       $scope.attemptLogin = ->
-        $http.post("/api/auth/login", $scope.login)
+        # TODO persist credentials on refresh
+        authHeader =
+          "Basic #{btoa($scope.login.username + ':' + $scope.login.password)}"
+        #$cookieStore.put('globals', $rootScope.globals);
+        $http.get("/api/auth/me",{ headers: {Authorization: authHeader} })
           .success (data, status, headers) ->
             toastr.success "Successfully logged in"
+            $http.defaults.headers.common['Authorization'] = authHeader
             User.username = $scope.login.username
             User.loggedIn = true
             $scope.login = {}

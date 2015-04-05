@@ -48,15 +48,9 @@ class AuthController < ApplicationController
     status 201
     json :id => new_user.id
   end
-  post '/login' do
-    halt_401 if params[:username].nil? or params[:password].nil?
-    candidate_user = User[username: params[:username]]
-    halt_401 if candidate_user.nil? or not candidate_user.password_matches? params[:password]
-    halt_403 unless candidate_user.active
-    login(candidate_user.id)
-  end
-  get '/logout' do
-    logout
+  get '/me' do
+    requires_login!
+    principal.to_json
   end
   helpers do
     def find_role!(role_id, status = 400)
