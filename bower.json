@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular-toastr": "~1.1.0"
+    "angular-toastr": "~1.1.0",
+    "angular-local-storage": "~0.1.5"
   }
 }

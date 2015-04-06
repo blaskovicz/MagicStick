@@ -6,5 +6,6 @@ angular.module("MagicStick.directives").directive "userView", ->
     "User"
     ($scope, User) ->
       $scope.user = User
+      $scope.logout = -> User.logout()
   ]
 

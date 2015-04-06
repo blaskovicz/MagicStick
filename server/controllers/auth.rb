@@ -46,11 +46,12 @@ class AuthController < ApplicationController
     halt 400, json(:errors => new_user.errors) unless new_user.valid?
     new_user.save
     status 201
+    logger.info "#{new_user.username} successfully registered"
     json :id => new_user.id
   end
   get '/me' do
     requires_login!
-    principal.to_json
+    principal.to_json(include: :roles)
   end
   helpers do
     def find_role!(role_id, status = 400)
