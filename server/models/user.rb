@@ -3,6 +3,7 @@ require 'digest/sha2'
 class User < Sequel::Model
   plugin :validation_helpers
   many_to_many :roles, :left_key => :user_id, :right_key => :role_id, :join_table => :users_roles
+  many_to_many :seasons, :left_key => :user_id, :right_key => :season_id, :join_table => :users_seasons
   def validate
     super
     validates_presence [:username, :password, :email]

@@ -1,0 +1,38 @@
+<div class="season-view">
+  <div class="page-header">
+    <h2>Seasons</h2>
+  </div>
+  <tabset>
+    <tab heading="Browse">
+      <ul>
+        <li ng-repeat="season in seasons">
+          {{season.name}}
+        </li>
+      </ul>
+    </tab>
+    <tab heading="Create">
+      <form ng-submit="createSeason()">
+        <form-input
+          label="Name"
+          type="text"
+          model="newSeason.name"
+          error-model="newSeasonError.name">
+        </form-input>
+        <form-input
+          label="Description"
+          type="text"
+          model="newSeason.description"
+          error-model="newSeasonError.description">
+        </form-input>
+        <form-input
+          label="Start Date"
+          type="date"
+          model="newSeason.starts"
+          error-model="newSeasonError.starts"
+          >
+        </form-input>
+        <button type="submit" class="btn">Submit</button>
+      </form>
+    </tab>
+  </tabset>
+</div>

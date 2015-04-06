@@ -18,8 +18,8 @@ Sequel.migration do
       TrueClass :active, :null => false, :default => true
     end
     create_table?(:users_roles) do
-      foreign_key :user_id, :users
-      foreign_key :role_id, :roles
+      foreign_key :user_id, :users, :on_delete => :cascade, :on_update => :cascade
+      foreign_key :role_id, :roles, :on_delete => :cascade, :on_update => :cascade
       primary_key [:user_id, :role_id]
       index [:user_id, :role_id]
     end
