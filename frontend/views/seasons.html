@@ -4,11 +4,52 @@
   </div>
   <tabset>
     <tab heading="Browse">
-      <ul>
-        <li ng-repeat="season in seasons">
-          {{season.name}}
-        </li>
-      </ul>
+      <table class="table">
+        <thead>
+          <th></th>
+          <th>Name</th>
+          <th>Created</th>
+          <th>Owner</th>
+          <th>Starts</th>
+          <th>Ends</th>
+          <th></th>
+        </thead>
+        <tr ng-repeat="season in seasons">
+          <!-- TODO use glyphicons and labels to annotate these -->
+          <td>
+            <a href="/#!/seasons/{{season.id}}">
+              <span class="label label-primary">
+                <span class="glyphicon glyphicon-eye-open"></span> View
+              </span>
+            </a>
+          </td>
+          <td>{{season.name}}</td>
+          <td>{{season.created}}</td>
+          <td>{{season.owner.username}}</td>
+          <td>{{season.starts}}</td>
+          <td>{{season.ends}}</td>
+          <td>
+            <span
+              ng-if="season.invite_only"
+              class="invite-only label label-warning"
+              tooltip="you must be invited to join this season">
+              <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+            </span>
+            <span 
+              ng-if="season.is_archived"
+              class="archived label label-default"
+              tooltip="this season is no longer open">
+              <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+            </span>
+            <span
+              ng-if="season.allow_auto_join"
+              class="auto-join-enabled label label-success"
+              tooltip="this season can be joined by anyone">
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            </span>
+          </td>
+        </tr>
+      </table>
     </tab>
     <tab heading="Create">
       <form ng-submit="createSeason()">
@@ -31,6 +72,28 @@
           error-model="newSeasonError.starts"
           >
         </form-input>
+        <form-input
+          label="End Date"
+          type="date"
+          model="newSeason.ends"
+          error-model="newSeasonError.ends"
+          >
+        </form-input>        
+        <div class="form-group">
+          <label for="invite_only">Invite Only</label>
+          <input id="invite_only"
+            type="checkbox"
+            ng-change="assertJoinType('invite_only')"
+            ng-model="newSeason.invite_only">
+        </div>
+        <div class="form-group">
+          <label for="allow_auto_join">Allow Auto-Join</label>
+          <input id="allow_auto_join"
+            type="checkbox"
+            ng-model="newSeason.allow_auto_join"
+            ng-change="assertJoinType('allow_auto_join')"
+          >
+        </div>
         <button type="submit" class="btn">Submit</button>
       </form>
     </tab>

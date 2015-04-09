@@ -7,7 +7,7 @@ Sequel.migration do
       DateTime :starts, :null => false
       DateTime :ends, :null => false
       String :description, :null => true, :size => 4000
-      FalseClass :archived, :null => false, :default => false
+      FalseClass :is_archived, :null => false, :default => false
       FalseClass :invite_only, :null => false, :default => false
       TrueClass :allow_auto_join, :null => false, :default => true
       foreign_key :owner_id, :users, :null => false, :on_delete => :cascade, :on_update => :cascade
@@ -56,6 +56,12 @@ Sequel.migration do
       DateTime :updated, :null => true
       String :comment, :null => false, :size => 4000
       FalseClass :hidden, :null => false, :default => false      
+    end
+    create_table?(:seasons_invites) do
+      primary_key :id
+      foreign_key :user_id, :users, :on_delete => :cascade, :on_update => :cascade
+      foreign_key :season_id, :seasons, :on_delete => :cascade, :on_update => :cascade
+      DateTime :created, :null => false
     end
   end
   down do

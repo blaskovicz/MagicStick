@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "angular-toastr": "~1.1.0",
-    "angular-local-storage": "~0.1.5"
+    "angular-local-storage": "~0.1.5",
+    "momentjs": "~2.9.0"
   }
 }

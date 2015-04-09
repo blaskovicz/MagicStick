@@ -31,6 +31,26 @@ app.config([
         controller: "SeasonDashController"
         auth: true
       })
+      .when("/seasons/:seasonId", {
+        templateUrl: "season-manage.html"
+        controller: "SeasonManageController"
+        auth: true
+        resolve:
+          season: [
+            "$route", "$q", "$http",
+            ($route, $q, $http) ->
+              #TODO move some of the $http stuff into service objects
+              promise = $q.defer()
+              seasonId = $route.current.params.seasonId
+              if not /^\d+$/.test(seasonId)
+                promise.reject("Invalid season id, must be numeric")
+              else
+                $http.get("/api/match/seasons/#{seasonId}")
+                  .success (data) -> promise.resolve(data)
+                  .error (data) -> promise.reject(data)
+              promise.promise
+          ]
+      })
       .otherwise(redirectTo: "/")
     $locationProvider.html5Mode false
     $locationProvider.hashPrefix '!'
@@ -54,6 +74,8 @@ app.run([
     notAuthorizedRedirect = ->
       $location.path("/").replace()
       toastr.warning "You're not authorized to access this page"
+    $rootScope.$on "$routeChangeError", ->
+      toastr.warning "An error occurred loading this page"
     $rootScope.$on "$routeChangeStart", (event, next) ->
       return unless next.auth
       type = typeof next.auth

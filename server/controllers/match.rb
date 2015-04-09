@@ -2,18 +2,33 @@ class MatchController < ApplicationController
   before do
     requires_login!
   end
-  before '/seasons/:season_id' do |season_id|
-    @season = Season[id: season_id]
-    halt 404, "Season #{season_id} couldn't be found" if @seasons.nil?
+  before %r{^/seasons/(?<season_id>[^/]+)} do
+    @season = Season[id: params[:season_id]]
+    halt 404, "Season #{params[:season_id]} couldn't be found" if @season.nil?
   end
   get '/seasons' do
-    seasons = []
     if params[:owned].nil?
-      seasons = Season.all
+      seasons = Season
     else
-      seasons = Season[owner_id: principal.id]
+      seasons = Season.filter(owner_id: principal.id)
     end
-    json seasons: seasons
+    seasons.to_json(root: true, include: {:owner => {:only => [:username]}})
+  end
+  get '/seasons/:season_id' do
+    @season.to_json(include: {:owner => {:only => [:username]}, :members => {}})
+  end
+  put '/seasons/:season_id/members/:member_id' do |season_id, member_id|
+    # cases: (owner vs not), (invite_only vs not), (invited vs not), (auto join vs not), (archived vs not) 
+    halt_403 unless @season.owner == principal
+    target_member = find_member! member_id
+    @season.add_member target_member
+    status 204
+  end
+  delete '/seasons/:season_id/members/:member_id' do |season_id, member_id|
+    halt_403 unless @season.owner == principal
+    target_member = find_member! member_id
+    @season.remove_member target_member
+    status 204
   end
   post '/seasons' do
     season_param_presence!
@@ -28,6 +43,11 @@ class MatchController < ApplicationController
   delete '/seasons/:season_id' do |season_id|
   end
   helpers do
+    def find_member!(id)
+      user = User[id: id]
+      halt 404, "No member with id #{id} found" if user.nil?
+      user
+    end
     def season_param_presence!
       halt 400, "No season object found in request payload" if params[:season].nil?
     end
