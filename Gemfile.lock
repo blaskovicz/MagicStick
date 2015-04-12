@@ -5,6 +5,7 @@ GEM
     diff-lcs (1.2.5)
     kgio (2.9.3)
     multi_json (1.11.0)
+    pg (0.18.1)
     rack (1.6.0)
     rack-parser (0.6.1)
       rack
@@ -13,6 +14,7 @@ GEM
     rack-test (0.6.3)
       rack (>= 1.0)
     raindrops (0.13.0)
+    rake (10.4.2)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
       rspec-expectations (~> 3.2.0)
@@ -26,6 +28,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.2.0)
     rspec-support (3.2.2)
+    sass (3.4.13)
     sequel (4.21.0)
     shotgun (0.9.1)
       rack (>= 1.0)
@@ -51,8 +54,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  pg
   rack-parser
+  rake
   rspec
+  sass
   sequel
   shotgun
   sinatra
