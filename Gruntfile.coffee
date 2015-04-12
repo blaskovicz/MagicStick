@@ -81,6 +81,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-coffeelint'
   grunt.loadNpmTasks 'grunt-bg-shell'
-  grunt.registerTask 'build', ['htmlhint','html2js','sass','coffeelint','coffee','bgShell:rake']
+  grunt.registerTask 'build', ['htmlhint','html2js','sass','coffeelint','coffee']
+  grunt.registerTask 'test', ['build','bgShell:rake']
   grunt.registerTask 'dist', ['build']
-  grunt.registerTask 'default', ['build','bgShell:shotgun','watch']
+  grunt.registerTask 'default', ['test','bgShell:shotgun','watch']

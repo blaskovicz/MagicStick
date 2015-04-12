@@ -5,4 +5,4 @@ before_script:
     - gem install sass
     - npm install
 script:
-    - grunt dist
+    - grunt test
