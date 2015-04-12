@@ -1,4 +1,3 @@
-require 'date'
 class Season < Sequel::Model
   plugin :validation_helpers
   one_to_many :season_match_groups
@@ -21,7 +20,6 @@ class Season < Sequel::Model
   def before_create
     self.invite_only = false if not self.invite_only
     self.allow_auto_join = false if not self.allow_auto_join
-    self.created = DateTime.now
     self.is_archived = false
     super
   end

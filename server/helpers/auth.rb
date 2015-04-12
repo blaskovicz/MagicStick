@@ -18,6 +18,7 @@ module Auth
       @auth.credentials
     return nil unless provided_basic_creds
     user = User[username: @auth.credentials.first]
+    return nil if user.nil?
     user.password_matches?(@auth.credentials.last) ? user : nil
   end
   def requires_login!
@@ -28,14 +29,14 @@ module Auth
     user.save_changes
   end
   def halt_500
-    halt 500, "An error occurred"
+    json_halt 500, "An error occurred"
   end
   def halt_401
     # although technically more correct, dont set this header to avoid browser prompts
     #headers['WWW-Authenticate'] = %(Basic Realm="Magic MagicStick Area")
-    halt 401, "Insufficient credentials provided"
+    json_halt 401, "Insufficient credentials provided"
   end
   def halt_403
-    halt 403, "You don't have the correct priviledges to access this resource"
+    json_halt 403, "You don't have the correct priviledges to access this resource"
   end
 end

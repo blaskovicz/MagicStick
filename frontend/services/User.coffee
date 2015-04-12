@@ -39,7 +39,7 @@ angular.module("MagicStick.services").factory "User", [
             @broadcastLoginStateChange()
             promise.resolve()
           .error (data, status, headers) ->
-            promise.reject(data)
+            promise.reject(data?.errors ? "Invalid credentials")
         promise.promise
       loadPrincipal: ->
         $http.get("/api/auth/me")

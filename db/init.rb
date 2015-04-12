@@ -1,5 +1,6 @@
 require 'sequel'
 Sequel::Model.plugin :json_serializer
+Sequel::Model.plugin :timestamps, :update_on_create => true
 $db_url = ENV["DATABASE_URL"] || (
   ENV["RACK_ENV"] == "production" ?
   "postgres://localhost/magicstick" :

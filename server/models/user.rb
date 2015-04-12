@@ -1,4 +1,3 @@
-require 'date'
 require 'digest/sha2'
 class User < Sequel::Model
   plugin :validation_helpers
@@ -15,7 +14,6 @@ class User < Sequel::Model
   end
   def before_create
     super
-    self.created = DateTime.now
     self.active = true
     e_password = encrypted_password(self.password)
     self.salt = e_password[:salt]

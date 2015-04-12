@@ -4,7 +4,7 @@ class MatchController < ApplicationController
   end
   before %r{^/seasons/(?<season_id>[^/]+)} do
     @season = Season[id: params[:season_id]]
-    halt 404, "Season #{params[:season_id]} couldn't be found" if @season.nil?
+    json_halt 404, "Season #{params[:season_id]} couldn't be found" if @season.nil?
   end
   get '/seasons' do
     if params[:owned].nil?
@@ -34,7 +34,7 @@ class MatchController < ApplicationController
     season_param_presence!
     new_season = Season.new params[:season]
     new_season.owner_id = principal.id
-    halt 400, json(errors: new_season.errors) unless new_season.valid?
+    json_halt 400, new_season.errors unless new_season.valid?
     new_season.save
     status 201
     logger.info "Season #{new_season.id} successfully created"
@@ -45,11 +45,11 @@ class MatchController < ApplicationController
   helpers do
     def find_member!(id)
       user = User[id: id]
-      halt 404, "No member with id #{id} found" if user.nil?
+      json_halt 404, "No member with id #{id} found" if user.nil?
       user
     end
     def season_param_presence!
-      halt 400, "No season object found in request payload" if params[:season].nil?
+      json_halt 400, "No season object found in request payload" if params[:season].nil?
     end
   end
 end
