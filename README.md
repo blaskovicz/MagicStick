@@ -52,19 +52,13 @@ $ bundle exec rake db:seed[roles]
 
 ## Run Grunt
 
-This will compile all front-end site files and watch them for changes.
+This will compile/test all source files and watch them for changes.
+Additionally it will launch a server via shotgun in development mode. All files
+are reloaded for each request ensuring changes will be picked up on subsequent
+requests.
 
 ```sh
 $ grunt
-```
-
-## Run the Server
-
-This will start the server in development mode and reload it for each request
-(ie changes made will be picked up on subsequent requests).
-
-```sh
-$ bundle exec shotgun config.ru
 ```
 
 ## View
