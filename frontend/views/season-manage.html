@@ -3,4 +3,93 @@
     <!-- TODO breadcrumb directive -->
     <h2><a href="/#!/seasons">Seasons</a> &gt; {{season.id}}</h2>
   </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Attributes</div>
+    <table class="table">
+      <tr><td>Name</td><td>{{season.name}}</td></tr>
+      <tr><td>Owner</td><td>{{season.owner.username}}</td></tr>
+      <tr><td>Created</td><td>{{season.created_at}}</td></tr>
+      <tr><td>Updated</td><td>{{season.updated_at}}</td></tr>
+      <tr><td>Starts</td><td>{{season.starts}}</td></tr>
+      <tr><td>Ends</td><td>{{season.ends}}</td></tr>
+      <tr><td>Description</td><td>{{season.description}}</td></tr>
+      <tr><td>Auto Join Enabled?</td><td>{{season.allow_auto_join && "Yes" || "No"}}</td></tr>
+      <tr><td>Invite Only?</td><td>{{season.invite_only && "Yes" || "No"}}</td></tr>
+      <tr><td>Archived?</td><td>{{season.is_archived && "Yes" || "No"}}</td></tr>
+    </table>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Members</div>
+    <div class="panel-body" ng-if="seasonOwner()">
+      <h4>Members</h4>
+      <p>Add users to the current season below.</p>
+      <form class="form-inline">
+        <div class="form-group">
+          <label for="newMemberLookup">Username</label>
+          <input
+            type="text"
+            class="form-control"
+            typeahead="user as user.username for user in findMembersMatching($viewValue)"
+            id="newMemberLookup"
+            ng-model="newMember">
+        </div>
+        <button
+          type="button"
+          class="btn btn-primary"
+          ng-disabled="!newMember.id"
+          ng-click="addSeasonMember(newMember)">
+          Add Member
+        </button>
+      </form>
+    </div>
+    <table class="table">
+      <tr ng-repeat="member in season.members">
+        <td>{{member.username}}</td>
+        <td ng-if="seasonOwner()">
+          <button
+            type="button"
+            class="btn btn-danger"
+            ng-click="removeSeasonMember(member)">
+            Remove
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Matches</div>
+    <div class="panel-body">
+      <div class="auth-wrapper" ng-if="seasonOwner()">
+        <h4>Groupings</h4>
+        <p>
+          Season matches are divided into groupings; groupings represent
+          a logical collection of matches (eg: week 1, week 2, playoffs, etc).
+          To create matches, there must first exist a grouping to add them to.
+        </p>
+        <form class="form-inline">
+          <form-input
+            label="Grouping Name"
+            type="text"
+            model="newGroupingName"
+            error-model="newGroupingNameError"></form-input>
+          <button
+            ng-disable="!newGroupingName"
+            type="button"
+            ng-click="createSeasonGrouping(newGroupingName)"
+            class="btn btn-primary">
+            Create Season Group
+          </button>
+        </form>
+        <h4>Matches</h4>
+        <p>Matches represent games to be played between multiple people.</p>
+        <form class="form-inline">
+          <button
+            type="button"
+            class="btn btn-primary">
+            Create Match
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

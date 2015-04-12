@@ -8,8 +8,15 @@ class AuthController < ApplicationController
     json :roles => Role.all
   end
   get '/users' do
-    requires_role! :admin
-    json :users => User.all
+    if params[:limitted]
+      requires_login!
+      params[:matching] ||= ""
+      User.where(Sequel.expr(active: true) & Sequel.like(:username, '%' + params[:matching] + '%'))
+        .to_json(root: true, :only => [:username, :id])
+    else
+      requires_role! :admin
+      User.to_json(root: true)
+    end
   end
   get '/users/:user_id' do
     requires_role! :admin

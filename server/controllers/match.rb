@@ -15,9 +15,32 @@ class MatchController < ApplicationController
     seasons.to_json(root: true, include: {:owner => {:only => [:username]}})
   end
   get '/seasons/:season_id' do
-    @season.to_json(include: {:owner => {:only => [:username]}, :members => {}})
+    @season.to_json(include: {
+      :season_match_groups => {},
+      :owner => {:only => [:username]},
+      :members => {:only => [:username, :id]}
+    })
+  end
+  post '/seasons/:season_id/match-groups' do
+    halt_403 unless @season.owner == principal
+    match_group = SeasonMatchGroup.new
+    match_group.name = params[:name]
+    match_group.season = @season
+    json_halt 400, match_group.errors unless match_group.valid?
+    match_group.save
+    status 201
+    logger.info "SeasonMatchGroup #{match_group.id} successfully created"
+    match_group.to_json
+  end
+  delete '/seasons/:season_id/match-groups/:match_group_id' do |season_id, match_group_id|
+    halt_403 unless @season.owner == principal
+    match_group = SeasonMatchGroup.where(id: match_group_id, season_id: season_id).first
+    json_halt 404, "No match group with id #{match_group_id} found" if match_group.nil?
+    match_group.delete
+    status 204
   end
   put '/seasons/:season_id/members/:member_id' do |season_id, member_id|
+    # TODO
     # cases: (owner vs not), (invite_only vs not), (invited vs not), (auto join vs not), (archived vs not) 
     halt_403 unless @season.owner == principal
     target_member = find_member! member_id

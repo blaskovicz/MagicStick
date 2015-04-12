@@ -12,7 +12,7 @@ class Season < Sequel::Model
     validates_unique [:owner_id, :name]
     join_mode_invalid = self.invite_only == self.allow_auto_join and self.invite_only
     if self.invite_only == true and self.allow_auto_join == true
-      errors.add(:allow_auto_join, 'cannot be set if invite only is also enalbed')
+      errors.add(:allow_auto_join, 'cannot be set if invite only is also enabled')
       errors.add(:invite_only, 'cannot be set if allow auto join is also enabled')
     end
     super
