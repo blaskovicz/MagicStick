@@ -9,8 +9,9 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
     $scope.seasonOwner = ->
       season?.owner?.username is User.username
     $scope.createSeasonGrouping = (groupingName) ->
-      $http.post("/api/match/seasons/#{season.id}/match-groups", { name: groupingName })
-        .success (newGroup) ->
+      $http.post("/api/match/seasons/#{season.id}/match-groups", {
+        name: groupingName
+      }).success (newGroup) ->
           toastr.success "Grouping successfully created"
         .error ->
     $scope.addSeasonMember = (newMember) ->
