@@ -1,0 +1,8 @@
+language: ruby
+rvms:
+    - 2.1.5
+before_script:
+    - gem install sass
+    - npm install
+script:
+    - grunt dist
