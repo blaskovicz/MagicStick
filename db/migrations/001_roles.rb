@@ -29,6 +29,12 @@ Sequel.migration do
       primary_key [:user_id, :role_id]
       index [:user_id, :role_id], :unique => true
     end
+    [
+      {:name => "admin", :description => "site admin"},
+      {:name => "moderator", :description => "site helper"}
+    ].each do |role|
+      self[:roles].insert(role)
+    end
   end
   down do
     drop_table(:users_roles, :users, :roles)

@@ -12,19 +12,6 @@ namespace :db do
       Sequel::Migrator.run($DB, "db/migrations")
     end
   end
-  task :seed, [:type] do |t, args|
-    require "./db/init"
-    if args[:type] == "roles"
-      [
-        {:name => "admin", :description => "site admin"},
-        {:name => "moderator", :description => "site helper"}
-      ].each do |role|
-        $DB[:roles].insert(role)
-      end
-    else
-      puts "please provide a recognized type (eg: [roles])"
-    end
-  end
 end
 namespace :test do
   desc "Configure test environment"

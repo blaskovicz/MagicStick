@@ -43,11 +43,10 @@ $ npm install
 If you run into issues with `$ bundle install` and are using `rbenv`, please
 consult [this post on stackoverflow](http://stackoverflow.com/a/11146496/626810).
 
-## Seed the Database
+## Initialize the Database
 
 ```sh
 $ bundle exec rake db:migrate
-$ bundle exec rake db:seed[roles]
 ```
 
 ## Run Grunt
