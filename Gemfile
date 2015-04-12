@@ -9,4 +9,5 @@ gem 'rack-parser', :require => 'rack/parser'
 group :development do
   gem 'sqlite3'
   gem 'shotgun'
+  gem 'rspec'
 end

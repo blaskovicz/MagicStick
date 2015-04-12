@@ -26,3 +26,21 @@ namespace :db do
     end
   end
 end
+namespace :test do
+  desc "Configure test environment"
+  task :configure do
+    ENV['RACK_ENV'] = 'test'
+  end
+
+  desc "Execute tests"
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    t.rspec_opts = ["--color", "-f documentation"]
+    t.pattern = Dir.glob("spec/**/*_spec.rb")
+  end
+
+  desc "Prepare environment and run test suite"
+  task :test => ['test:configure', 'db:migrate', 'test:spec'] do
+  end
+end
+task :default => ['test:test']
