@@ -70,6 +70,7 @@ module.exports = (grunt) ->
     bgShell:
       rake:
         cmd: 'bundler exec rake'
+        fail: true
       shotgun:
         cmd: 'bundler exec shotgun config.ru'
         bg: true
