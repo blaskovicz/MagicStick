@@ -63,3 +63,39 @@ $ grunt
 ## View
 
 The server should be running at [http://localhost:9393](http://localhost:9393)
+
+
+## Testing & Deployment
+
+### Travis
+
+MagicStick utilizes TravisCI for testing and deployment to Heroku. See the .travis.yml for configuration details.
+
+### Heroku
+
+MagicStick is deployed via [Heroku](https://magic-stick.herokuapp.com/).
+
+The configuration process is as follows:
+
+```
+# Create the heroku app
+$ heroku create
+
+# Add the postgres addon
+$ heroku addons:add heroku-postgresql
+
+# The heroku-buildpack-multi is configured via .buildpacks to install both rake and grunt
+$ heroku config:add BUILDPACK_URL=https://github.com/ddollar/heroku-buildpack-multi.git
+
+# Ensures dev-dependencies like grunt are installed for the build
+$ heroku config:add NPM_CONFIG_PRODUCTION=false
+
+# Configure ruby rack to run in production mode
+$ heroku config:add RACK_ENV=production
+
+# Push to Heroku
+$ git push heroku master
+
+# Execute database migrations
+$ heroku run 'bundler exec rake db:migrate'
+```
