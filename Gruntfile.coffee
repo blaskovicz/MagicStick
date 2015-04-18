@@ -69,10 +69,10 @@ module.exports = (grunt) ->
         ]
     bgShell:
       rake:
-        cmd: 'bundler exec rake'
+        cmd: 'bundle exec rake'
         fail: true
       shotgun:
-        cmd: 'bundler exec shotgun config.ru'
+        cmd: 'bundle exec shotgun config.ru'
         bg: true
   grunt.loadNpmTasks 'grunt-html2js'
   grunt.loadNpmTasks 'grunt-contrib-sass'
