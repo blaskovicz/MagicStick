@@ -23,7 +23,7 @@
       <form ng-submit="attemptSignup()">
         <div class="form-group" ng-class="{'has-error': signupError.username != null}">
           <label for="username-s">Username</label>
-          <input class="form-control" id="username-s" type-"text" ng-model="signup.username">
+          <input class="form-control" id="username-s" type="text" ng-model="signup.username">
           <span class="help-block" ng-if="signupError.username != null" ng-bind="signupError.username.join(',')"></span>
         </div>
         <div class="form-group" ng-class="{'has-error': signupError.password != null}">

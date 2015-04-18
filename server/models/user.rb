@@ -1,8 +1,9 @@
-require 'date'
 require 'digest/sha2'
 class User < Sequel::Model
   plugin :validation_helpers
   many_to_many :roles, :left_key => :user_id, :right_key => :role_id, :join_table => :users_roles
+  many_to_many :season_memberships, :join_table => :seasons, :left_key => :user_id, :right_key => :season_id, :join_table => :users_seasons
+  one_to_many :managed_seasons, :class => :Season, :key => :owner_id
   def validate
     super
     validates_presence [:username, :password, :email]
@@ -13,7 +14,6 @@ class User < Sequel::Model
   end
   def before_create
     super
-    self.created = DateTime.now
     self.active = true
     e_password = encrypted_password(self.password)
     self.salt = e_password[:salt]

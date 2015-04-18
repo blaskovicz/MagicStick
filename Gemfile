@@ -5,7 +5,12 @@ gem 'sinatra-contrib'
 gem 'unicorn'
 gem 'sequel'
 gem 'rack-parser', :require => 'rack/parser'
-#gem 'postgres'
+gem 'rake'
+gem 'rspec'
+gem 'sass'
+group :production do
+  gem 'pg'
+end
 group :development do
   gem 'sqlite3'
   gem 'shotgun'

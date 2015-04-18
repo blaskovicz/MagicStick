@@ -57,12 +57,31 @@ module.exports = (grunt) ->
           'coffeelint'
           'coffee'
         ]
+      ruby:
+        files: [
+          'server/**/*.rb'
+          'spec/**/*.rb'
+          'Rakefile'
+          'config.ru'
+        ]
+        tasks: [
+          'bgShell:rake'
+        ]
+    bgShell:
+      rake:
+        cmd: 'bundle exec rake'
+        fail: true
+      shotgun:
+        cmd: 'bundle exec shotgun config.ru'
+        bg: true
   grunt.loadNpmTasks 'grunt-html2js'
   grunt.loadNpmTasks 'grunt-contrib-sass'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-htmlhint'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-coffeelint'
+  grunt.loadNpmTasks 'grunt-bg-shell'
   grunt.registerTask 'build', ['htmlhint','html2js','sass','coffeelint','coffee']
+  grunt.registerTask 'test', ['build','bgShell:rake']
   grunt.registerTask 'dist', ['build']
-  grunt.registerTask 'default', ['build','watch']
+  grunt.registerTask 'default', ['test','bgShell:shotgun','watch']

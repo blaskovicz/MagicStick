@@ -1,9 +1,14 @@
 require 'sequel'
 Sequel::Model.plugin :json_serializer
-$db_url = ENV["DATABASE_URL"] || (
-  ENV["RACK_ENV"] == "production" ?
-  "postgres://localhost/magicstick" :
-  "sqlite://magicstick.db"
-)
-$DB = Sequel.connect($db_url)
+Sequel::Model.plugin :timestamps, :update_on_create => true
 
+$db_url = ENV["DATABASE_URL"] || case ENV["RACK_ENV"]
+when "production"
+  "postgres://localhost/magicstick"
+when "test"
+  "sqlite://test.db"
+else
+  "sqlite://magicstick.db"
+end
+
+$DB = Sequel.connect($db_url)
