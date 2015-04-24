@@ -27,7 +27,12 @@ Sequel.migration do
       foreign_key :user_id, :users, :on_delete => :cascade, :on_update => :cascade
       foreign_key :role_id, :roles, :on_delete => :cascade, :on_update => :cascade
       primary_key [:user_id, :role_id]
-      index [:user_id, :role_id], :unique => true
+    end
+    [
+      {:name => "admin", :description => "site admin"},
+      {:name => "moderator", :description => "site helper"}
+    ].each do |role|
+      self[:roles].insert(role)
     end
   end
   down do
