@@ -36,7 +36,7 @@ Sequel.migration do
       DateTime :updated_at
       DateTime :scheduled_for, :null => false
       DateTime :completed, :null => true
-      foreign_key :season_match_group_id, :season_match_group, :null => false, :on_delete => :cascade, :on_update => :cascade
+      foreign_key :season_match_group_id, :season_match_groups, :null => false, :on_delete => :cascade, :on_update => :cascade
       String :description, :null => true, :size => 4000
     end
     create_table?(:users_seasons_matches) do

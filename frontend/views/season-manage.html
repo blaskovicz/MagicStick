@@ -3,6 +3,7 @@
     <!-- TODO breadcrumb directive -->
     <h2><a href="/#!/seasons">Seasons</a> &gt; {{season.id}}</h2>
   </div>
+  <!-- TODO directives for these tabs / panes -->
   <div class="panel panel-default">
     <div class="panel-heading">Attributes</div>
     <table class="table">
@@ -21,7 +22,6 @@
   <div class="panel panel-default">
     <div class="panel-heading">Members</div>
     <div class="panel-body" ng-if="seasonOwner()">
-      <h4>Members</h4>
       <p>Add users to the current season below.</p>
       <form class="form-inline">
         <div class="form-group">
@@ -57,39 +57,104 @@
     </table>
   </div>
   <div class="panel panel-default">
+    <div class="panel-heading">Match Groups</div>
+    <div class="panel-body" ng-if="seasonOwner()">
+      <p>
+        Season matches are divided into groupings; groupings represent
+        a logical collection of matches (eg: week 1, week 2, playoffs, etc).
+        To create matches, there must first exist a grouping to add them to.
+      </p>
+      <form class="form-inline">
+        <form-input
+          label="Grouping Name"
+          type="text"
+          model="newGroupingName"
+          error-model="newGroupingNameError"></form-input>
+        <button
+          ng-disabled="!newGroupingName"
+          type="button"
+          ng-click="createSeasonGrouping(newGroupingName)"
+          class="btn btn-primary">
+          Create Season Group
+        </button>
+      </form>
+    </div>
+    <table class="table">
+      <tbody ng-repeat="group in season.season_match_groups">
+        <tr>
+          <td>{{group.name}}</td>
+          <td>
+            <button
+              type="button"
+              class="btn btn-default"
+              ng-click="group.viewingMatches = !group.viewingMatches">
+              {{group.viewingMatches ? "Hide Matches" : "View Matches (" + group.matches.length +")"}}
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              ng-click="removeSeasonGrouping(group)">
+              Remove
+            </button>
+          </td>
+        </tr>
+        <tr ng-if="group.viewingMatches">
+          <td colspan="2">
+            <div ng-repeat="match in group.matches" class="row">
+              <div class="col-md-12">
+                <h3 ng-class="{'green-text': match.completed, 'purple-text': !match.completed}">Match #{{match.id}}</h3>
+<!--              <a
+                ng-href="/#!/seasons/{{season.id}}/match-groups/{{group.id}}/matches/{{match.id}}">
+                Match #{{match.id}}
+              </a> TODO seperate edit page-->
+                <div class="row">
+                  <div class="col-md-12">
+                    <h3>Members</h3>
+                    <ul>
+                      <li ng-repeat="participant in match.participants">
+                        {{participant.username}}
+                        <button type="button" class="btn btn-danger" ng-click="" ng-if="seasonOwner()">
+                          Remove
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              <hr>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel panel-default">
     <div class="panel-heading">Matches</div>
-    <div class="panel-body">
-      <div class="auth-wrapper" ng-if="seasonOwner()">
-        <h4>Groupings</h4>
-        <p>
-          Season matches are divided into groupings; groupings represent
-          a logical collection of matches (eg: week 1, week 2, playoffs, etc).
-          To create matches, there must first exist a grouping to add them to.
-        </p>
-        <form class="form-inline">
-          <form-input
-            label="Grouping Name"
-            type="text"
-            model="newGroupingName"
-            error-model="newGroupingNameError"></form-input>
-          <button
-            ng-disable="!newGroupingName"
-            type="button"
-            ng-click="createSeasonGrouping(newGroupingName)"
-            class="btn btn-primary">
-            Create Season Group
-          </button>
-        </form>
-        <h4>Matches</h4>
-        <p>Matches represent games to be played between multiple people.</p>
-        <form class="form-inline">
-          <button
-            type="button"
-            class="btn btn-primary">
-            Create Match
-          </button>
-        </form>
-      </div>
+    <div class="panel-body" ng-if="seasonOwner()">
+      <p>Matches represent games to be played between multiple people.</p>
+        <form-input
+          label="Scheduled For"
+          type="date"
+          model="newMatch.scheduled_for"
+          error-model="newMatchError.scheduled_for"></form-input>
+        <form-input
+          label="Description"
+          type="text"
+          model="newMatch.description"
+          error-model="newMatchError.description"></form-input>
+        <form-input
+          label="Match Group"
+          type="select"
+          options="season.season_match_groups"
+          model="newMatch.season_match_group_id"
+          error-model="newMatchError.season_match_group_id"></form-input>
+        <button
+          ng-disabled="newMatch.season_match_group_id == null"
+          type="button"
+          ng-click="createMatch()"
+          class="btn btn-primary">
+          Create Match
+        </button>
     </div>
   </div>
 </div>

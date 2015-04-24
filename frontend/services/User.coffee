@@ -45,6 +45,9 @@ angular.module("MagicStick.services").factory "User", [
         $http.get("/api/auth/me")
           .success (data) =>
             @parsePrincipal(data)
+          .error (data, status, headers) =>
+            $log.warn("Couldn't load auth data: #{data}")
+            @logout() if status is 401
       parsePrincipal: (data) ->
         return unless data?
         @roles = {}

@@ -3,6 +3,7 @@ angular.module("MagicStick.directives").directive "formInput", ->
     label: "@"
     type: "@"
     model: "="
+    options: "&"
     errorModel: "="
   restrict: "E"
   template: """
@@ -18,6 +19,14 @@ angular.module("MagicStick.directives").directive "formInput", ->
           ng-model="$parent.model"
           >
         </timepicker>
+      </span>
+      <span ng-switch-when="select">
+        <select
+          class="form-control"
+          ng-options=
+            "option.id as option.name for option in $parent.options()"
+          ng-model="$parent.model">
+        </select>
       </span>
       <input
         class="form-control"
