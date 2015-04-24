@@ -43,30 +43,59 @@ $ npm install
 If you run into issues with `$ bundle install` and are using `rbenv`, please
 consult [this post on stackoverflow](http://stackoverflow.com/a/11146496/626810).
 
-## Seed the Database
+## Initialize the Database
 
 ```sh
 $ bundle exec rake db:migrate
-$ bundle exec rake db:seed[roles]
 ```
 
 ## Run Grunt
 
-This will compile all front-end site files and watch them for changes.
+This will compile/test all source files and watch them for changes.
+Additionally it will launch a server via shotgun in development mode. All files
+are reloaded for each request ensuring changes will be picked up on subsequent
+requests.
 
 ```sh
 $ grunt
 ```
 
-## Run the Server
-
-This will start the server in development mode and reload it for each request
-(ie changes made will be picked up on subsequent requests).
-
-```sh
-$ bundle exec shotgun config.ru
-```
-
 ## View
 
 The server should be running at [http://localhost:9393](http://localhost:9393)
+
+
+## Testing & Deployment
+
+### Travis
+
+MagicStick utilizes TravisCI for testing and deployment to Heroku. See the .travis.yml for configuration details.
+
+### Heroku
+
+MagicStick is deployed via [Heroku](https://magic-stick.herokuapp.com/).
+
+The configuration process is as follows:
+
+```
+# Create the heroku app
+$ heroku create
+
+# Add the postgres addon
+$ heroku addons:add heroku-postgresql
+
+# The heroku-buildpack-multi is configured via .buildpacks to install both rake and grunt
+$ heroku config:add BUILDPACK_URL=https://github.com/ddollar/heroku-buildpack-multi.git
+
+# Ensures dev-dependencies like grunt are installed for the build
+$ heroku config:add NPM_CONFIG_PRODUCTION=false
+
+# Configure ruby rack to run in production mode
+$ heroku config:add RACK_ENV=production
+
+# Push to Heroku
+$ git push heroku master
+
+# Execute database migrations
+$ heroku run 'bundler exec rake db:migrate'
+```
