@@ -4,6 +4,7 @@ app = angular.module("MagicStick", [
   "ngRoute"
   "toastr"
   "ui.bootstrap"
+  "ngFileUpload"
   "MagicStick.controllers"
   "MagicStick.services"
   "MagicStick.directives"

@@ -35,6 +35,7 @@ class User < Sequel::Model
   end
   def avatar_url
     hash = Digest::MD5.hexdigest(if self.email then self.email.strip.downcase else "" end)
-    "https://secure.gravatar.com/avatar/" + hash + "?s=155&d=identicon"
+    self.avatar ? "/api/auth/users/#{self.id}/avatar"
+      : "https://secure.gravatar.com/avatar/#{hash}?s=155&d=identicon"
   end
 end

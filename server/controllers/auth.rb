@@ -15,12 +15,16 @@ class AuthController < ApplicationController
         .to_json(root: true, :only => [:username, :id])
     else
       requires_role! :admin
-      User.to_json(root: true)
+      User.to_json(root: true, exclude: :avatar)
     end
   end
   get '/users/:user_id' do
     requires_role! :admin
     json :user => @user
+  end
+  get '/users/:user_id/avatar' do
+    content_type 'image/png' # probably wrong, but it works
+    @user.avatar
   end
   delete '/users/:user_id' do
     requires_role! :admin
@@ -58,7 +62,7 @@ class AuthController < ApplicationController
   end
   get '/me' do
     requires_login!
-    principal.to_json(include: [:roles,:avatar_url], except: [:id, :active, :password, :salt])
+    principal.to_json(include: [:roles,:avatar_url], except: [:id, :active, :password, :salt, :avatar])
   end
   post '/me' do
     requires_login!
@@ -85,6 +89,16 @@ class AuthController < ApplicationController
     status 200
     logger.info "#{user.username} successfully updated"
     json :id => user.id
+  end
+  post '/me/avatar' do
+    json_halt 413, { :avatar => [ 'avatar must be less than 1mb' ] } if request.content_length.to_i > 1024 * 1024
+    requires_login!
+    user = User[principal.id]
+    user.avatar = Sequel.blob(params['file'][:tempfile].read)
+    json_halt 400, user.errors unless user.valid?
+    user.save
+    logger.info "#{user.username} avatar uploaded"
+    status 200
   end
   helpers do
     def find_role!(role_id)

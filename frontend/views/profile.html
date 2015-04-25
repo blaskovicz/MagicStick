@@ -26,8 +26,31 @@
       </dl>
     </div>
     <div class="col-sm-2">
-      <div ng-hide="!user.avatar_url" class="thumbnail">
-        <img ng-src="{{user.avatar_url}}" alt="avatar" />
+      <style>
+        #avatar-selector {
+          cursor: pointer;
+          position: relative;
+        }
+        #avatar-selector:hover:after {
+          content: 'Upload';
+          display: block;
+          position: absolute;
+          font-size: 2em;
+          color: white;
+          background-color: rgba(0, 0, 0, 0.5);
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          text-align: center;
+          padding-top: 45%;
+          pointer-events: none;
+        }
+      </style>
+      <div class="thumbnail" id="avatar-selector">
+        <a ngf-select ng-model="avatars">
+          <img ng-src="{{user.avatar_url}}" alt="avatar" />
+        </a>
       </div>
     </div>
   </div>

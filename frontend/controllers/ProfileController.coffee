@@ -3,7 +3,23 @@ angular.module("MagicStick.controllers").controller "ProfileController", [
   "User"
   "$http"
   "toastr"
-  ($scope, User, $http, toastr) ->
+  "Upload"
+  ($scope, User, $http, toastr, Upload) ->
+
+    $scope.avatars = []
+
+    $scope.$watch 'avatars', ->
+      if $scope.avatars
+        for avatar in $scope.avatars
+          do (avatar) ->
+            Upload.upload({
+                  url: '/api/auth/me/avatar',
+                  file: avatar
+              }).success (data, status, headers, config) ->
+                toastr.success "Avatar updated"
+                # hack to force image reloading
+                $scope.user.avatar_url += "?" + Math.random()
+
     $http.get("/api/auth/me").then (response) ->
       $scope.user = response.data
 
