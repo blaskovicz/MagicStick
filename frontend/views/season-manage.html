@@ -82,15 +82,16 @@
     <table class="table">
       <tbody ng-repeat="group in season.season_match_groups">
         <tr>
-          <td>{{group.name}}</td>
+          <td><h3>{{group.name}}</h3></td>
           <td>
             <button
               type="button"
               class="btn btn-default"
               ng-click="group.viewingMatches = !group.viewingMatches">
-              {{group.viewingMatches ? "Hide Matches" : "View Matches (" + group.matches.length +")"}}
+              {{group.viewingMatches ? "Hide Matches" : "View Matches (" + (group.matches == null ? "0" : group.matches.length) +")"}}
             </button>
             <button
+              ng-if="seasonOwner()"
               type="button"
               class="btn btn-danger"
               ng-click="removeSeasonGrouping(group)">
@@ -102,7 +103,15 @@
           <td colspan="2">
             <div ng-repeat="match in group.matches" class="row">
               <div class="col-md-12">
-                <h3 ng-class="{'green-text': match.completed, 'purple-text': !match.completed}">Match #{{match.id}}</h3>
+                <h3 ng-class="{'green-text': match.completed, 'purple-text': !match.completed}">
+                  Match #{{match.id}}
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    ng-click="deleteMatch(group.id, match.id)">
+                    Delete
+                  </button>
+                </h3>
 <!--              <a
                 ng-href="/#!/seasons/{{season.id}}/match-groups/{{group.id}}/matches/{{match.id}}">
                 Match #{{match.id}}
@@ -110,14 +119,82 @@
                 <div class="row">
                   <div class="col-md-12">
                     <h3>Members</h3>
-                    <ul>
-                      <li ng-repeat="participant in match.participants">
-                        {{participant.username}}
-                        <button type="button" class="btn btn-danger" ng-click="" ng-if="seasonOwner()">
-                          Remove
-                        </button>
-                      </li>
-                    </ul>
+                    <form class="form-inline" ng-if="seasonOwner()">
+                      <div class="form-group">
+                        <label for="nextMatchMember">Add Match Member</label>
+                        <select
+                          id="nextMatchMember"
+                          class="form-control"
+                          ng-model="nextMatchMember"
+                          ng-options="user as user.username for user in season.members">
+                        </select>
+                      </div>
+                      <button
+                        ng-disabled="nextMatchMember == null"
+                        ng-click="addNextMatchMember(nextMatchMember, group.id, match.id)"
+                        class="btn btn-default"
+                        type="button">
+                        Add to Match
+                      </button>
+                    </form>
+                    <table class="table">
+                      <tr ng-repeat="user_season_match in match.user_season_match">
+                        <td>
+                          {{user_season_match.user_season.user.username}}
+                        </td>
+                        <td ng-if="!seasonOwner() && !isMatchMember(match)">
+                          {{
+                            (user_season_match.won === null && "Not Played") ||
+                            (user_season_match.won === false  && "Lost") ||
+                            (user_season_match.won === true && "Won")
+                          }}
+                        </td>
+                        <td ng-if="seasonOwner() || isMatchMember(match)">
+                          <form name="match{{match.id}}form">
+                            <label>
+                              <input
+                                ng-model="user_season_match.won"
+                                ng-value="false"
+                                type="radio"
+                                name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}">
+                              Lost
+                            </label>
+                            <label>
+                              <input
+                                ng-model="user_season_match.won"
+                                ng-value="true"
+                                type="radio"
+                                name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}">
+                              Won
+                            </label>
+                            <label>
+                              <input
+                                ng-model="user_season_match.won"
+                                ng-value="null"
+                                type="radio"
+                                name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}">
+                              Not Played
+                            </label>
+                            <button
+                              ng-click="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, user_season_match.won)"
+                              ng-disabled="!match{{match.id}}form.$dirty"
+                              type="button"
+                              class="btn btn-primary">
+                              Update Status
+                            </button>
+                          </form>
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            class="btn btn-danger"
+                            ng-click="removeMatchMember(user_season_match.user_season.user.id, group.id, match.id)"
+                            ng-if="seasonOwner()">
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    </table>
                   </div>
                 </div>
               <hr>

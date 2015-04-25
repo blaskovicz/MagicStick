@@ -16,7 +16,9 @@ class MatchController < ApplicationController
           .where(id: params[:season_id])
           .select(:id)
         ).select(:id)
-      ).first
+      )
+      .select_all(:matches) # this is required since the model has extra fields that cant be json-serialized into a Match row
+      .first
     json_halt 404, "No match found (season #{params[:season_id]}, match group #{params[:match_group_id]}, match #{params[:match_id]})" if @match.nil?   
   end
   before %r{/.+/members/(?<user_id>[^/]+)} do
@@ -33,33 +35,63 @@ class MatchController < ApplicationController
   end
   get '/seasons/:season_id' do
     @season.to_json(include: {
-      :season_match_groups => {include: {:matches => {include: []}}},
-      :owner => {:only => [:username]},
-      :members => {:only => [:username, :id]}
+      season_match_groups: {
+        include: {
+          matches: {
+            include: {
+              user_season_match: {
+                include: {
+                  user_season: {
+                    include: {
+                      user: {
+                        only: User.public_attrs
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      :owner => {:only => User.public_attrs},
+      :members => {:only => User.public_attrs}
     })
   end
   put '/seasons/:season_id/match-groups/:group_id/matches/:match_id/members/:member_id' do |season_id, group_id, match_id, member_id|
     requires_season_owner!
-    requires_season_membership! season_id, member_id
+    requires_season_membership! season: season_id, member: member_id
     $DB.transaction do
-      user_season = $DB[:users_seasons].where(user_id: member_id, season_id: season_id).first
-      if $DB[:users_seasons_matches].where(user_season_id: user_season[:id], match_id: match_id).first.nil?
-        $DB[:users_seasons_matches].insert(user_season_id: user_season[:id], match_id: match_id)
+      user_season = UserSeason.where(user_id: member_id, season_id: season_id).first
+      user_season_match = UserSeasonMatch.new
+      user_season_match.user_season = user_season
+      user_season_match.match = @match
+      if user_season_match.valid?
+        user_season_match.save
       end
     end
     status 204
   end
   delete '/seasons/:season_id/match-groups/:group_id/matches/:match_id/members/:member_id' do |season_id, group_id, match_id, member_id|
     requires_season_owner!
-    requires_season_membership! season_id, member_id
+    requires_season_membership! season: season_id, member: member_id
     $DB.transaction do
-      user_season = $DB[:users_seasons].where(user_id: member_id, season_id: season_id).first
-      $DB[:users_seasons_matches].where(user_season_id: user_season[:id], match_id: match_id).delete
+      user_season = UserSeason.where(user_id: member_id, season_id: season_id).first
+      UserSeasonMatch.where(user_season: user_season, match: @match).delete
     end
     status 204
   end
-  put '/seasons/:season_id/match-groups/:group_id/matches/:match_id/status' do |season_id, group_id, match_id|
-    requires_match_privs!
+  put '/seasons/:season_id/match-groups/:group_id/matches/:match_id/members/:member_id/status' do |season_id, group_id, match_id, member_id|
+    requires_match_membership!
+    user_season_match = UserSeasonMatch.where(user_season: UserSeason.where(user_id: member_id, season_id: season_id).first,  match: @match).first
+    json_halt 404, "Member #{member_id} not found as part of match #{match_id}, group #{group_id}, season #{season_id}" if user_season_match.nil?
+    if params.has_key? "status"
+      user_season_match.won = params[:status]
+      json_halt 400, user_season_match.errors unless user_season_match.valid?
+      user_season_match.save
+      #TODO should we also mark other people as finished here?
+    end
+    status 204
   end
   post '/seasons/:season_id/match-groups/:group_id/matches' do |season_id, group_id|
     requires_season_owner!
@@ -76,8 +108,26 @@ class MatchController < ApplicationController
   end
   get '/seasons/:season_id/match-groups/:group_id/matches/:match_id' do
     requires_login!
-    # this is required since the model has extra fields that cant be serialized  into a Match row
-    @match.to_json(:only => [:id, :created_at, :scheduled_for, :completed, :description])
+    # this output should match what's returned by /seasons/:season except at a lower-level of nesting.
+    #
+    # ideally, since we're treating these tables as sub-resources, we'd want to be able to have
+    # each and every route in between defined for all actions (get/put/post, etc) dynamically
+    # so that we dont have to manually create them all TODO
+    @match.to_json(
+      include: {
+        user_season_match: {
+          include: {
+            user_season: {
+              include: {
+                user: {
+                  only: User.public_attrs
+                }
+              }
+            }
+          }
+        }
+      }
+    )
   end
   delete '/seasons/:season_id/match-groups/:group_id/matches/:match_id' do |season_id, group_id, match_id|
     requires_season_owner!
@@ -130,17 +180,20 @@ class MatchController < ApplicationController
     status 204
   end
   helpers do
+    def requires_match_membership!
+      halt_403 unless (
+        @season.owner == principal ||
+        @match.user_season_match.map{|m| m.user.id}.include?(principal.id) #TODO is there a more correct way to do this?
+      )
+    end
     def requires_season_owner!
       halt_403 unless @season.owner == principal
     end
     def season_param_presence!
       json_halt 400, "No season object found in request payload" if params[:season].nil?
     end
-    def has_season_membership(user_id, season_id)
-      not $DB[:users_seasons].where(user_id: user_id, season_id: season_id).first.nil?
-    end
-    def requires_season_membership!(user_id, season_id)
-      json_halt 400, "User #{user_id} isn't a member of season #{season_id}" unless has_season_membership(user_id, season_id)
+    def requires_season_membership!(season:, member:)
+      json_halt 400, "User #{member} isn't a member of season #{season}" if UserSeason.where(user_id: member, season_id: season).first.nil?
     end
   end
 end

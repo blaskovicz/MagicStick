@@ -29,4 +29,8 @@ class User < Sequel::Model
     return false if self.salt.nil? or self.password.nil?
     self.password == encrypted_password(raw_password, self.salt)[:password]
   end
+  # TODO add a concept of visibility that all classes can utilize
+  def self.public_attrs
+    [:username, :id]
+  end
 end

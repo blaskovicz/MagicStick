@@ -1,4 +1,3 @@
-#TODO finish this class and utilize in other related classes / controllers
 class UserSeasonMatch < Sequel::Model(:users_seasons_matches)
   plugin :validation_helpers
   many_to_one :match
