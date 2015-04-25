@@ -31,7 +31,7 @@ angular.module("MagicStick.directives").directive "formInput", ->
       <input
         class="form-control"
         id="{{label}}"
-        type="text"
+        type="{{type}}"
         ng-model="$parent.model"
         ng-switch-default>
     </span>

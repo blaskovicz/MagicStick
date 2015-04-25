@@ -58,7 +58,33 @@ class AuthController < ApplicationController
   end
   get '/me' do
     requires_login!
-    principal.to_json(include: :roles)
+    principal.to_json(include: [:roles,:avatar_url], except: [:id, :active, :password, :salt])
+  end
+  post '/me' do
+    requires_login!
+    user_param_presence!
+    user = User[principal.id]
+
+    if params[:user][:passwordCurrent]
+      error_message = { :passwordCurrent => [ 'incorrect password' ] }
+      json_halt 400, error_message unless user.password_matches?(params[:user][:passwordCurrent])
+
+      params[:user].delete 'passwordConfirmation'
+      params[:user].delete 'passwordCurrent'
+
+      user.set_fields params[:user], [:password]
+      json_halt 400, user.errors unless user.valid?
+
+      e_password = user.encrypted_password(params[:user][:password] || "", user.salt)
+      user.set_fields e_password, [:password]
+    end
+
+    user.set_fields params[:user], [:email, :catchphrase]
+    json_halt 400, user.errors unless user.valid?
+    user.save
+    status 200
+    logger.info "#{user.username} successfully updated"
+    json :id => user.id
   end
   helpers do
     def find_role!(role_id)

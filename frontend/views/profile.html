@@ -1,0 +1,72 @@
+<div class="me" ng-hide="!user">
+  <div ng-hide="edit" class="pull-right btn-group" role="group">
+    <button class="btn btn-default" type="submit" ng-click="editProfile()">Update</button>
+    <button class="btn btn-warning" type="submit" ng-click="logout()">Logout</button>
+  </div>
+  <div class="page-header">
+    <h2>
+      {{user.username}}
+    </h2>
+  </div>
+  <div ng-hide="edit" class="row">
+    <div class="col-sm-10">
+      <dl class="dl-horizontal">
+        <dt>Username</dt><dd>{{user.username}}</dd>
+        <dt>Email</dt><dd>{{user.email}}</dd>
+
+        <dt ng-hide="!user.catchphrase">Catchphrase</dt>
+        <dd ng-hide="!user.catchphrase">“{{user.catchphrase}}”</dd>
+
+        <dt ng-show="user.roles.length">Roles</dt>
+        <dd ng-show="user.roles.length">
+          <ul class="list-unstyled">
+            <li ng-repeat="role in user.roles">{{role}}</li>
+          </ul>
+        </dd>
+      </dl>
+    </div>
+    <div class="col-sm-2">
+      <div ng-hide="!user.avatar_url" class="thumbnail">
+        <img ng-src="{{user.avatar_url}}" alt="avatar" />
+      </div>
+    </div>
+  </div>
+  <form ng-show="edit" ng-submit="saveProfile()" class="form-horizontal">
+    <form-input
+      label="Email"
+      type="text"
+      model="user.email"
+      error-model="errors.email"
+      >
+    </form-input>
+    <form-input
+      label="Catchphrase"
+      type="text"
+      model="user.catchphrase"
+      error-model="errors.catchphrase"
+      >
+    </form-input>
+    <form-input
+      label="Current Password"
+      type="password"
+      model="user.passwordCurrent"
+      error-model="errors.passwordCurrent"
+      >
+    </form-input>
+    <form-input
+      label="New Password"
+      type="password"
+      model="user.password"
+      error-model="errors.password"
+      >
+    </form-input>
+    <form-input
+      label="Confirm Password"
+      type="password"
+      model="user.passwordConfirmation"
+      error-model="errors.passwordConfirmation"
+      >
+    </form-input>
+    <button type="submit" class="btn btn-default">Update</button>
+  </form>
+</div>

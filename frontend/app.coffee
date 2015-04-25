@@ -26,6 +26,11 @@ app.config([
         templateUrl: "dashboard.html"
         controller: "DashboardController"
       })
+      .when("/profile", {
+        templateUrl: "profile.html"
+        controller: "ProfileController"
+        auth: true
+      })
       .when("/seasons", {
         templateUrl: "seasons.html"
         controller: "SeasonDashController"
