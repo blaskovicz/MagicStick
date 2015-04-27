@@ -1,6 +1,6 @@
-# MagicStick
+# MagicStick [![Build Status](https://travis-ci.org/blaskovicz/MagicStick.svg?branch=master)](https://travis-ci.org/blaskovicz/MagicStick) [![Heroku](https://heroku-badge.herokuapp.com/?app=magic-stick&style=flat)](https://dashboard.heroku.com/apps/magic-stick/activity)
 
-Create leagues and matches for yourself and friends.
+> Create leagues and matches for yourself and friends.
 
 # Developing
 
