@@ -20,7 +20,7 @@ angular.module("MagicStick.controllers").controller "ProfileController", [
                 # hack to force image reloading
                 $scope.user.avatar_url += "?" + Math.random()
 
-    $http.get("/api/auth/me").then (response) ->
+    User.get().then (response) ->
       $scope.user = response.data
 
     $scope.logout = -> User.logout()

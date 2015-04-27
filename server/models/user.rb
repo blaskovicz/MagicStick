@@ -29,13 +29,17 @@ class User < Sequel::Model
     return false if self.salt.nil? or self.password.nil?
     self.password == encrypted_password(raw_password, self.salt)[:password]
   end
+  def avatar_url
+    hash = Digest::MD5.hexdigest(if self.email then self.email.strip.downcase else "" end)
+    if self.avatar
+      "/api/auth/users/#{self.id}/avatar"
+    else
+      hash = Digest::MD5.hexdigest(self.email ? self.email.strip.downcase : "")
+      "https://secure.gravatar.com/avatar/#{hash}?s=155&d=identicon"
+    end
+  end
   # TODO add a concept of visibility that all classes can utilize
   def self.public_attrs
     [:username, :id]
-  end
-  def avatar_url
-    hash = Digest::MD5.hexdigest(if self.email then self.email.strip.downcase else "" end)
-    self.avatar ? "/api/auth/users/#{self.id}/avatar"
-      : "https://secure.gravatar.com/avatar/#{hash}?s=155&d=identicon"
   end
 end

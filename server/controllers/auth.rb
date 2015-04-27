@@ -98,7 +98,7 @@ class AuthController < ApplicationController
     json_halt 400, user.errors unless user.valid?
     user.save
     logger.info "#{user.username} avatar uploaded"
-    status 200
+    status 204
   end
   helpers do
     def find_role!(role_id)

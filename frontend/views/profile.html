@@ -1,5 +1,5 @@
-<div class="me" ng-hide="!user">
-  <div ng-hide="edit" class="pull-right btn-group" role="group">
+<div class="me" ng-show="user">
+  <div ng-show="!edit" class="pull-right btn-group" role="group">
     <button class="btn btn-default" type="submit" ng-click="editProfile()">Update</button>
     <button class="btn btn-warning" type="submit" ng-click="logout()">Logout</button>
   </div>
@@ -8,14 +8,14 @@
       {{user.username}}
     </h2>
   </div>
-  <div ng-hide="edit" class="row">
+  <div ng-show="!edit" class="row">
     <div class="col-sm-10">
       <dl class="dl-horizontal">
         <dt>Username</dt><dd>{{user.username}}</dd>
         <dt>Email</dt><dd>{{user.email}}</dd>
 
-        <dt ng-hide="!user.catchphrase">Catchphrase</dt>
-        <dd ng-hide="!user.catchphrase">“{{user.catchphrase}}”</dd>
+        <dt ng-show="user.catchphrase">Catchphrase</dt>
+        <dd ng-show="user.catchphrase">“{{user.catchphrase}}”</dd>
 
         <dt ng-show="user.roles.length">Roles</dt>
         <dd ng-show="user.roles.length">
@@ -26,27 +26,6 @@
       </dl>
     </div>
     <div class="col-sm-2">
-      <style>
-        #avatar-selector {
-          cursor: pointer;
-          position: relative;
-        }
-        #avatar-selector:hover:after {
-          content: 'Upload';
-          display: block;
-          position: absolute;
-          font-size: 2em;
-          color: white;
-          background-color: rgba(0, 0, 0, 0.5);
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          text-align: center;
-          padding-top: 45%;
-          pointer-events: none;
-        }
-      </style>
       <div class="thumbnail" id="avatar-selector">
         <a ngf-select ng-model="avatars">
           <img ng-src="{{user.avatar_url}}" alt="avatar" />

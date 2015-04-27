@@ -53,14 +53,6 @@ describe "Authentication" do
       }
       expect(last_response.status).to equal(200)
       expect(JSON.parse(last_response.body)).to have_key("id")
-      authorize 'unit-test-account', 'unit-test-new-password'
-      post '/me', {
-        :user => {
-          :passwordCurrent => 'unit-test-new-password',
-          :password => 'unit-test-password',
-          :passwordConfirmation => 'unit-test-password',
-        }
-      }
     end
   end
 end

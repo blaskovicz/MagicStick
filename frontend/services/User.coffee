@@ -41,8 +41,10 @@ angular.module("MagicStick.services").factory "User", [
           .error (data, status, headers) ->
             promise.reject(data?.errors ? "Invalid credentials")
         promise.promise
-      loadPrincipal: ->
+      get: ->
         $http.get("/api/auth/me")
+      loadPrincipal: ->
+        @get()
           .success (data) =>
             @parsePrincipal(data)
           .error (data, status, headers) =>
