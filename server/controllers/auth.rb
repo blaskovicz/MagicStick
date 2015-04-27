@@ -15,12 +15,16 @@ class AuthController < ApplicationController
         .to_json(root: true, :only => [:username, :id])
     else
       requires_role! :admin
-      User.to_json(root: true)
+      User.to_json(root: true, exclude: :avatar)
     end
   end
   get '/users/:user_id' do
     requires_role! :admin
     json :user => @user
+  end
+  get '/users/:user_id/avatar' do
+    content_type 'image/png' # probably wrong, but it works
+    @user.avatar
   end
   delete '/users/:user_id' do
     requires_role! :admin
@@ -58,7 +62,43 @@ class AuthController < ApplicationController
   end
   get '/me' do
     requires_login!
-    principal.to_json(include: :roles)
+    principal.to_json(include: [:roles,:avatar_url], except: [:id, :active, :password, :salt, :avatar])
+  end
+  post '/me' do
+    requires_login!
+    user_param_presence!
+    user = User[principal.id]
+
+    if params[:user][:passwordCurrent]
+      error_message = { :passwordCurrent => [ 'incorrect password' ] }
+      json_halt 400, error_message unless user.password_matches?(params[:user][:passwordCurrent])
+
+      params[:user].delete 'passwordConfirmation'
+      params[:user].delete 'passwordCurrent'
+
+      user.set_fields params[:user], [:password]
+      json_halt 400, user.errors unless user.valid?
+
+      e_password = user.encrypted_password(params[:user][:password] || "", user.salt)
+      user.set_fields e_password, [:password]
+    end
+
+    user.set_fields params[:user], [:email, :catchphrase]
+    json_halt 400, user.errors unless user.valid?
+    user.save
+    status 200
+    logger.info "#{user.username} successfully updated"
+    json :id => user.id
+  end
+  post '/me/avatar' do
+    json_halt 413, { :avatar => [ 'avatar must be less than 1mb' ] } if request.content_length.to_i > 1024 * 1024
+    requires_login!
+    user = User[principal.id]
+    user.avatar = Sequel.blob(params['file'][:tempfile].read)
+    json_halt 400, user.errors unless user.valid?
+    user.save
+    logger.info "#{user.username} avatar uploaded"
+    status 204
   end
   helpers do
     def find_role!(role_id)

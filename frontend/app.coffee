@@ -4,6 +4,7 @@ app = angular.module("MagicStick", [
   "ngRoute"
   "toastr"
   "ui.bootstrap"
+  "ngFileUpload"
   "MagicStick.controllers"
   "MagicStick.services"
   "MagicStick.directives"
@@ -25,6 +26,11 @@ app.config([
       .when("/", {
         templateUrl: "dashboard.html"
         controller: "DashboardController"
+      })
+      .when("/profile", {
+        templateUrl: "profile.html"
+        controller: "ProfileController"
+        auth: true
       })
       .when("/seasons", {
         templateUrl: "seasons.html"
