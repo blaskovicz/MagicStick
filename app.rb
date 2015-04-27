@@ -16,4 +16,7 @@ class ApplicationController < Sinatra::Base
     set :logging, true
     set :method_override, false
   end
+  before do
+    content_type "application/json"
+  end
 end

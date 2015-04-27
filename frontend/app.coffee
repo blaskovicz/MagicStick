@@ -4,6 +4,7 @@ app = angular.module("MagicStick", [
   "ngRoute"
   "toastr"
   "ui.bootstrap"
+  "ngFileUpload"
   "MagicStick.controllers"
   "MagicStick.services"
   "MagicStick.directives"
@@ -26,10 +27,35 @@ app.config([
         templateUrl: "dashboard.html"
         controller: "DashboardController"
       })
+      .when("/profile", {
+        templateUrl: "profile.html"
+        controller: "ProfileController"
+        auth: true
+      })
       .when("/seasons", {
         templateUrl: "seasons.html"
         controller: "SeasonDashController"
         auth: true
+      })
+      .when("/seasons/:seasonId", {
+        templateUrl: "season-manage.html"
+        controller: "SeasonManageController"
+        auth: true
+        resolve:
+          season: [
+            "$route", "$q", "$http",
+            ($route, $q, $http) ->
+              #TODO move some of the $http stuff into service objects
+              promise = $q.defer()
+              seasonId = $route.current.params.seasonId
+              if not /^\d+$/.test(seasonId)
+                promise.reject("Invalid season id, must be numeric")
+              else
+                $http.get("/api/match/seasons/#{seasonId}")
+                  .success (data) -> promise.resolve(data)
+                  .error (data) -> promise.reject(data)
+              promise.promise
+          ]
       })
       .otherwise(redirectTo: "/")
     $locationProvider.html5Mode false
@@ -54,6 +80,8 @@ app.run([
     notAuthorizedRedirect = ->
       $location.path("/").replace()
       toastr.warning "You're not authorized to access this page"
+    $rootScope.$on "$routeChangeError", ->
+      toastr.warning "An error occurred loading this page"
     $rootScope.$on "$routeChangeStart", (event, next) ->
       return unless next.auth
       type = typeof next.auth

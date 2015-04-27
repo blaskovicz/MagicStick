@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+require "bundler/setup"
+require "irb"
+require_relative "../db/init"
+file_dir = File.expand_path File.dirname(__FILE__) 
+Dir["#{file_dir}/../server/models/*.rb"].each do |file|
+  require_relative file
+end
+puts "Console loaded..."
+IRB.start(__FILE__)

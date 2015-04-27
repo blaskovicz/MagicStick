@@ -1,8 +1,9 @@
-require 'date'
 require 'digest/sha2'
 class User < Sequel::Model
   plugin :validation_helpers
   many_to_many :roles, :left_key => :user_id, :right_key => :role_id, :join_table => :users_roles
+  many_to_many :season_memberships, :class => :Season, :left_key => :user_id, :right_key => :season_id, :join_table => :users_seasons
+  one_to_many :managed_seasons, :class => :Season, :key => :owner_id
   def validate
     super
     validates_presence [:username, :password, :email]
@@ -13,7 +14,6 @@ class User < Sequel::Model
   end
   def before_create
     super
-    self.created = DateTime.now
     self.active = true
     e_password = encrypted_password(self.password)
     self.salt = e_password[:salt]
@@ -28,5 +28,18 @@ class User < Sequel::Model
   def password_matches?(raw_password)
     return false if self.salt.nil? or self.password.nil?
     self.password == encrypted_password(raw_password, self.salt)[:password]
+  end
+  def avatar_url
+    hash = Digest::MD5.hexdigest(if self.email then self.email.strip.downcase else "" end)
+    if self.avatar
+      "/api/auth/users/#{self.id}/avatar"
+    else
+      hash = Digest::MD5.hexdigest(self.email ? self.email.strip.downcase : "")
+      "https://secure.gravatar.com/avatar/#{hash}?s=155&d=identicon"
+    end
+  end
+  # TODO add a concept of visibility that all classes can utilize
+  def self.public_attrs
+    [:username, :id]
   end
 end

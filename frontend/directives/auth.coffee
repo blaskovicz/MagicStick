@@ -8,6 +8,7 @@ angular.module("MagicStick.directives").directive("auth", [
       $scope.$watch(
         -> User,
         ->
+          $scope.username = User.username
           authed = false
           rolesRequired = attrs.auth
           if rolesRequired is ""

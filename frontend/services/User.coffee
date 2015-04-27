@@ -39,12 +39,17 @@ angular.module("MagicStick.services").factory "User", [
             @broadcastLoginStateChange()
             promise.resolve()
           .error (data, status, headers) ->
-            promise.reject(data)
+            promise.reject(data?.errors ? "Invalid credentials")
         promise.promise
-      loadPrincipal: ->
+      get: ->
         $http.get("/api/auth/me")
+      loadPrincipal: ->
+        @get()
           .success (data) =>
             @parsePrincipal(data)
+          .error (data, status, headers) =>
+            $log.warn("Couldn't load auth data: #{data}")
+            @logout() if status is 401
       parsePrincipal: (data) ->
         return unless data?
         @roles = {}

@@ -1,0 +1,14 @@
+language: ruby
+rvms:
+    - 2.1.5
+before_script:
+    - gem install sass
+    - npm install
+script:
+    - grunt test
+deploy:
+    provider: heroku
+    app: magic-stick
+    run: 'bundle exec rake db:migrate'
+    api_key:
+        secure: IZuMSkfODCW7ImwQofERlr9lLYyff5Jn9SVpuKQ0+1wHmq+ycePd+mC/Axes8HBu0NQHI4nopdJvPNOGW2m4Zy+mARPOCmcAgZBY6kw+YHIBJafAyw/PuaoIDDHxBbN6U1wDg/cspNQYEzIVTEO2s86QxBfsY23UdPaZ4CDzJH0=

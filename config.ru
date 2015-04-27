@@ -12,7 +12,7 @@ root_dir = File.dirname(__FILE__)
 end
 # for some reason this was the only place I could register the helper
 # with the controller; i'm sure there is a better way TODO
-ApplicationController.helpers Auth
+ApplicationController.helpers Request, Auth
 use Rack::Parser, :content_types => {
   'application/json' => Proc.new { |body| ::MultiJson.decode body }
 }
@@ -21,3 +21,4 @@ use Rack::Parser, :content_types => {
 map('/'){ run ViewController }
 map('/api/meta'){ run StatusCheckController }
 map('/api/auth'){ run AuthController }
+map('/api/match'){ run MatchController }
