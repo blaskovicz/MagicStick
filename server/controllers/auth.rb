@@ -23,7 +23,7 @@ class AuthController < ApplicationController
     json :user => @user
   end
   get '/users/:user_id/avatar' do
-    content_type 'image/png' # probably wrong, but it works
+    content_type @user.avatar_content_type
     @user.avatar
   end
   delete '/users/:user_id' do
@@ -83,7 +83,7 @@ class AuthController < ApplicationController
       user.set_fields e_password, [:password]
     end
 
-    user.set_fields params[:user], [:email, :catchphrase]
+    user.set_fields params[:user], [:name, :email, :catchphrase]
     json_halt 400, user.errors unless user.valid?
     user.save
     status 200
@@ -94,7 +94,8 @@ class AuthController < ApplicationController
     json_halt 413, { :avatar => [ 'avatar must be less than 1mb' ] } if request.content_length.to_i > 1024 * 1024
     requires_login!
     user = User[principal.id]
-    user.avatar = Sequel.blob(params['file'][:tempfile].read)
+    user.avatar_content_type = params[:file][:type]
+    user.avatar = Sequel.blob(params[:file][:tempfile].read)
     json_halt 400, user.errors unless user.valid?
     user.save
     logger.info "#{user.username} avatar uploaded"

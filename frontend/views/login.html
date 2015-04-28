@@ -35,13 +35,18 @@
           <label for="password-s-confirm">Confirm-Password</label>
           <input class="form-control" id="password-s-confirm" type="password" ng-model="signup.passwordConfirmation">
         </div>
+        <div class="form-group" ng-class="{'has-error': signupError.name != null}">
+          <label for="name">Name</label>
+          <input class="form-control" id="name" type="text" ng-model="signup.name">
+          <span class="help-block" ng-if="signupError.name != null" ng-bind="signupError.name.join(',')"></span>
+        </div>
         <div class="form-group" ng-class="{'has-error': signupError.email != null}">
           <label for="email">Email</label>
           <input class="form-control" id="email" type="text" ng-model="signup.email">
           <span class="help-block" ng-if="signupError.email != null" ng-bind="signupError.email.join(',')"></span>
         </div>
         <button
-          ng-disabled="signup.passwordConfirmation != signup.password || signup.password == '' || signup.password == null || signup.username == '' || signup.username == null || signup.email == '' || signup.email == null"
+          ng-disabled="signup.passwordConfirmation != signup.password || signup.password == '' || signup.password == null || signup.username == '' || signup.username == null || signup.name == '' || signup.name == null || signup.email == '' || signup.email == null"
           class="btn" type="submit">
           Sign Up
         </button>

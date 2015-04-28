@@ -17,8 +17,11 @@ angular.module("MagicStick.controllers").controller "ProfileController", [
                   file: avatar
               }).success (data, status, headers, config) ->
                 toastr.success "Avatar updated"
-                # hack to force image reloading
-                $scope.user.avatar_url += "?" + Math.random()
+                User.get().then (response) ->
+                  $scope.user = response.data
+
+                  # hack to force image reloading
+                  $scope.user.avatar_url += "?" + Math.random()
 
     User.get().then (response) ->
       $scope.user = response.data
