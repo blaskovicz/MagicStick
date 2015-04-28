@@ -6,6 +6,10 @@ class MatchController < ApplicationController
     @season = Season[id: params[:season_id]]
     json_halt 404, "Season #{params[:season_id]} couldn't be found" if @season.nil?
   end
+  before %r{^/seasons/(?<season_id>[^/]+)/comments/(?<comment_id>[^/]+)} do
+    @season_comment = @season.season_comments_dataset.where(id: params[:comment_id]).select_all(:seasons_comments).first
+    json_halt 404, "Comment #{params[:comment_id]} couldn't be found in season #{params[:season_id]}" if @season_comment.nil?
+  end
   before %r{/seasons/(?<season_id>[^/]+)/match-groups/(?<match_group_id>[^/]+)/matches/(?<match_id>[^/]+)} do
     # there has to be an easier way to do this? TODO
     @match = Match
@@ -56,6 +60,54 @@ class MatchController < ApplicationController
       },
       :owner => {:only => User.public_attrs},
       :members => {:only => User.public_attrs}
+    })
+  end
+  get '/seasons/:season_id/comments/:comment_id' do
+    @season_comment.to_json(root: true, include: {
+      user: {
+        only: User.public_attrs
+      }
+    })
+  end
+  post '/seasons/:season_id/comments' do
+    comment = SeasonComment.new
+    comment.user = principal
+    comment.season = @season
+    comment.comment = params[:comment]
+    json_halt 400, comment.errors unless comment.valid?
+    comment.save
+    status 201
+    comment.to_json(root: true, include: {
+      user: {
+        only: User.public_attrs
+      }
+    })
+  end
+  put '/seasons/:season_id/comments/:comment_id' do
+    requires_seasoncomment_owner!
+    @season_comment.comment = params[:comment]
+    json_halt 400, @season_comment.errors unless @season_comment.valid?
+    @season_comment.save
+    status 200
+    @season_comment.to_json(root: true, include: {
+      user: {
+        only: User.public_attrs
+      }
+    })
+  end
+  delete '/seasons/:season_id/comments/:comment_id' do
+    halt_403 unless (
+      (@season_comment.user == principal) || (@season.owner == principal)
+    )
+    @season_comment.hidden = true
+    @season_comment.save
+    status 204
+  end
+  get '/seasons/:season_id/comments' do
+    @season.season_comments_dataset.to_json(root: true, include: {
+      user: {
+        only: User.public_attrs
+      }
     })
   end
   put '/seasons/:season_id/match-groups/:group_id/matches/:match_id/members/:member_id' do |season_id, group_id, match_id, member_id|
@@ -180,6 +232,11 @@ class MatchController < ApplicationController
     status 204
   end
   helpers do
+    def requires_seasoncomment_owner!
+      halt_403 unless (
+        @season_comment.user == principal
+      )
+    end
     def requires_match_membership!
       halt_403 unless (
         @season.owner == principal ||

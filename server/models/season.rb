@@ -1,6 +1,7 @@
 class Season < Sequel::Model
   plugin :validation_helpers
   one_to_many :season_match_groups
+  one_to_many :season_comments
   many_to_many :members, :class => :User, :left_key => :season_id, :right_key => :user_id, :join_table => :users_seasons
   many_to_one :owner, :class => :User, :key => :owner_id
   def validate

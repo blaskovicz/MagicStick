@@ -5,6 +5,7 @@ app = angular.module("MagicStick", [
   "toastr"
   "ui.bootstrap"
   "ngFileUpload"
+  "hc.marked"
   "MagicStick.controllers"
   "MagicStick.services"
   "MagicStick.directives"
@@ -65,6 +66,13 @@ app.config([
   "$logProvider"
   ($logProvider) ->
     $logProvider.debugEnabled true
+]).config([
+  "markedProvider"
+  (markedProvider) ->
+    markedProvider.setOptions {
+      gfm: true
+      tables: true
+    }
 ])
 
 # auth shim

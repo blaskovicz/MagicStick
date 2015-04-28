@@ -234,4 +234,110 @@
         </button>
     </div>
   </div>
+
+  <div class="panel panel-default comments" auth>
+    <div class="panel-heading">Comments</div>
+    <div class="panel-body">
+      <div ng-if="!comment.hidden" class="panel panel-info comment-cell" ng-repeat="comment in comments">
+        <div class="header panel-heading">
+          <b>{{comment.user.username}}</b> added a comment at {{comment.created_at}}
+          <i
+            title="Updated at {{comment.updated_at}}"
+            ng-if="comment.created_at != comment.updated_at">
+            (editted)
+          </i>
+          <div class="pull-right">
+            <button
+              ng-click="deleteComment(comment)"
+              ng-if="seasonOwner() || hasCommentPrivs(comment)"
+              type="button"
+              class="btn btn-xs btn-default">
+              Delete
+            </button>
+            <button
+              ng-disabled="comment.editMode"
+              ng-if="hasCommentPrivs(comment)"
+              type="button"
+              ng-click="enterEditMode(comment)"
+              class="btn btn-xs btn-default">
+              Edit
+            </button>
+          </div>
+        </div>
+        <div class="body panel-body">
+          <div
+            ng-if="!comment.editMode"
+            marked="comment.comment">
+          </div>
+          <div
+            ng-if="comment.editMode">
+            <tabset>
+              <tab heading="Write">
+                <div class="form-group" ng-class="{'has-error': comment.error != null}">
+                  <textarea
+                    rows="4"
+                    class="form-control edit-comment"
+                    ng-model="comment.comment">
+                  </textarea>
+                  <span class="help-block" ng-if="comment.error">
+                    {{comment.error}}
+                  </span>
+                </div>
+              </tab>
+              <tab heading="Preview">
+                <div marked="comment.comment" class="preview"></div>
+              </tab>
+            </tabset>
+            <button
+              ng-disabled="commentUnchanged(comment)"
+              ng-click="updateComment(comment)"
+              type="button"
+              class="btn btn-success">
+              Save
+            </button>
+            <button
+              ng-click="cancelEditMode(comment)"
+              type="button"
+              class="btn">
+              Cancel
+            </button>
+            <span class="markdown-help">
+              <a href="https://guides.github.com/features/mastering-markdown/" target="_blank">Markdown</a> supported
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="new-comment">
+        <!-- TODO directive for comment editting / creation -->
+        <h3>Add A Comment</h3>
+        <tabset>
+          <tab heading="Write">
+            <div class="form-group" ng-class="{'has-error': comment.error != null}">
+              <textarea
+                rows="4"
+                class="form-control new-comment"
+                ng-model="comment.comment">
+              </textarea>
+              <span class="help-block" ng-if="comment.error">
+                {{comment.error}}
+              </span>
+            </div>
+          </tab>
+          <tab heading="Preview">
+            <div marked="comment.comment" class="preview"></div>
+          </tab>
+        </tabset>
+        <button
+          ng-disabled="commentUnchanged(comment)"
+          ng-click="addComment(comment)"
+          type="button"
+          class="btn btn-success">
+          Submit
+        </button>
+        <span class="markdown-help">
+          <a href="https://guides.github.com/features/mastering-markdown/" target="_blank">Markdown</a> supported
+        </span>
+      </div>
+    </div>
+  </div>
 </div>

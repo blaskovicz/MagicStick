@@ -1,6 +1,7 @@
 require 'digest/sha2'
 class User < Sequel::Model
   plugin :validation_helpers
+  one_to_many :season_comments
   many_to_many :roles, :left_key => :user_id, :right_key => :role_id, :join_table => :users_roles
   many_to_many :season_memberships, :class => :Season, :left_key => :user_id, :right_key => :season_id, :join_table => :users_seasons
   one_to_many :managed_seasons, :class => :Season, :key => :owner_id

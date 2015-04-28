@@ -6,6 +6,9 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
   "toastr"
   ($scope, User, $http, season, toastr) ->
     $scope.season = season
+    $scope.comment =
+      comment: ""
+      savedComment: ""
     $scope.isCurrentUser = (username) -> username is User.username
     $scope.seasonOwner = ->
       season?.owner?.username is User.username
@@ -111,6 +114,55 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         .error (data) ->
           toastr.error \
             "Couldn't update member match status: #{data.errors ? data}"
+    $scope.hasCommentPrivs = (comment) ->
+      comment?.user?.username is User.username
+    $scope.deleteComment = (comment) ->
+      $http.delete("/api/match/seasons/#{season.id}/comments/#{comment.id}")
+        .success ->
+          toastr.success "Comment successfully deleted"
+          comment.hidden = true
+        .error (data) ->
+          toastr.error "Comment couldn't be deleted: #{data.errors ? data}"
+    #TODO DRY all these up into services
+    $scope.addComment = (comment) ->
+      $http.post("/api/match/seasons/#{season.id}/comments", {
+        comment: comment.comment
+      })
+        .success (fullComment) ->
+          toastr.success "Comment successfully created"
+          $scope.comments ?= []
+          $scope.comments.push fullComment.season_comment
+          $scope.comment =
+            comment: ""
+            savedComment: ""
+        .error (data) ->
+          toastr.error "Comment couldn't be created"
+          comment.error = if data.errors?.comment?
+            data.errors.comment.join(", ")
+          else
+            data
+    $scope.updateComment = (comment) ->
+      return if comment.savedComment is comment.comment
+      $http.put("/api/match/seasons/#{season.id}/comments/#{comment.id}", {
+        comment: comment.comment
+      }).success (newFields) ->
+          toastr.success "Comment successfully updated"
+          comment.updated_at = newFields.season_comment.updated_at
+          comment.editMode = false
+        .error (data) ->
+          toastr.error "Couldn't update comment"
+          comment.error = if data.errors?.comment?
+            data.errors.comment.join(", ")
+          else
+            data
+    $scope.enterEditMode = (comment) ->
+      comment.savedComment = comment.comment
+      comment.editMode = true
+    $scope.cancelEditMode = (comment) ->
+      comment.comment = comment.savedComment
+      comment.editMode = false
+    $scope.commentUnchanged = (comment) ->
+      comment.savedComment is comment.comment
     # reload the members of the match from the api since the json
     # format is non-trivial
     refreshMatchMembers = (groupId, matchId) ->
@@ -132,4 +184,7 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
     matchPath = (groupId, matchId) ->
       "/api/match/seasons/#{season.id}"+ \
       "/match-groups/#{groupId}/matches/#{matchId}"
+    $http.get("/api/match/seasons/#{season.id}/comments")
+      .success (comments) ->
+        $scope.comments = comments?.season_comments ? []
 ]

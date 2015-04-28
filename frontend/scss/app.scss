@@ -23,3 +23,11 @@
   padding-top: 45%;
   pointer-events: none;
 }
+div.panel.comments {
+  div.preview {
+    min-height: 60px;
+  }
+}
+span.markdown-help {
+  font-size: 10pt;
+}
