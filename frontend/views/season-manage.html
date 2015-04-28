@@ -1,7 +1,7 @@
 <div class="season-manage">
   <div class="page-header">
     <!-- TODO breadcrumb directive -->
-    <h2><a href="/#!/seasons">Seasons</a> &gt; {{season.id}}</h2>
+    <h2><a href="/#!/seasons">Seasons</a> &gt; {{season.name}} [id: {{season.id}}]</h2>
   </div>
   <!-- TODO directives for these tabs / panes -->
   <div class="panel panel-default">
@@ -85,12 +85,6 @@
           <td><h3>{{group.name}}</h3></td>
           <td>
             <button
-              type="button"
-              class="btn btn-default"
-              ng-click="group.viewingMatches = !group.viewingMatches">
-              {{group.viewingMatches ? "Hide Matches" : "View Matches (" + (group.matches == null ? "0" : group.matches.length) +")"}}
-            </button>
-            <button
               ng-if="seasonOwner()"
               type="button"
               class="btn btn-danger"
@@ -99,19 +93,24 @@
             </button>
           </td>
         </tr>
-        <tr ng-if="group.viewingMatches">
+        <tr>
           <td colspan="2">
             <div ng-repeat="match in group.matches" class="row">
               <div class="col-md-12">
                 <h3 ng-class="{'green-text': match.completed, 'purple-text': !match.completed}">
-                  Match #{{match.id}}
+                  Match "{{match.description}}" [id: {{match.id}}]
                   <button
                     type="button"
                     class="btn btn-danger"
+                    ng-if="seasonOwner()"
                     ng-click="deleteMatch(group.id, match.id)">
                     Delete
                   </button>
                 </h3>
+                <dl>
+                  <dt>Scheduled For</dt>
+                  <dd>{{match.scheduled_for}}</dd>
+                </dl>
 <!--              <a
                 ng-href="/#!/seasons/{{season.id}}/match-groups/{{group.id}}/matches/{{match.id}}">
                 Match #{{match.id}}
