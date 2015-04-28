@@ -16,6 +16,7 @@ describe "Authentication" do
           :username => 'unit-test-account',
           :password => 'unit-test-password',
           :passwordConfirmation => 'unit-test-password',
+          :name => 'Unit Test',
           :email => 'unit-test-email@example.com'
         }
       }
@@ -29,6 +30,7 @@ describe "Authentication" do
       authorize 'unit-test-account', 'unit-test-password'
       post '/me', {
         :user => {
+          :name => 'Unit Test',
           :email => 'unit-test-email@example.com',
           :catchphrase => 'catchphrase'
         }
@@ -45,6 +47,7 @@ describe "Authentication" do
       authorize 'unit-test-account', 'unit-test-password'
       post '/me', {
         :user => {
+          :name => 'Unit Test',
           :email => 'unit-test-email@example.com',
           :passwordCurrent => 'unit-test-password',
           :password => 'unit-test-new-password',

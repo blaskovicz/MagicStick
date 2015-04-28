@@ -11,7 +11,9 @@
   <div ng-show="!edit" class="row">
     <div class="col-sm-10">
       <dl class="dl-horizontal">
-        <dt>Username</dt><dd>{{user.username}}</dd>
+        <dt ng-show="user.name">Name</dt>
+        <dd ng-show="user.name">{{user.name}}</dd>
+
         <dt>Email</dt><dd>{{user.email}}</dd>
 
         <dt ng-show="user.catchphrase">Catchphrase</dt>
@@ -34,6 +36,13 @@
     </div>
   </div>
   <form ng-show="edit" ng-submit="saveProfile()" class="form-horizontal">
+    <form-input
+      label="Name"
+      type="text"
+      model="user.name"
+      error-model="errors.name"
+      >
+    </form-input>
     <form-input
       label="Email"
       type="text"
