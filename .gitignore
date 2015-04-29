@@ -9,4 +9,5 @@ public/bower_components
 public/css/app.css
 public/css/app.css.map
 public/js/templates.js
+public/js/tests.js
 *.db
