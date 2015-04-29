@@ -16,7 +16,7 @@ class AuthController < ApplicationController
           Sequel.ilike(:name, '%' + params[:matching] + '%') |
           Sequel.ilike(:email, params[:matching])
         ))
-        .to_json(root: true, :only => [:id, :username, :name, :avatar_url])
+        .to_json(root: true, :only => User.public_attrs)
     else
       requires_role! :admin
       User.to_json(root: true, exclude: :avatar)

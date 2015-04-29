@@ -43,6 +43,6 @@ class User < Sequel::Model
   end
   # TODO add a concept of visibility that all classes can utilize
   def self.public_attrs
-    [:username, :id]
+    [:id, :username, :name, :avatar_url, :catchphrase]
   end
 end
