@@ -4,6 +4,38 @@
 .purple-text {
   color: #6d426d;
 }
+.user-typeahead {
+  position: relative;
+  width: 250px;
+}
+.user-typeahead .avatar {
+  display: inline-block;
+}
+.user-typeahead span {
+  padding-left: 1em;
+}
+.user-typeahead span:first-of-type {
+  position: absolute;
+  top: 20%;
+}
+.user-typeahead span:last-of-type {
+  position: absolute;
+  bottom: 20%;
+}
+.avatar {
+    display: block;
+    overflow: hidden;
+}
+.avatar-64 {
+    height: 64px;
+    width: 64px;
+}
+.avatar img {
+    display: block;
+    min-width: 100%;
+    min-height: 100%;
+    -ms-interpolation-mode: bicubic; /* Scaled images look a bit better in IE now */
+}
 #avatar-selector {
   cursor: pointer;
   position: relative;

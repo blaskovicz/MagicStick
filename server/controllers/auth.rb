@@ -11,8 +11,12 @@ class AuthController < ApplicationController
     if params[:limitted]
       requires_login!
       params[:matching] ||= ""
-      User.where(Sequel.expr(active: true) & Sequel.like(:username, '%' + params[:matching] + '%'))
-        .to_json(root: true, :only => [:username, :id])
+      User.where(Sequel.expr(active: true) & (
+          Sequel.ilike(:username, '%' + params[:matching] + '%') |
+          Sequel.ilike(:name, '%' + params[:matching] + '%') |
+          Sequel.ilike(:email, params[:matching])
+        ))
+        .to_json(root: true, :only => User.public_attrs)
     else
       requires_role! :admin
       User.to_json(root: true, exclude: :avatar)

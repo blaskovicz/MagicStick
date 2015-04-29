@@ -30,6 +30,7 @@
             type="text"
             class="form-control"
             typeahead="user as user.username for user in findMembersMatching($viewValue)"
+            typeahead-template-url="user-typeahead.html"
             id="newMemberLookup"
             ng-model="newMember">
         </div>

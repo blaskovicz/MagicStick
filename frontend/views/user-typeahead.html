@@ -1,0 +1,9 @@
+<a>
+  <div class="user-typeahead">
+    <div class="avatar avatar-64">
+      <img ng-src="{{match.model.avatar_url}}" width="64" />
+    </div>
+    <span bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+    <span>{{match.model.name}}</span>
+  </div>
+</a>
