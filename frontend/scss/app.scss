@@ -23,18 +23,38 @@
   bottom: 20%;
 }
 .avatar {
-    display: block;
-    overflow: hidden;
+  display: block;
+  overflow: hidden;
+}
+p.navbar-text.profile {
+  margin-bottom: .2em;
+  margin-top: .8em;
+  a.profile {
+    &:hover {
+      color: #4183c4;
+      img.nav-avatar {
+        border-color: #77B5F2;
+      }
+    }
+    font-weight: bold;
+    text-decoration: none;
+    img.nav-avatar {
+      border-radius: 100%;
+      border: 2px solid rgb(216, 214, 214);
+      height: 32px;
+      width: 32px;
+    }
+  }
 }
 .avatar-64 {
-    height: 64px;
-    width: 64px;
+  height: 64px;
+  width: 64px;
 }
 .avatar img {
-    display: block;
-    min-width: 100%;
-    min-height: 100%;
-    -ms-interpolation-mode: bicubic; /* Scaled images look a bit better in IE now */
+  display: block;
+  min-width: 100%;
+  min-height: 100%;
+  -ms-interpolation-mode: bicubic; /* Scaled images look a bit better in IE now */
 }
 #avatar-selector {
   cursor: pointer;
@@ -59,7 +79,54 @@ div.panel.comments {
   div.preview {
     min-height: 60px;
   }
+  img.avatar {
+    display: inline-block;
+    border-radius: 100%;
+    border: 2px solid rgb(216, 214, 214);
+    height: 32px;
+    width: 32px;
+  }
 }
 span.markdown-help {
   font-size: 10pt;
+}
+div.season-members {
+  button.btn-danger {
+    vertical-align: top;
+  }
+}
+div.user-view {
+  margin: 0 5px 0 5px;
+  display: inline-block;
+  padding: 4px;
+  border-radius: 4px;
+  width: 200px;
+  height: 40px;
+  background-color: rgb(66, 17, 82);
+  color: rgb(252, 250, 250);
+  div.left {
+    float: left;
+    width: 25%;
+    img.cell-avatar {
+      border-radius: 100%;
+      border: 2px solid #9334D3;
+      height: 32px;
+      width: 32px;
+    }
+  }
+  div.right {
+    float: right;
+    width: 75%;
+    p {
+      font-size: 10pt;
+      margin: 0;
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      white-space: nowrap;
+      &.name {
+        font-size: 8pt;
+        color: rgb(198, 186, 210);
+      }
+    }
+  }
 }

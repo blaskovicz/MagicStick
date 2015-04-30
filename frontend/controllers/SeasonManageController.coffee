@@ -10,6 +10,8 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
       comment: ""
       savedComment: ""
     $scope.isCurrentUser = (username) -> username is User.username
+    $scope.userLabel = (user) ->
+      user.username + if user.name? then " (#{user.name})" else ""
     $scope.seasonOwner = ->
       season?.owner?.username is User.username
     $scope.createSeasonGrouping = (groupingName) ->

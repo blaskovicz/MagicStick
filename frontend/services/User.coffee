@@ -52,6 +52,7 @@ angular.module("MagicStick.services").factory "User", [
             @logout() if status is 401
       parsePrincipal: (data) ->
         return unless data?
+        @avatar_url = data.avatar_url
         @roles = {}
         for role in data.roles
           @roles[role.name] = true
@@ -59,6 +60,7 @@ angular.module("MagicStick.services").factory "User", [
         @loggedIn = false
         @username = ""
         @roles = {}
+        @avatar_url = null
         delete $http.defaults.headers.common['Authorization']
         localStorageService.set('currentUser', null)
         @broadcastLoginStateChange()

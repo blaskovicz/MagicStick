@@ -35,7 +35,7 @@ class MatchController < ApplicationController
     else
       seasons = Season.filter(owner_id: principal.id)
     end
-    seasons.to_json(root: true, include: {:owner => {:only => [:username]}})
+    seasons.to_json(root: true, include: {:owner => {:only => User.public_attrs}})
   end
   get '/seasons/:season_id' do
     @season.to_json(include: {

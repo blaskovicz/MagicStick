@@ -43,19 +43,19 @@
         </button>
       </form>
     </div>
-    <table class="table">
-      <tr ng-repeat="member in season.members">
-        <td>{{member.username}}</td>
-        <td ng-if="seasonOwner()">
-          <button
-            type="button"
-            class="btn btn-danger"
-            ng-click="removeSeasonMember(member)">
-            Remove
-          </button>
-        </td>
-      </tr>
-    </table>
+    <div class="season-members">
+      <div
+        ng-repeat="member in season.members">
+        <user-view user="member"></user-view>
+        <button
+          ng-if="seasonOwner()"
+          type="button"
+          class="btn btn-danger"
+          ng-click="removeSeasonMember(member)">
+          Remove
+        </button>
+      </div>
+    </div>
   </div>
   <div class="panel panel-default">
     <div class="panel-heading">Match Groups</div>
@@ -126,7 +126,7 @@
                           id="nextMatchMember"
                           class="form-control"
                           ng-model="nextMatchMember"
-                          ng-options="user as user.username for user in season.members">
+                          ng-options="user as userLabel(user) for user in season.members">
                         </select>
                       </div>
                       <button
@@ -140,7 +140,7 @@
                     <table class="table">
                       <tr ng-repeat="user_season_match in match.user_season_match">
                         <td>
-                          {{user_season_match.user_season.user.username}}
+                          <user-view user="user_season_match.user_season.user"></user-view>
                         </td>
                         <td ng-if="!seasonOwner() && !isMatchMember(match)">
                           {{
@@ -240,7 +240,7 @@
     <div class="panel-body">
       <div ng-if="!comment.hidden" class="panel panel-info comment-cell" ng-repeat="comment in comments">
         <div class="header panel-heading">
-          <b>{{comment.user.username}}</b> added a comment at {{comment.created_at}}
+          <b><img class="avatar" ng-src="{{comment.user.avatar_url}}"/> {{comment.user.username}}</b> added a comment at {{comment.created_at}}
           <i
             title="Updated at {{comment.updated_at}}"
             ng-if="comment.created_at != comment.updated_at">

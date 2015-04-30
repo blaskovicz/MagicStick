@@ -1,3 +1,15 @@
-<div class="user-view" ng-if="user.loggedIn">
-  <span>Logged in as {{user.username}} <i><a ng-click="logout()">logout?</a></i></span>
+<div class="user-view clearfix">
+  <div class="left">
+    <img
+      class="cell-avatar"
+      ng-src="{{user().avatar_url}}"/>
+  </div>
+  <div class="right">
+    <p class="username">
+      {{user().username}}
+    </p>
+    <p class="name" ng-if="user().name != null">
+      {{user().name}}
+    </p>
+  </div>
 </div>
