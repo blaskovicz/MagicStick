@@ -216,7 +216,9 @@ class MatchController < ApplicationController
     # TODO
     # cases: (owner vs not), (invite_only vs not), (invited vs not), (auto join vs not), (archived vs not) 
     requires_season_owner!
-    @season.add_member @member
+    if @season.members_dataset.where(users__id: member_id).first.nil?
+      @season.add_member @member
+    end
     status 204
   end
   delete '/seasons/:season_id/members/:member_id' do |season_id, member_id|
