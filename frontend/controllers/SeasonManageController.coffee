@@ -9,11 +9,27 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
     $scope.comment =
       comment: ""
       savedComment: ""
+    $scope.bestOfOptions = [
+      {id: 1, name: "one"}
+      {id: 3, name: "three"}
+      {id: 5, name: "five"}
+      {id: 7, name: "seven"}
+      {id: 11, name: "eleven"}
+    ]
     $scope.isCurrentUser = (username) -> username is User.username
     $scope.userLabel = (user) ->
       user.username + if user.name? then " (#{user.name})" else ""
     $scope.seasonOwner = ->
       season?.owner?.username is User.username
+    $scope.matchStatusAlias = (status) ->
+      if status is false
+        "Loss"
+      else if status is true
+        "Win"
+      else if not status?
+        "Not Played"
+      else
+        "??"
     $scope.createSeasonGrouping = (groupingName) ->
       $http.post("/api/match/seasons/#{season.id}/match-groups", {
         name: groupingName
@@ -61,6 +77,7 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
             reason?.error ? ""
     $scope.newMatch =
       scheduled_for: new Date()
+      best_of: $scope.bestOfOptions[1].id
     $scope.newMatchError = null
     $scope.createMatch = ->
       return unless $scope.newMatch.season_match_group_id?
@@ -86,12 +103,14 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         .error (data) ->
           toastr.error "Couldn't delete match: #{data}"
     $scope.addNextMatchMember = (nextMatchMember, groupId, matchId) ->
-      $http.put("#{matchPath(groupId, matchId)}/members/#{nextMatchMember.id}")
+      member = angular.copy nextMatchMember
+      $http.put("#{matchPath(groupId, matchId)}/members/#{member.id}")
         .success ->
           toastr.success "Successfully added user to match"
           refreshMatchMembers groupId, matchId
         .error (data) ->
-          toastr.error "Couldn't add user to match: #{data.errors ? data}"
+          toastr.error "Couldn't add user to match: " + \
+            if data.errors? then JSON.stringify(data.errors) else data
     $scope.removeMatchMember = (memberId, groupId, matchId) ->
       $http.delete("#{matchPath(groupId, matchId)}/members/#{memberId}")
         .success ->
@@ -112,7 +131,7 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         status: newStatus,
         game_wins: parseInt(wins, 10)
       }).success ->
-          toastr.success "Successfully updated match member status"
+          #toastr.success "Successfully updated match member status"
           refreshMatchMembers groupId, matchId
         .error (data) ->
           toastr.error \

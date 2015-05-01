@@ -137,9 +137,16 @@ class MatchController < ApplicationController
     requires_match_membership!
     user_season_match = UserSeasonMatch.where(user_season: UserSeason.where(user_id: member_id, season_id: season_id).first,  match: @match).first
     json_halt 404, "Member #{member_id} not found as part of match #{match_id}, group #{group_id}, season #{season_id}" if user_season_match.nil?
+    attempt_save = false
     if params.has_key? "status"
+      attempt_save = true
       user_season_match.won = params[:status]
-      user_season_match.game_wins = params[:game_wins].to_i
+    end
+    if params.has_key? "game_wins"
+      attempt_save = true
+      user_season_match.game_wins = params[:game_wins]
+    end
+    if attempt_save
       json_halt 400, user_season_match.errors unless user_season_match.valid?
       user_season_match.save
       #TODO should we also mark other people as finished here?
