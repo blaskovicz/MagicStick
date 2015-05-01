@@ -90,6 +90,13 @@ div.panel.comments {
 span.markdown-help {
   font-size: 10pt;
 }
+div.match-groups {
+  table.status-report {
+    div.game-count, button.win-status {
+      width: 12em;
+    }
+  }
+}
 div.season-members {
   button.btn-danger {
     vertical-align: top;

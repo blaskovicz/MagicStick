@@ -57,7 +57,7 @@
       </div>
     </div>
   </div>
-  <div class="panel panel-default">
+  <div class="panel panel-default match-groups">
     <div class="panel-heading">Match Groups</div>
     <div class="panel-body" ng-if="seasonOwner()">
       <p>
@@ -99,7 +99,7 @@
             <div ng-repeat="match in group.matches" class="row">
               <div class="col-md-12">
                 <h3 ng-class="{'green-text': match.completed, 'purple-text': !match.completed}">
-                  Match "{{match.description}}" [id: {{match.id}}]
+                  Match {{match.description}} [id: {{match.id}}]
                   <button
                     type="button"
                     class="btn btn-danger"
@@ -108,9 +108,11 @@
                     Delete
                   </button>
                 </h3>
-                <dl>
+                <dl class="dl-horizontal">
                   <dt>Scheduled For</dt>
                   <dd>{{match.scheduled_for}}</dd>
+                  <dt>Best Of</dt>
+                  <dd>{{match.best_of}}</dd>
                 </dl>
 <!--              <a
                 ng-href="/#!/seasons/{{season.id}}/match-groups/{{group.id}}/matches/{{match.id}}">
@@ -137,51 +139,68 @@
                         Add to Match
                       </button>
                     </form>
-                    <table class="table">
+                    <table class="table status-report">
                       <tr ng-repeat="user_season_match in match.user_season_match">
                         <td>
                           <user-view user="user_season_match.user_season.user"></user-view>
                         </td>
-                        <td ng-if="!seasonOwner() && !isMatchMember(match)">
-                          {{
-                            (user_season_match.won === null && "Not Played") ||
-                            (user_season_match.won === false  && "Lost") ||
-                            (user_season_match.won === true && "Won")
-                          }}
-                        </td>
-                        <td ng-if="seasonOwner() || isMatchMember(match)">
-                          <form name="match{{match.id}}form">
-                            <label>
-                              <input
-                                ng-model="user_season_match.won"
-                                ng-value="false"
-                                type="radio"
-                                name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}">
-                              Lost
-                            </label>
-                            <label>
-                              <input
-                                ng-model="user_season_match.won"
-                                ng-value="true"
-                                type="radio"
-                                name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}">
-                              Won
-                            </label>
-                            <label>
-                              <input
-                                ng-model="user_season_match.won"
-                                ng-value="null"
-                                type="radio"
-                                name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}">
-                              Not Played
-                            </label>
-                            <button
-                              ng-click="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, user_season_match.won)"
-                              ng-disabled="!match{{match.id}}form.$dirty"
-                              type="button"
-                              class="btn btn-primary">
-                              Update Status
-                            </button>
+                        <td>
+                          <form class="form-inline">
+                            <!-- TODO refactor this dropdown into a directive, DRY up function calls -->
+                            <div class="btn-group" dropdown>
+                              <button
+                                ng-disabled="!seasonOwner() &&  !isMatchMember(match)"
+                                ng-class="{
+                                  'btn-danger': user_season_match.won === false,
+                                  'btn-success': user_season_match.won === true,
+                                  'btn-default': user_season_match.won == null
+                                }"
+                                type="button"
+                                class="win-status btn dropdown-toggle" dropdown-toggle>
+                                Match: {{matchStatusAlias(user_season_match.won)}}
+                                <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" role="menu">
+                                <li>
+                                  <a ng-click="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, true, user_season_match.game_wins)">
+                                    <span class="glyphicon glyphicon-ok" ng-if="user_season_match.won === true"></span>
+                                    Win
+                                  </a>
+                                </li>
+                                <li>
+                                  <a ng-click="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, false, user_season_match.game_wins)">
+                                    <span class="glyphicon glyphicon-ok" ng-if="user_season_match.won === false"></span>
+                                    Loss
+                                  </a>
+                                </li>
+                                <li>
+                                  <a ng-click="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, null, user_season_match.game_wins)">
+                                    <span class="glyphicon glyphicon-ok" ng-if="user_season_match.won == null"></span>
+                                    Not Played
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="form-group">
+                              <label
+                                class="sr-only"
+                                for="gameWins">
+                                Game Wins
+                              </label>
+                              <div class="input-group game-count">
+                                <div class="input-group-addon">Game Wins</div>
+                                <input
+                                  ng-disabled="!seasonOwner() &&  !isMatchMember(match)"
+                                  ng-change="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, user_season_match.won, user_season_match.game_wins)"
+                                  ng-model="user_season_match.game_wins"
+                                  type="number"
+                                  class="form-control"
+                                  size="2"
+                                  min="0"
+                                  max="{{match.best_of}}"
+                                  name="gameWins"/>
+                              </div>
+                            </div>
                           </form>
                         </td>
                         <td>
@@ -225,6 +244,12 @@
           options="season.season_match_groups"
           model="newMatch.season_match_group_id"
           error-model="newMatchError.season_match_group_id"></form-input>
+        <form-input
+          label="Best Of"
+          type="select"
+          options="bestOfOptions"
+          model="newMatch.best_of"
+          error-model="newMatchError.best_of"></form-input>
         <button
           ng-disabled="newMatch.season_match_group_id == null"
           type="button"
