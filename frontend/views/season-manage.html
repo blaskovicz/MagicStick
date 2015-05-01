@@ -149,7 +149,7 @@
                             <!-- TODO refactor this dropdown into a directive, DRY up function calls -->
                             <div class="btn-group" dropdown>
                               <button
-                                ng-disabled="!seasonOwner() &&  !isMatchMember(match)"
+                                ng-disabled="statusIsUpdating || (!seasonOwner() &&  !isMatchMember(match))"
                                 ng-class="{
                                   'btn-danger': user_season_match.won === false,
                                   'btn-success': user_season_match.won === true,
@@ -190,7 +190,7 @@
                               <div class="input-group game-count">
                                 <div class="input-group-addon">Game Wins</div>
                                 <input
-                                  ng-disabled="!seasonOwner() &&  !isMatchMember(match)"
+                                  ng-disabled="statusIsUpdating || (!seasonOwner() &&  !isMatchMember(match))"
                                   ng-change="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, user_season_match.won, user_season_match.game_wins)"
                                   ng-model="user_season_match.game_wins"
                                   type="number"

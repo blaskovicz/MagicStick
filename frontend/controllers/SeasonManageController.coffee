@@ -126,14 +126,16 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         ((item) -> item.user_season.user.username is User.username)
       )
       member?
+    $scope.statusIsUpdating = false
     $scope.updateMatchStatus = (groupId, matchId, memberId, newStatus, wins) ->
+      $scope.statusIsUpdating = true
       $http.put("#{matchPath(groupId, matchId)}/members/#{memberId}/status", {
         status: newStatus,
         game_wins: parseInt(wins, 10)
       }).success ->
-          #toastr.success "Successfully updated match member status"
           refreshMatchMembers groupId, matchId
         .error (data) ->
+          $scope.statusIsUpdating = false
           toastr.error \
             "Couldn't update member match status: #{data.errors ? data}"
     $scope.hasCommentPrivs = (comment) ->
@@ -193,6 +195,9 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
       $http.get(matchPath(groupId, matchId))
         .success (matchData) ->
           match.user_season_match = matchData.user_season_match
+          $scope.statusIsUpdating = false
+        .error ->
+          $scope.statusIsUpdating = false
     findMatch = (groupId, matchId) ->
       return unless matchId? and groupId?
       group = findGroup groupId
