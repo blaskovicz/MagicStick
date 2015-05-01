@@ -98,6 +98,9 @@ div.match-groups {
   }
 }
 div.season-members {
+  & > div {
+    display: inline-block;
+  }
   button.btn-danger {
     vertical-align: top;
   }
