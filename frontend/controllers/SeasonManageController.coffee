@@ -107,9 +107,10 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         ((item) -> item.user_season.user.username is User.username)
       )
       member?
-    $scope.updateMatchStatus = (groupId, matchId, memberId, newStatus) ->
+    $scope.updateMatchStatus = (groupId, matchId, memberId, newStatus, wins) ->
       $http.put("#{matchPath(groupId, matchId)}/members/#{memberId}/status", {
-        status: newStatus
+        status: newStatus,
+        game_wins: parseInt(wins, 10)
       }).success ->
           toastr.success "Successfully updated match member status"
           refreshMatchMembers groupId, matchId
