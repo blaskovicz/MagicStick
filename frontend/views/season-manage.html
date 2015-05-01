@@ -150,7 +150,7 @@
                           }}
                         </td>
                         <td ng-if="seasonOwner() || isMatchMember(match)">
-                          <form name="match{{match.id}}form">
+                          <form name="match{{match.id}}form" class="form-inline">
                             <label>
                               <input
                                 ng-model="user_season_match.won"
@@ -175,8 +175,23 @@
                                 name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}">
                               Not Played
                             </label>
+                            <div class="form-group">
+                              <label
+                                class="sr-only"
+                                for="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}-game-wins">
+                                  Game Wins</label>
+                              <div class="input-group">
+                                <input
+                                  ng-model="user_season_match.game_wins"
+                                  type="text"
+                                  class="form-control"
+                                  size="1"
+                                  name="match-{{match.id}}-user-{{user_season_match.user_season.user.id}}-game-wins" />
+                                <div class="input-group-addon">Game Wins</div>
+                              </div>
+                            </div>
                             <button
-                              ng-click="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, user_season_match.won)"
+                              ng-click="updateMatchStatus(group.id, match.id, user_season_match.user_season.user.id, user_season_match.won, user_season_match.game_wins)"
                               ng-disabled="!match{{match.id}}form.$dirty"
                               type="button"
                               class="btn btn-primary">
