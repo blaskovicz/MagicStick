@@ -3,3 +3,10 @@ angular.module("MagicStick.directives").directive "userView", ->
   scope:
     "user": "&"
   templateUrl: "user.html"
+  controller: [
+    "$scope"
+    "$location"
+    ($scope, $location, user) ->
+      $scope.view = ->
+        $location.path('/users/' + $scope.user().username)
+  ]

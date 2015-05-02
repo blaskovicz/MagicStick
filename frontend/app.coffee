@@ -33,6 +33,22 @@ app.config([
         controller: "ProfileController"
         auth: true
       })
+      .when("/users/:username", {
+        templateUrl: "user-profile.html"
+        controller: "UserController"
+        auth: true
+        resolve:
+          user: [
+            "$route", "$q", "$http",
+            ($route, $q, $http) ->
+              promise = $q.defer()
+              username = $route.current.params.username
+              $http.get("/api/users/#{username}")
+                .success (data) -> promise.resolve(data)
+                .error (data) -> promise.reject(data)
+              promise.promise
+          ]
+      })
       .when("/seasons", {
         templateUrl: "seasons.html"
         controller: "SeasonDashController"

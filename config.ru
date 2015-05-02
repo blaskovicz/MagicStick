@@ -21,4 +21,5 @@ use Rack::Parser, :content_types => {
 map('/'){ run ViewController }
 map('/api/meta'){ run StatusCheckController }
 map('/api/auth'){ run AuthController }
+map('/api/users'){ run UserController }
 map('/api/match'){ run MatchController }
