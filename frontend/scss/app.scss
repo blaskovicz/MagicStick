@@ -90,11 +90,20 @@ div.panel.comments {
 span.markdown-help {
   font-size: 10pt;
 }
-div.match-groups {
-  table.status-report {
-    div.game-count, button.win-status {
-      width: 12em;
+div.season-matchup-tab {
+  div.row {
+    margin-top: 5px;
+    margin-left: 0;
+    margin-right: 0;
+    @for $i from 1 through 13 {
+      div.col-md-#{$i} {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
+  }
+  div.game-count, button.win-status {
+    width: 12em;
   }
 }
 div.season-members {

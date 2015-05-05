@@ -30,6 +30,9 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         "Not Played"
       else
         "??"
+    $scope.matchIsComplete = (match) ->
+      match.user_season_match?.length > 0 and \
+      _.any(match.user_season_match, ((userMatch) -> userMatch?.won?))
     $scope.createSeasonGrouping = (groupingName) ->
       $http.post("/api/match/seasons/#{season.id}/match-groups", {
         name: groupingName

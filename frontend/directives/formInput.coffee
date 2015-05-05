@@ -11,14 +11,16 @@ angular.module("MagicStick.directives").directive "formInput", ->
     <label for="{{label}}" ng-bind="label"></label>
     <span ng-switch="type">
       <span ng-switch-when="date">
-        <datepicker
-          ng-model="$parent.model"
-          >
-        </datepicker>
-        <timepicker
-          ng-model="$parent.model"
-          >
-        </timepicker>
+        <div class="row">
+          <div class="col-md-4">
+            <datepicker ng-model="$parent.model">
+            </datepicker>
+          </div>
+          <div class="col-md-2">
+            <timepicker ng-model="$parent.model">
+            </timepicker>
+          </div>
+        </div>
       </span>
       <span ng-switch-when="select">
         <select

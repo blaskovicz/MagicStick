@@ -58,69 +58,58 @@
     </div>
   </div>
   <div class="panel panel-default match-groups">
-    <div class="panel-heading">Match Groups</div>
-    <div class="panel-body" ng-if="seasonOwner()">
-      <p>
-        Season matches are divided into groupings; groupings represent
-        a logical collection of matches (eg: week 1, week 2, playoffs, etc).
-        To create matches, there must first exist a grouping to add them to.
-      </p>
-      <form class="form-inline">
-        <form-input
-          label="Grouping Name"
-          type="text"
-          model="newGroupingName"
-          error-model="newGroupingNameError"></form-input>
-        <button
-          ng-disabled="!newGroupingName"
-          type="button"
-          ng-click="createSeasonGrouping(newGroupingName)"
-          class="btn btn-primary">
-          Create Season Group
-        </button>
-      </form>
-    </div>
-    <table class="table">
-      <tbody ng-repeat="group in season.season_match_groups">
-        <tr>
-          <td><h3>{{group.name}}</h3></td>
-          <td>
-            <button
-              ng-if="seasonOwner()"
-              type="button"
-              class="btn btn-danger"
-              ng-click="removeSeasonGrouping(group)">
-              Remove
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <div ng-repeat="match in group.matches" class="row">
-              <div class="col-md-12">
-                <h3 ng-class="{'green-text': match.completed, 'purple-text': !match.completed}">
-                  Match {{match.description}} [id: {{match.id}}]
-                  <button
-                    type="button"
-                    class="btn btn-danger"
-                    ng-if="seasonOwner()"
-                    ng-click="deleteMatch(group.id, match.id)">
-                    Delete
-                  </button>
-                </h3>
-                <dl class="dl-horizontal">
-                  <dt>Scheduled For</dt>
-                  <dd>{{match.scheduled_for}}</dd>
-                  <dt>Best Of</dt>
-                  <dd>{{match.best_of}}</dd>
-                </dl>
-<!--              <a
-                ng-href="/#!/seasons/{{season.id}}/match-groups/{{group.id}}/matches/{{match.id}}">
-                Match #{{match.id}}
-              </a> TODO seperate edit page-->
+    <div class="panel-heading">Matchups</div>
+    <tabset>
+      <tab ng-repeat="group in season.season_match_groups" heading="{{group.name}}">
+        <div class="season-matchup-tab">
+          <div class="row" ng-if="seasonOwner()">
+            <div class="col-md-1 col-md-offset-10">
+              <button
+                type="button"
+                class="btn btn-danger"
+                ng-click="removeSeasonGrouping(group)">
+                Delete Season Group
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <tabset>
+              <tab
+                ng-repeat="match in group.matches">
+                <tab-heading>
+                  {{match.description}}
+                  <i
+                    ng-if="matchIsComplete(match)"
+                    class="glyphicon glyphicon-ok">
+                  </i>
+                  <i
+                    ng-if="isMatchMember(match)"
+                    class="glyphicon glyphicon-user">
+                  </i>
+                </tab-heading>
+                <div class="row">
+                  <div class="col-md-1 col-md-offset-10">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      ng-if="seasonOwner()"
+                      ng-click="deleteMatch(group.id, match.id)">
+                      Delete Match
+                    </button>
+                  </div>
+                </div>
                 <div class="row">
                   <div class="col-md-12">
-                    <h3>Members</h3>
+                    <dl class="dl-horizontal">
+                      <dt>Scheduled For</dt>
+                      <dd>{{match.scheduled_for}}</dd>
+                      <dt>Best Of</dt>
+                      <dd>{{match.best_of}}</dd>
+                    </dl>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
                     <form class="form-inline" ng-if="seasonOwner()">
                       <div class="form-group">
                         <label for="nextMatchMember">Add Match Member</label>
@@ -139,12 +128,14 @@
                         Add to Match
                       </button>
                     </form>
-                    <table class="table status-report">
-                      <tr ng-repeat="user_season_match in match.user_season_match">
-                        <td>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="row" ng-repeat="user_season_match in match.user_season_match">
+                        <div class="col-md-4">
                           <user-view user="user_season_match.user_season.user"></user-view>
-                        </td>
-                        <td>
+                        </div>
+                        <div class="col-md-6">
                           <form class="form-inline">
                             <!-- TODO refactor this dropdown into a directive, DRY up function calls -->
                             <div class="btn-group" dropdown>
@@ -202,8 +193,8 @@
                               </div>
                             </div>
                           </form>
-                        </td>
-                        <td>
+                        </div>
+                        <div class="col-md-2">
                           <button
                             type="button"
                             class="btn btn-danger"
@@ -211,23 +202,46 @@
                             ng-if="seasonOwner()">
                             Remove
                           </button>
-                        </td>
-                      </tr>
-                    </table>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              <hr>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+              </tab>
+            </tabset>
+          </div>
+        </div>
+      </tab>
+    </tabset>
   </div>
-  <div class="panel panel-default">
-    <div class="panel-heading">Matches</div>
-    <div class="panel-body" ng-if="seasonOwner()">
-      <p>Matches represent games to be played between multiple people.</p>
+  <div class="panel panel-default" ng-if="seasonOwner()">
+    <div class="panel-heading">Create Match</div>
+    <div class="panel-body">
+      <p><b>Matches</b> represent games to be played between multiple people.</p>
+      <p>
+        Matches are divided into <b>groupings</b>; groupings represent
+        a logical collection of matches (eg: week 1, week 2, playoffs, etc).
+        To create matches, there must first exist a grouping to add them to.
+      </p>
+      <div>
+        <h3>Season Group</h3>
+        <form class="form-inline">
+          <form-input
+            label="Grouping Name"
+            type="text"
+            model="newGroupingName"
+            error-model="newGroupingNameError"></form-input>
+          <button
+            ng-disabled="!newGroupingName"
+            type="button"
+            ng-click="createSeasonGrouping(newGroupingName)"
+            class="btn btn-primary">
+            Create Season Group
+          </button>
+        </form>
+      </div>
+      <div>
+        <h3>Matchup</h3>
         <form-input
           label="Scheduled For"
           type="date"
@@ -257,6 +271,7 @@
           class="btn btn-primary">
           Create Match
         </button>
+      </div>
     </div>
   </div>
 
