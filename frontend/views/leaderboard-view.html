@@ -1,0 +1,22 @@
+<div class="leaderboard-view">
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>Match Wins</th>
+        <th>Game Wins</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="rank in rankings">
+        <td>{{rank.rank}}</td>
+        <td>
+          <user-view user="rank.member"></user-view>
+        </td>
+        <td>{{rank.matchWins}}</td>
+        <td>{{rank.gameWins}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

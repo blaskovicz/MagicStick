@@ -45,7 +45,7 @@
     </div>
     <div class="season-members">
       <div
-        ng-repeat="member in season.members">
+        ng-repeat="member in season.members track by $index">
         <user-view user="member"></user-view>
         <button
           ng-if="seasonOwner()"
@@ -60,6 +60,11 @@
   <div class="panel panel-default match-groups">
     <div class="panel-heading">Matchups</div>
     <tabset>
+      <tab>
+        <tab-heading><b>Leaderboard</b></tab-heading>
+        <leaderboard season="season">
+        </leaderboard>
+      </tab>
       <tab ng-repeat="group in season.season_match_groups" heading="{{group.name}}">
         <div class="season-matchup-tab">
           <div class="row" ng-if="seasonOwner()">
