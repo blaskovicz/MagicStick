@@ -104,7 +104,7 @@ class MatchController < ApplicationController
     status 204
   end
   get '/seasons/:season_id/comments' do
-    @season.season_comments_dataset.to_json(root: true, include: {
+    @season.season_comments_dataset.order(:created_at).to_json(root: true, include: {
       user: {
         only: User.public_attrs
       }
