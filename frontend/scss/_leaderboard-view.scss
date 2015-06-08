@@ -1,0 +1,23 @@
+div.leaderboard-view {
+  table {
+    td.rank {
+      font-size: 14pt;
+      font-weight: 700;
+      font-family: monospace;
+      color: rgb(168, 163, 163);
+      &.rank-wins {
+        color: rgb(52, 166, 39);
+      }
+      &.rank-loss {
+        color: rgb(223, 28, 51);
+      }
+      &.rank-overall {
+        color: #000;
+        font-size: 20pt;
+        &:before {
+          content: "#"
+        }
+      }
+    }
+  }
+}
