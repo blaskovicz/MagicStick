@@ -4,22 +4,24 @@
       <tr>
         <th>Rank</th>
         <th>User</th>
-        <th>Match Wins</th>
+        <th>Matches (Win/Loss/Unplayed)</th>
         <th>Game Wins</th>
-        <th>Matches Unplayed</th>
-        <th>Matches Lost</th>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="rank in rankings">
-        <td class="rank rank-overall">{{rank.rank}}</td>
+        <td><span class="rank rank-overall">{{rank.rank}}</span></td>
         <td>
           <user-view user="rank.member"></user-view>
         </td>
-        <td class="rank rank-wins">{{rank.matchWins}}</td>
-        <td class="rank rank-wins">{{rank.gameWins}}</td>
-        <td class="rank">{{rank.matchUnplayed}}</td>
-        <td class="rank rank-loss">{{rank.matchLoss}}</td>
+        <td>
+          <span class="rank">
+            <span class="rank rank-wins">{{rank.matchWins}}</span> /
+            <span class="rank rank-loss">{{rank.matchLoss}}</span> /
+            <span class="rank rank-unplayed">{{rank.matchUnplayed}}</span>
+          </span>
+        </td>
+        <td><span class="rank rank-wins">{{rank.gameWins}}</span></td>
       </tr>
     </tbody>
   </table>

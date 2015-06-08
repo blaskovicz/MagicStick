@@ -1,10 +1,13 @@
 div.leaderboard-view {
   table {
-    td.rank {
+    span.rank {
       font-size: 14pt;
       font-weight: 700;
       font-family: monospace;
-      color: rgb(168, 163, 163);
+      color: #000;
+      &.rank-unplayed {
+        color: rgb(168, 163, 163);
+      }
       &.rank-wins {
         color: rgb(52, 166, 39);
       }
