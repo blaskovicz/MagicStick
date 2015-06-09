@@ -10,6 +10,9 @@ div.leaderboard-view {
       }
       &.rank-wins {
         color: rgb(52, 166, 39);
+        &.dark {
+          color: #4B8444;
+        }
       }
       &.rank-loss {
         color: rgb(223, 28, 51);

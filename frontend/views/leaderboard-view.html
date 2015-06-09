@@ -4,8 +4,7 @@
       <tr>
         <th>Rank</th>
         <th>User</th>
-        <th>Matches (Win/Loss/Unplayed)</th>
-        <th>Game Wins</th>
+        <th>Win / Loss / Unplayed</th>
       </tr>
     </thead>
     <tbody>
@@ -16,12 +15,34 @@
         </td>
         <td>
           <span class="rank">
-            <span class="rank rank-wins">{{rank.matchWins}}</span> /
-            <span class="rank rank-loss">{{rank.matchLoss}}</span> /
-            <span class="rank rank-unplayed">{{rank.matchUnplayed}}</span>
+            <span
+              class="rank rank-wins"
+              tooltip-append-to-body="true"
+              tooltip="matches won (a series of games)">
+              {{rank.matchWins}}
+            </span>
+            <span
+              class="rank rank-wins">-</span>
+            <span
+              class="rank rank-wins"
+              tooltip-append-to-body="true"
+              tooltip="games won (multiple games per match)">
+              {{rank.gameWins}}
+            </span>  /
+            <span
+              class="rank rank-loss"
+              tooltip-append-to-body="true"
+              tooltip="matches lost (a series of games)">
+              {{rank.matchLoss}}
+            </span> /
+            <span
+              class="rank rank-unplayed"
+              tooltip-append-to-body="true"
+              tooltip="matches unplayed">
+              {{rank.matchUnplayed}}
+            </span>
           </span>
         </td>
-        <td><span class="rank rank-wins">{{rank.gameWins}}</span></td>
       </tr>
     </tbody>
   </table>
