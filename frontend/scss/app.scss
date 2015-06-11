@@ -94,6 +94,11 @@ div.match-groups {
   .nav-tabs > li {
     margin-top: 1px;
     width: 250px;
+    a {
+      margin-bottom: 2px;
+      border-radius: 0;
+      border: 1px solid #ddd;
+    }
     i {
       float: right;
     }
