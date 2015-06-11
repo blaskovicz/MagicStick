@@ -90,20 +90,35 @@ div.panel.comments {
 span.markdown-help {
   font-size: 10pt;
 }
-div.season-matchup-tab {
-  div.row {
-    margin-top: 5px;
-    margin-left: 0;
-    margin-right: 0;
-    @for $i from 1 through 13 {
-      div.col-md-#{$i} {
-        padding-left: 0;
-        padding-right: 0;
+div.match-groups {
+  .nav-tabs > li {
+    margin-top: 1px;
+    width: 250px;
+    i {
+      float: right;
+    }
+    &.active {
+      a {
+        border-color: rgb(66, 17, 82);
+        border-radius: 0;
       }
     }
   }
-  div.game-count, button.win-status {
-    width: 12em;
+  div.season-matchup-tab {
+    div.row {
+      margin-top: 5px;
+      margin-left: 0;
+      margin-right: 0;
+      @for $i from 1 through 13 {
+        div.col-md-#{$i} {
+          padding-left: 0;
+          padding-right: 0;
+        }
+      }
+    }
+    div.game-count, button.win-status {
+      width: 12em;
+    }
   }
 }
 div.season-members {
