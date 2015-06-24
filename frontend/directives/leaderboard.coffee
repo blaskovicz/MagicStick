@@ -6,6 +6,12 @@ angular.module("MagicStick.directives").directive "leaderboard", ->
   controller: [
     "$scope"
     ($scope) ->
+      maxOpacity = 0.9
+      minOpacity = 0.1
+      opacityFor = (rank, maxRanks) ->
+        factor = (maxOpacity - minOpacity) / maxRanks
+        offset = if rank isnt maxRanks then 1 else 0
+        factor * (maxRanks + offset - rank) + minOpacity
       updateRankings = ->
         return unless angular.isDefined $scope.season()
         rankBucket = {}
@@ -33,6 +39,7 @@ angular.module("MagicStick.directives").directive "leaderboard", ->
           _.values(rankBucket), ['matchWins', 'gameWins']
         ).reverse()
         currentRank = 1
+        numRanks = ranks.length
         for rank, i in ranks
           increment = false
           nextRank = ranks[i + 1]
@@ -41,6 +48,7 @@ angular.module("MagicStick.directives").directive "leaderboard", ->
             nextRank.gameWins != rank.gameWins
               increment = true
           rank.rank = currentRank
+          rank.opacity = opacityFor currentRank, numRanks
           currentRank++ if increment
         $scope.rankings = ranks
       $scope.$watch "season()", ->

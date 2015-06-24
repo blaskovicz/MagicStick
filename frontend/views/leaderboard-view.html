@@ -9,7 +9,13 @@
     </thead>
     <tbody>
       <tr ng-repeat="rank in rankings">
-        <td><span class="rank rank-overall">{{rank.rank}}</span></td>
+        <td>
+          <span
+            ng-style="{'opacity': rank.opacity}"
+            class="rank rank-overall">
+            {{rank.rank}}
+          </span>
+        </td>
         <td>
           <user-view user="rank.member"></user-view>
         </td>
