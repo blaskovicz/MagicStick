@@ -101,6 +101,12 @@ div.match-groups {
     }
     i {
       float: right;
+      &.won {
+        color: rgb(35, 148, 30);
+      }
+      &.lost {
+        color: rgb(243, 28, 28);
+      }
     }
     &.active {
       a {

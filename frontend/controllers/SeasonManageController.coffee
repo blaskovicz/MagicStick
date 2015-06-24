@@ -122,13 +122,20 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         .error (data) ->
           toastr.error \
             "Couldn't remove member from match: #{data.errors ? data}"
-    $scope.isMatchMember = (match) ->
-      return false unless match?.user_season_match?.length > 0
+
+    findMatchMember = (match) ->
+      return unless match?.user_season_match?.length > 0
       member = _.find(
         match.user_season_match,
         ((item) -> item.user_season.user.username is User.username)
       )
-      member?
+      member
+    $scope.isMatchMember = (match) ->
+      findMatchMember(match)?
+    $scope.isMatchWinner = (match) ->
+      findMatchMember(match)?.won is true
+    $scope.isMatchLoser = (match) ->
+      findMatchMember(match)?.won is false
     $scope.statusIsUpdating = false
     $scope.updateMatchStatus = (groupId, matchId, memberId, newStatus, wins) ->
       $scope.statusIsUpdating = true

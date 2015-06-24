@@ -89,6 +89,7 @@
                   </i>
                   <i
                     ng-if="isMatchMember(match)"
+                    ng-class="{'won': isMatchWinner(match), 'lost': isMatchLoser(match)}"
                     class="glyphicon glyphicon-user">
                   </i>
                 </tab-heading>
