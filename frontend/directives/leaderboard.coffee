@@ -40,6 +40,13 @@ angular.module("MagicStick.directives").directive "leaderboard", ->
         ).reverse()
         currentRank = 1
         numRanks = ranks.length
+        rankGap = 0
+        # for every row sorted by matchWins, then gameWins descending,
+        # assign them the currentRank. if the next row isn't equivalent
+        # in standing, increment the rank by one, accounting for any
+        # gaps (ties) (eg: if two people are ranked 1st, the next
+        # person would be ranked 3rd).  if the next row is the same
+        # rank, increase the rankGap.
         for rank, i in ranks
           increment = false
           nextRank = ranks[i + 1]
@@ -49,7 +56,12 @@ angular.module("MagicStick.directives").directive "leaderboard", ->
               increment = true
           rank.rank = currentRank
           rank.opacity = opacityFor currentRank, numRanks
-          currentRank++ if increment
+          if increment
+            currentRank++
+            currentRank += rankGap
+            rankGap = 0
+          else
+            rankGap++
         $scope.rankings = ranks
       $scope.$watch "season()", ->
         updateRankings()
