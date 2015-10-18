@@ -9,11 +9,11 @@ gem 'rake'
 gem 'rspec'
 gem 'sass'
 gem 'slack-notifier'
+gem 'dotenv'
 group :production do
   gem 'pg'
 end
 group :development do
   gem 'sqlite3'
   gem 'shotgun'
-  gem 'dotenv'
 end
