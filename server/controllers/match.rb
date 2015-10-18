@@ -157,12 +157,19 @@ class MatchController < ApplicationController
         "#{principal.username} just updated the status of season-#{season_id}/group-#{group_id}/match-#{match_id}/user-#{member_id}" +
         "from #{previous_state.inspect} to #{user_season_match.inspect}"
       )
-      def format_win_state(state)
-        if state
-          "_WIN_ :thumbsup:"
-        else
-          "_LOSS_ :thumbsdown:"
-        end
+      def format_win_state(state, bold: true, italic: true, emoji: true)
+        display = if state.nil?
+                    ["Not Played", ":clock9:"]
+                  elsif state
+                    ["WIN", ":thumbsup:"]
+                  else
+                    ["LOSS", ":thumbsdown:"]
+                  end
+        status_text = display.first
+        emoji_text = if emoji then " #{display.last}" else "" end
+        bold_mod = if bold then "*" else "" end
+        italic_mod = if italic then "_" else "" end
+        "#{bold_mod}#{italic_mod}#{status_text}#{italic_mod}#{bold_mod}#{emoji_text}"
       end
       # we want to say "[Principal] just updated the status of [Season Name] >> [Group Name] > [Match Name] >> [Member Name]
       # only report overall match reporting to slack
@@ -173,7 +180,7 @@ class MatchController < ApplicationController
           "in match *<#{link_to_season season_id}|#{slack_escape @season.name}>* &gt; " +
           "#{slack_escape SeasonMatchGroup.where(season_id: season_id, id: group_id).first.name} &gt; " +
           "#{slack_escape @match.description}\n" +
-          (previous_state.won.nil? ? "" : "from #{format_win_state previous_state.won}") + " to #{format_win_state user_season_match.won}"
+          "from #{format_win_state previous_state.won, bold: false, emoji: false} to #{format_win_state user_season_match.won}"
         )
       end
       #TODO should we also mark other people as finished here?
