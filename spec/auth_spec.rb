@@ -1,10 +1,12 @@
 require_relative 'spec_helper'
 require_relative '../server/controllers/auth'
+require_relative '../server/helpers/slack'
 require_relative '../server/helpers/auth'
 require_relative '../server/helpers/request'
+require_relative '../server/helpers/link'
 
 describe "Authentication" do
-  AuthController.helpers Auth, Request
+  AuthController.helpers Slack, Auth, Request, Link
   def app() AuthController end
 
   context "unauthenticated" do

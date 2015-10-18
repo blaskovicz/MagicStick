@@ -3,6 +3,7 @@ GEM
   specs:
     backports (3.6.4)
     diff-lcs (1.2.5)
+    dotenv (2.0.2)
     kgio (2.9.3)
     multi_json (1.11.0)
     pg (0.18.1)
@@ -43,6 +44,7 @@ GEM
       rack-test
       sinatra (~> 1.4.0)
       tilt (~> 1.3)
+    slack-notifier (1.4.0)
     sqlite3 (1.3.10)
     tilt (1.4.1)
     unicorn (4.8.3)
@@ -54,6 +56,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dotenv
   pg
   rack-parser
   rake
@@ -63,5 +66,6 @@ DEPENDENCIES
   shotgun
   sinatra
   sinatra-contrib
+  slack-notifier
   sqlite3
   unicorn
