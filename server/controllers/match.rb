@@ -69,7 +69,7 @@ class MatchController < ApplicationController
       }
     })
   end
-  post '/seasons/:season_id/comments' do
+  post '/seasons/:season_id/comments' do |season_id|
     comment = SeasonComment.new
     comment.user = principal
     comment.season = @season
@@ -77,6 +77,9 @@ class MatchController < ApplicationController
     json_halt 400, comment.errors unless comment.valid?
     comment.save
     status 201
+    slack_message(
+      "\n*<#{link_to_user principal.username}|#{slack_escape principal.username}>* *commented* on *<#{link_to_season season_id}|#{slack_escape @season.name}>*\n>#{slack_escape comment.comment}"
+    )
     comment.to_json(root: true, include: {
       user: {
         only: User.public_attrs
@@ -138,6 +141,7 @@ class MatchController < ApplicationController
     user_season_match = UserSeasonMatch.where(user_season: UserSeason.where(user_id: member_id, season_id: season_id).first,  match: @match).first
     json_halt 404, "Member #{member_id} not found as part of match #{match_id}, group #{group_id}, season #{season_id}" if user_season_match.nil?
     attempt_save = false
+    previous_state = user_season_match.clone
     if params.has_key? "status"
       attempt_save = true
       user_season_match.won = params[:status]
@@ -149,6 +153,29 @@ class MatchController < ApplicationController
     if attempt_save
       json_halt 400, user_season_match.errors unless user_season_match.valid?
       user_season_match.save
+      logger.info(
+        "#{principal.username} just updated the status of season-#{season_id}/group-#{group_id}/match-#{match_id}/user-#{member_id}" +
+        "from #{previous_state.inspect} to #{user_season_match.inspect}"
+      )
+      def format_win_state(state)
+        if state
+          "_WIN_ :thumbsup:"
+        else
+          "_LOSS_ :thumbsdown:"
+        end
+      end
+      # we want to say "[Principal] just updated the status of [Season Name] >> [Group Name] > [Match Name] >> [Member Name]
+      # only report overall match reporting to slack
+      if previous_state.won != user_season_match.won
+        slack_message(
+          "*<#{link_to_user principal.username}|#{slack_escape principal.username}>* just *updated* " +
+          (@member.id == principal.id ? "their own *status* " : "the *status* of *<#{link_to_user @member.username}|#{slack_escape @member.username}>* ") +
+          "in match *<#{link_to_season season_id}|#{slack_escape @season.name}>* &gt; " +
+          "#{slack_escape SeasonMatchGroup.where(season_id: season_id, id: group_id).first.name} &gt; " +
+          "#{slack_escape @match.description}\n" +
+          (previous_state.won.nil? ? "" : "from #{format_win_state previous_state.won}") + " to #{format_win_state user_season_match.won}"
+        )
+      end
       #TODO should we also mark other people as finished here?
     end
     status 204

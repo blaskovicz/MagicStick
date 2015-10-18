@@ -11,3 +11,5 @@ public/css/app.css.map
 public/js/templates.js
 public/js/tests.js
 *.db
+vendor/bundle
+.env

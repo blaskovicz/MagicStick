@@ -8,10 +8,12 @@ gem 'rack-parser', :require => 'rack/parser'
 gem 'rake'
 gem 'rspec'
 gem 'sass'
+gem 'slack-notifier'
 group :production do
   gem 'pg'
 end
 group :development do
   gem 'sqlite3'
   gem 'shotgun'
+  gem 'dotenv'
 end
