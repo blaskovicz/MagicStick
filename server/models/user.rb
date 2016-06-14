@@ -22,7 +22,17 @@ class User < Sequel::Model
     self.salt = e_password[:salt]
     self.password = e_password[:password]
   end
-  def encrypted_password(raw_password, salt = ('a'..'z').to_a.shuffle[0,8].join)
+  def generate_salt
+    ('a'..'z').to_a.shuffle[0,8].join
+  end
+  def plaintext_password=(plaintext_password)
+    return unless plaintext_password.length >= 8 #TODO hack for now, should call validator
+    fields = encrypted_password(plaintext_password, self.salt)
+    self.password = fields[:password]
+    self.salt = fields[:salt]
+  end
+  def encrypted_password(raw_password, salt = nil)
+    salt = generate_salt if salt.nil?
     {
       :password => Digest::SHA2.new(512).hexdigest(raw_password + salt),
       :salt => salt

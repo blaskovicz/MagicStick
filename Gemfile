@@ -10,6 +10,7 @@ gem 'rspec'
 gem 'sass'
 gem 'slack-notifier'
 gem 'dotenv'
+gem 'pony'
 group :production do
   gem 'pg'
 end

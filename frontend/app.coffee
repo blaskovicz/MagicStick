@@ -28,6 +28,10 @@ app.config([
         templateUrl: "dashboard.html"
         controller: "DashboardController"
       })
+      .when("/password-reset/:token/:iv", {
+        templateUrl: "password-reset.html"
+        controller: "PasswordResetController"
+      })
       .when("/profile", {
         templateUrl: "profile.html"
         controller: "ProfileController"

@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'sinatra/json'
 require 'sinatra/config_file'
 require 'slack-notifier'
+require 'pony'
 require 'dotenv'
 Dotenv.load
 # common controller for other controllers to inherit from.
@@ -13,13 +14,26 @@ Dotenv.load
 class ApplicationController < Sinatra::Base
   use Rack::Logger
   register Sinatra::ConfigFile
-  @@version = "0.2.0"
+  @@version = "0.3.0"
   config_file 'config.yml'
   configure do
     enable :sessions
     enable :logging
     set :method_override, false
   end
+  Pony.options = {
+    :from => 'noreply@magic-stick.herokuapp.com',
+    :via => (ENV['RACK_ENV'] == 'production' ? :smtp : :test),
+    :via_options => {
+      :address => 'smtp.sendgrid.net',
+      :port => '587',
+      :domain => 'heroku.com',
+      :user_name => ENV['SENDGRID_USERNAME'],
+      :password => ENV['SENDGRID_PASSWORD'],
+      :authentication => :plain,
+      :enable_starttls_auto => true
+    }
+  }
   before do
     content_type "application/json"
   end

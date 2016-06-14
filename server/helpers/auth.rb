@@ -1,4 +1,6 @@
 require 'date'
+require 'openssl'
+require 'digest/sha1'
 module Auth
   def requires_role!(*roles)
     requires_login!
@@ -38,5 +40,30 @@ module Auth
   end
   def halt_403
     json_halt 403, "You don't have the correct priviledges to access this resource"
+  end
+  def encrypt(string)
+    assert_key
+    cipher = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
+    cipher.encrypt
+    cipher.key = Digest::SHA1.hexdigest(ENV['SECRET'])
+    iv = cipher.random_iv
+    cipher.iv = iv
+    encrypted = cipher.update(string)
+    encrypted << cipher.final
+    [encrypted, iv]
+  end
+  def decrypt(string, iv)
+    assert_key
+    cipher = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
+    cipher.decrypt
+    cipher.key = Digest::SHA1.hexdigest(ENV['SECRET'])
+    cipher.iv = iv
+    decrypted = cipher.update(string)
+    decrypted << cipher.final
+    decrypted
+  end
+  private
+  def assert_key
+    raise 'SECRET unset' unless ENV.has_key? 'SECRET'
   end
 end

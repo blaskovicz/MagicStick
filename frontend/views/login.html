@@ -1,6 +1,6 @@
 <div class="login-view" anon>
   <tabset>
-    <tab heading="Log In">
+    <tab heading="Log In" active='tabs.login'>
       <div class="login-dialog">
         <form ng-submit="attemptLogin()">
           <div class="form-group">
@@ -13,13 +13,15 @@
           </div>
           <button
             ng-disabled="login.password == '' || login.password == null || login.username == '' || login.username == null"
-            class="btn" type="submit">
+            class="btn btn-primary"
+            type="submit">
             Login
           </button>
+          <button class="btn" type="button" ng-click='tabs.forgotPassword = true'>Forgot Password?</button>
         </form>
       </div>
     </tab>
-    <tab heading="Sign Up">
+    <tab heading="Sign Up" active='tabs.signUp'>
       <form ng-submit="attemptSignup()">
         <div class="form-group" ng-class="{'has-error': signupError.username != null}">
           <label for="username-s">Username</label>
@@ -47,10 +49,31 @@
         </div>
         <button
           ng-disabled="signup.passwordConfirmation != signup.password || signup.password == '' || signup.password == null || signup.username == '' || signup.username == null || signup.name == '' || signup.name == null || signup.email == '' || signup.email == null"
-          class="btn" type="submit">
+          class="btn btn-primary" type="submit">
           Sign Up
         </button>
       </form>
     </tab>
+    <tab heading="Forgot Password" active='tabs.forgotPassword'>
+      <div class="login-dialog">
+        <form ng-submit="attemptForgotPassword()">
+          <div class="form-group">
+            <label for="usernameForgotten">Username</label>
+            <input class="form-control" id="usernameForgotten" type="text" ng-model="forgotten.username">
+          </div>
+          <div class="form-group">
+            <label for="emailForgotten">Email</label>
+            <input class="form-control" id="emailForgotten" type="text" ng-model="forgotten.email">
+          </div>
+          <button
+            ng-disabled="forgotten.username == '' || forgotten.username == null || forgotten.email == null || forgotten.email == ''"
+            class="btn btn-primary"
+            type="submit">
+            Request Password Reset
+          </button>
+        </form>
+      </div>
+    </tab>
   </tabset>
+  <!-- TODO reCaptcha -->
 </div>

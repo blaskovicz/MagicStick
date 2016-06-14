@@ -1,3 +1,5 @@
+require 'date'
+require 'base64'
 class AuthController < ApplicationController
   before %r{^/users/+([^/]+)} do |user_id|
     @user = User[id: user_id]
@@ -52,6 +54,67 @@ class AuthController < ApplicationController
     requires_role! :admin
     @user.remove_role find_role!(role_id)
     status 204
+  end
+  post '/forgot-password' do
+    user_param_presence!
+    # requesting a password reset
+    #TODO rate limit / regen limit
+    if params[:user][:username] && params[:user][:email]
+      status 204
+      user = User[username: params[:user][:username]]
+      if user.nil?
+        logger.warn "User #{params[:user][:username]} not found for password reset"
+        return
+      elsif user.email.nil? || user.email != params[:user][:email]
+        logger.warn "User #{params[:user][:username]} found, but email #{params[:user][:email]} not found for password reset"
+        return
+      end
+
+      expires = DateTime.now.next_day.iso8601
+      id = user.id
+      encrypted, iv = encrypt("#{id}/#{expires}")
+      link = "#{link_to_reset}/#{Base64.urlsafe_encode64(encrypted)}/#{Base64.urlsafe_encode64(iv)}"
+      logger.info "Generated reset link and sent email for user #{user.username}, id #{user.id}, email #{user.email}"
+      if ENV['RACK_ENV'] == 'development'
+        logger.info ">> #{link}"
+      end
+      Pony.mail(to: user.email, subject: "Password Reset Request", body: "Hi #{user.username},\nSomeone requested a reset of your password on #{ENV['SITE_BASE_URI']}.\nIf it was you, visit the following link to continue: #{link}.\nIf you didn't request this, please ignore this email.\n\n-MagicStick")
+    # trying to update a password based on a reset link
+    elsif params[:user][:token] && params[:user][:iv] && params[:user][:password]
+      status 204
+      begin
+        iv = Base64.urlsafe_decode64(params[:user][:iv])
+        decrypted = decrypt(Base64.urlsafe_decode64(params[:user][:token]), iv)
+        id, date_s = decrypted.split("/", 2)
+        logger.info "Reset request, id #{id}, expires #{date_s}"
+        user = User[id: id]
+        if user.nil?
+          status 500
+          raise "User with id #{id} not found"
+        end
+        date = DateTime.iso8601(date_s)
+        if date < DateTime.now
+          status 400
+          raise "Token already expired at #{date_s}"
+        end
+        user.plaintext_password = params[:user][:password]
+        if user.valid?
+          user.save
+          logger.info "Set new password for user #{user.username}, id #{user.id}, email #{user.email}"
+          if ENV['RACK_ENV'] == 'development'
+            logger.info ">> #{params[:user][:password]}"
+          end
+          Pony.mail(to: user.email, subject: "Password Was Changed", body: "Hi #{user.username},\nYour password on #{ENV['SITE_BASE_URI']} was recently changed.\nIf it was you, please ignore this email. If you did not make the change, please file an issue with us on github: #{link_to_github}.\n\n-MagicStick")
+        else
+          logger.warn "Couldn't set new password for user #{user.username}, #{user.id}, email #{user.email}: #{user.errors.inspect}"
+        end
+      rescue => e
+        logger.warn "Couldn't perform password reset: #{e}"
+      end
+    # other nefarious things
+    else
+      json_halt 400, "Invalid user object found in request payload"
+    end
   end
   post '/users' do
     user_param_presence!
