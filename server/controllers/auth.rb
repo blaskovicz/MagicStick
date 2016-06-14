@@ -104,7 +104,7 @@ class AuthController < ApplicationController
           if ENV['RACK_ENV'] == 'development'
             logger.info ">> #{params[:user][:password]}"
           end
-          Pony.mail(to: user.email, subject: "Password Was Changed", body: "Hi #{user.username},\nYour password on #{ENV['SITE_BASE_URI']} was recently changed.\nIf it was you, please ignore this email. If you did not make the change, please file an issue with us on github: #{link_to_github}.\n\n-MagicStick")
+          email_password_changed user
         else
           logger.warn "Couldn't set new password for user #{user.username}, #{user.id}, email #{user.email}: #{user.errors.inspect}"
         end
@@ -135,8 +135,9 @@ class AuthController < ApplicationController
     requires_login!
     user_param_presence!
     user = User[principal.id]
-
+    password_changed = false
     if params[:user][:passwordCurrent]
+      password_changed = true
       error_message = { :passwordCurrent => [ 'incorrect password' ] }
       json_halt 400, error_message unless user.password_matches?(params[:user][:passwordCurrent])
 
@@ -155,6 +156,7 @@ class AuthController < ApplicationController
     user.save
     status 200
     logger.info "#{user.username} successfully updated"
+    email_password_changed(user) if password_changed
     json :id => user.id
   end
   post '/me/avatar' do

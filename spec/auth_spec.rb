@@ -6,7 +6,7 @@ require_relative '../server/helpers/request'
 require_relative '../server/helpers/link'
 
 describe "Authentication" do
-  AuthController.helpers Slack, Auth, Request, Link
+  AuthController.helpers Slack, Auth, Request, Link, Email
   def app() AuthController end
 
   context "unauthenticated" do
