@@ -4,51 +4,53 @@
   </div>
   <tabset>
     <tab heading="Browse">
-      <table class="table">
+      <table class="table season-listings">
         <thead>
-          <th></th>
-          <th>Name</th>
+          <th class="season-name">Name</th>
           <th>Created</th>
           <th>Owner</th>
           <th>Starts</th>
           <th>Ends</th>
           <th></th>
         </thead>
-        <tr ng-repeat="season in seasons">
-          <!-- TODO use glyphicons and labels to annotate these -->
-          <td>
-            <a href="/#!/seasons/{{season.id}}">
-              <span class="label label-primary">
-                <span class="glyphicon glyphicon-eye-open"></span> View
+        <tbody>
+          <tr
+            ng-repeat="season in seasons | orderBy:'-created_at'"
+            ng-click="openSeason($event, season)">
+            <!-- TODO use glyphicons and labels to annotate these -->
+            <td class="season-name">
+              <span
+                tooltip="click to view season"
+                class="glyphicon glyphicon-eye-open hidden">
               </span>
-            </a>
-          </td>
-          <td>{{season.name}}</td>
-          <td>{{season.created_at}}</td>
-          <td><user-view user="season.owner"></user-view></td>
-          <td>{{season.starts}}</td>
-          <td>{{season.ends}}</td>
-          <td>
-            <span
-              ng-if="season.invite_only"
-              class="invite-only label label-warning"
-              tooltip="you must be invited to join this season">
-              <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
-            </span>
-            <span 
-              ng-if="season.is_archived"
-              class="archived label label-default"
-              tooltip="this season is no longer open">
-              <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-            </span>
-            <span
-              ng-if="season.allow_auto_join"
-              class="auto-join-enabled label label-success"
-              tooltip="this season can be joined by anyone">
-              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-            </span>
-          </td>
-        </tr>
+              <span>{{season.name}}</span>
+            </td>
+            <td>{{season.created_at}}</td>
+            <td><user-view user="season.owner"></user-view></td>
+            <td>{{season.starts}}</td>
+            <td>{{season.ends}}</td>
+            <td>
+              <span
+                ng-if="season.invite_only"
+                class="invite-only label label-warning"
+                tooltip="you must be invited to join this season">
+                <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+              </span>
+              <span
+                ng-if="season.is_archived"
+                class="archived label label-default"
+                tooltip="this season is no longer open">
+                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+              </span>
+              <span
+                ng-if="season.allow_auto_join"
+                class="auto-join-enabled label label-success"
+                tooltip="this season can be joined by anyone">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              </span>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </tab>
     <tab heading="Create">

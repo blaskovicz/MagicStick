@@ -1,23 +1,23 @@
 <div class="season-manage">
   <div class="page-header">
     <!-- TODO breadcrumb directive -->
-    <h2><a href="/#!/seasons">Seasons</a> &gt; {{season.name}} [id: {{season.id}}]</h2>
+    <h2><a href="/#!/seasons">Seasons</a> &raquo; {{season.name}} <small>(#{{season.id}})</small></h2>
   </div>
   <!-- TODO directives for these tabs / panes -->
   <div class="panel panel-default">
     <div class="panel-heading">Attributes</div>
-    <table class="table">
-      <tr><td>Name</td><td>{{season.name}}</td></tr>
-      <tr><td>Owner</td><td>{{season.owner.username}}</td></tr>
-      <tr><td>Created</td><td>{{season.created_at}}</td></tr>
-      <tr><td>Updated</td><td>{{season.updated_at}}</td></tr>
-      <tr><td>Starts</td><td>{{season.starts}}</td></tr>
-      <tr><td>Ends</td><td>{{season.ends}}</td></tr>
-      <tr><td>Description</td><td>{{season.description}}</td></tr>
-      <tr><td>Auto Join Enabled?</td><td>{{season.allow_auto_join && "Yes" || "No"}}</td></tr>
-      <tr><td>Invite Only?</td><td>{{season.invite_only && "Yes" || "No"}}</td></tr>
-      <tr><td>Archived?</td><td>{{season.is_archived && "Yes" || "No"}}</td></tr>
-    </table>
+    <dl class='dl-horizontal'>
+      <dt>Name</dt><dd>{{season.name}}</dd>
+      <dt>Owner</dt><dd><user-view user="season.owner"></user-view></dd>
+      <dt>Created</dt><dd>{{season.created_at}}</dd>
+      <dt>Updated</dt><dd>{{season.updated_at}}</dd>
+      <dt>Starts</dt><dd>{{season.starts}}</dd>
+      <dt>Ends</dt><dd>{{season.ends}}</dd>
+      <dt>Description</dt><dd marked="season.description"></dd>
+      <dt>Auto Join Enabled?</dt><dd>{{season.allow_auto_join && "Yes" || "No"}}</dd>
+      <dt>Invite Only?</dt><dd>{{season.invite_only && "Yes" || "No"}}</dd>
+      <dt>Archived?</dt><dd>{{season.is_archived && "Yes" || "No"}}</dd>
+    </dl>
   </div>
   <div class="panel panel-default">
     <div class="panel-heading">Members</div>

@@ -7,6 +7,7 @@ angular.module("MagicStick.directives").directive "userView", ->
     "$scope"
     "$location"
     ($scope, $location, user) ->
-      $scope.view = ->
-        $location.path('/users/' + $scope.user().username)
+      $scope.view = (event) ->
+        event.stopPropagation()
+        $location.path "/users/#{$scope.user().username}"
   ]

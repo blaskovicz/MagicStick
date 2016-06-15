@@ -37,5 +37,8 @@ angular.module("MagicStick.controllers").controller "SeasonDashController", [
         .error (data) ->
           toastr.error "Failed to create season"
           $scope.newSeasonError = data.errors
+    $scope.openSeason = (event, season) ->
+      event.stopPropagation()
+      $location.path "/seasons/#{season.id}"
     $scope.loadSeasons()
 ]

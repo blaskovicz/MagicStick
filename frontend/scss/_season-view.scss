@@ -1,0 +1,22 @@
+div.season-view {
+  table.season-listings {
+    tbody tr {
+      td.season-name {
+        width: 20%;
+        font-weight: bold;
+        font-style: italic;
+      }
+      &:hover {
+        span {
+          &.hidden {
+            display: inline-block!important;
+          }
+        }
+        td {
+          background: #eee;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
