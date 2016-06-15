@@ -17,11 +17,25 @@ module Auth
     provided_basic_creds =
       @auth.provided? and
       @auth.basic? and
-      @auth.credentials
+      @auth.credentials.all?{|part| part.length >= 4 } #TODO tie in with User validators
     return nil unless provided_basic_creds
-    user = User[username: @auth.credentials.first]
-    return nil if user.nil?
-    user.password_matches?(@auth.credentials.last) ? user : nil
+    username_or_email, password = @auth.credentials.first, @auth.credentials.last
+    lookup_by = [:username]
+    # if the user specified an @, try lookup by email first
+    if username_or_email.index('@')
+      lookup_by.unshift :email
+    else
+      lookup_by.push :email
+    end
+
+    lookup_by.each do |attr|
+      user = User.where(attr => username_or_email).first
+      if user and user.password_matches? password
+        return user
+      end
+    end
+    logger.warn "Invalid login attempt with username_or_email #{username_or_email}"
+    nil
   end
   def requires_login!
     user = principal

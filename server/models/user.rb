@@ -11,7 +11,9 @@ class User < Sequel::Model
     validates_presence :name if new? # initial users don't have a name defined
     validates_min_length 8, :password
     validates_min_length 4, :username
+    validates_unique :email
     validates_unique :username
+    errors.add(:username, 'cannot contain @ character') if !self.username.nil? && self.username.index('@')
     validates_format /[^@]+@[^@]+\..+/, :email, :message => "is not a valid email address"
     errors.add(:avatar_mime_type, 'unsupported content-type') unless [nil, 'image/png', 'image/jpeg', 'image/gif'].include? self.avatar_content_type
   end
