@@ -64,17 +64,44 @@ app.config([
         auth: true
         resolve:
           season: [
-            "$route", "$q", "$http",
-            ($route, $q, $http) ->
+            "$route"
+            "$q"
+            "$http"
+            "$modal"
+            ($route, $q, $http, $modal) ->
+              modal = $modal.open {
+                backdrop: "static"
+                template: """
+                <div>
+                  <div class="modal-header">
+                    <h3 class="modal-title">
+                      Loading...
+                    </h3>
+                  </div>
+                  <div class="modal-body">
+                    <progressbar
+                      class="progress-striped active"
+                      value="'100'">
+                    </progressbar>
+                  </div>
+                </div>"""
+                keyboard: no
+                size: "lg"
+              }
               #TODO move some of the $http stuff into service objects
               promise = $q.defer()
               seasonId = $route.current.params.seasonId
               if not /^\d+$/.test(seasonId)
+                modal.close()
                 promise.reject("Invalid season id, must be numeric")
               else
                 $http.get("/api/match/seasons/#{seasonId}")
-                  .success (data) -> promise.resolve(data)
-                  .error (data) -> promise.reject(data)
+                  .success (data) ->
+                    modal.close()
+                    promise.resolve(data)
+                  .error (data) ->
+                    modal.close()
+                    promise.reject(data)
               promise.promise
           ]
       })
