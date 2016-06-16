@@ -4,7 +4,9 @@
       <tr>
         <th>Rank</th>
         <th>User</th>
-        <th>Win / Loss / Unplayed</th>
+        <th>Match Record</th>
+        <th>Games Won</th>
+        <th>Matches Unplayed</th>
       </tr>
     </thead>
     <tbody>
@@ -20,33 +22,34 @@
           <user-view user="rank.member"></user-view>
         </td>
         <td>
-          <span class="rank">
-            <span
-              class="rank rank-wins"
-              tooltip-append-to-body="true"
-              tooltip="matches won (a series of games)">
-              {{rank.matchWins}}
-            </span>
-            <span
-              class="rank rank-wins">-</span>
-            <span
-              class="rank rank-wins"
-              tooltip-append-to-body="true"
-              tooltip="games won (multiple games per match)">
-              {{rank.gameWins}}
-            </span>  /
-            <span
-              class="rank rank-loss"
-              tooltip-append-to-body="true"
-              tooltip="matches lost (a series of games)">
-              {{rank.matchLoss}}
-            </span> /
-            <span
-              class="rank rank-unplayed"
-              tooltip-append-to-body="true"
-              tooltip="matches unplayed">
-              {{rank.matchUnplayed}}
-            </span>
+          <span
+            class="rank rank-wins"
+            tooltip-append-to-body="true"
+            tooltip="matches won (a series of games)">
+            {{rank.matchWins}}
+          </span>
+          <span class="rank"> - </span>
+          <span
+            class="rank rank-loss"
+            tooltip-append-to-body="true"
+            tooltip="matches lost (a series of games)">
+            {{rank.matchLoss}}
+          </span>
+        </td>
+        <td>
+          <span
+            class="rank rank-wins"
+            tooltip-append-to-body="true"
+            tooltip="games won (multiple games per match)">
+            {{rank.gameWins}}
+          </span>
+        </td>
+        <td>
+          <span
+            class="rank rank-unplayed"
+            tooltip-append-to-body="true"
+            tooltip="matches unplayed">
+            {{rank.matchUnplayed}}
           </span>
         </td>
       </tr>
