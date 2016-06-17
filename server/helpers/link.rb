@@ -10,9 +10,19 @@ module Link
     "#{link_to_site_root}/#!/password-reset"
   end
   def link_to_season(season_id)
-    "#{link_to_site_root}/#!/seasons/#{season_id}"
+    id = if season_id.kind_of? Season
+           season_id.id
+         else
+           season_id
+         end
+    "#{link_to_site_root}/#!/seasons/#{id}"
   end
   def link_to_user(username)
-    "#{link_to_site_root}/#!/users/#{CGI.escape username}"
+    u = if username.kind_of? User
+          username.username
+        else
+          username
+        end
+    "#{link_to_site_root}/#!/users/#{CGI.escape u}"
   end
 end

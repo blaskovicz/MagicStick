@@ -74,11 +74,11 @@ class AuthController < ApplicationController
       id = user.id
       encrypted, iv = encrypt("#{id}/#{expires}")
       link = "#{link_to_reset}/#{Base64.urlsafe_encode64(encrypted)}/#{Base64.urlsafe_encode64(iv)}"
+      email_password_reset_request user, link
       logger.info "Generated reset link and sent email for user #{user.username}, id #{user.id}, email #{user.email}"
       if ENV['RACK_ENV'] == 'development'
         logger.info ">> #{link}"
       end
-      Pony.mail(to: user.email, subject: "Password Reset Request", body: "Hi #{user.username},\nSomeone requested a reset of your password on #{ENV['SITE_BASE_URI']}.\nIf it was you, visit the following link to continue: #{link}.\nIf you didn't request this, please ignore this email.\n\n-MagicStick")
     # trying to update a password based on a reset link
     elsif params[:user][:token] && params[:user][:iv] && params[:user][:password]
       status 204
@@ -129,7 +129,7 @@ class AuthController < ApplicationController
   end
   get '/me' do
     requires_login!
-    principal.to_json(include: [:roles,:avatar_url], except: [:id, :active, :password, :salt, :avatar])
+    principal.to_json(include: [:roles,:avatar_url], except: [:active, :password, :salt, :avatar])
   end
   post '/me' do
     requires_login!

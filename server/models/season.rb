@@ -11,10 +11,9 @@ class Season < Sequel::Model
     validates_min_length 4, :description
     validates_max_length 4000, :description
     validates_unique [:owner_id, :name]
-    join_mode_invalid = self.invite_only == self.allow_auto_join and self.invite_only
-    if self.invite_only == true and self.allow_auto_join == true
-      errors.add(:allow_auto_join, 'cannot be set if invite only is also enabled')
-      errors.add(:invite_only, 'cannot be set if allow auto join is also enabled')
+    if self.invite_only == self.allow_auto_join
+      errors.add(:allow_auto_join, 'cannot be the same as invite_only')
+      errors.add(:invite_only, 'cannot be the same as allow_auto_join')
     end
     super
   end
@@ -23,5 +22,13 @@ class Season < Sequel::Model
     self.allow_auto_join = false if not self.allow_auto_join
     self.is_archived = false
     super
+  end
+  def has_member?(user)
+    id = if user.kind_of? User
+           user.id
+         else
+           user
+         end
+    !self.members_dataset.where(users__id: id).first.nil?
   end
 end

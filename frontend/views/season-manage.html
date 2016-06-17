@@ -14,45 +14,78 @@
       <dt>Starts</dt><dd>{{season.starts}}</dd>
       <dt>Ends</dt><dd>{{season.ends}}</dd>
       <dt>Description</dt><dd marked="season.description"></dd>
-      <dt>Auto Join Enabled?</dt><dd>{{season.allow_auto_join && "Yes" || "No"}}</dd>
-      <dt>Invite Only?</dt><dd>{{season.invite_only && "Yes" || "No"}}</dd>
+      <dt>Season Enrollment</dt>
+      <dd>
+        <div ng-if="!seasonOwner()">
+          <span ng-if="season.invite_only">Invite Only</span>
+          <span ng-if="season.allow_auto_join">Anyone Can Join</span>
+        </div>
+        <div class="btn-group" ng-if="seasonOwner()">
+          <label
+            ng-disabled="updatingSeason"
+            class="btn btn-primary"
+            ng-model="season.invite_only"
+            btn-radio='true'
+            ng-change="updateJoinType()">
+            Invite Only
+          </label>
+          <label
+            ng-disabled="updatingSeason"
+            class="btn btn-primary"
+            ng-model="season.invite_only"
+            btn-radio='false'
+            ng-change="updateJoinType()">
+            Anyone Can Join
+          </label>
+        </div>
+      </dd>
       <dt>Archived?</dt><dd>{{season.is_archived && "Yes" || "No"}}</dd>
     </dl>
   </div>
   <div class="panel panel-default">
     <div class="panel-heading">Members</div>
-    <div class="panel-body" ng-if="seasonOwner()">
-      <p>Add users to the current season below.</p>
-      <form class="form-inline">
-        <div class="form-group">
-          <label for="newMemberLookup">Username</label>
-          <input
-            type="text"
-            class="form-control"
-            typeahead="user as user.username for user in findMembersMatching($viewValue)"
-            typeahead-template-url="user-typeahead.html"
-            id="newMemberLookup"
-            ng-model="newMember">
-        </div>
-        <button
-          type="button"
-          class="btn btn-primary"
-          ng-disabled="!newMember.id"
-          ng-click="addSeasonMember(newMember)">
-          Add Member
-        </button>
-      </form>
+    <div class="panel-body">
+      <div ng-if="seasonOwner()">
+        <p>Add users to the current season below.</p>
+        <form class="form-inline">
+          <div class="form-group">
+            <label for="newMemberLookup">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              typeahead="user as user.username for user in findMembersMatching($viewValue)"
+              typeahead-template-url="user-typeahead.html"
+              id="newMemberLookup"
+              ng-model="newMember">
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary"
+            ng-disabled="!newMember.id"
+            ng-click="addSeasonMember(newMember)">
+            Add Member
+          </button>
+        </form>
+      </div>
     </div>
     <div class="season-members">
       <div
         ng-repeat="member in season.members track by $index">
         <user-view user="member"></user-view>
         <button
-          ng-if="seasonOwner()"
+          ng-if="seasonOwner() || isCurrentUser(member)"
           type="button"
           class="btn btn-danger"
           ng-click="removeSeasonMember(member)">
-          Remove
+          {{isCurrentUser(member) ? "Leave" : "Remove"}}
+        </button>
+      </div>
+      <div ng-if="(seasonOwner() || season.allow_auto_join) && !seasonParticipant()">
+        <button
+          ng-click="joinSeason()"
+          type="button"
+          class="btn btn-default pull-left">
+          Join Season
         </button>
       </div>
     </div>

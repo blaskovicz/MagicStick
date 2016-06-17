@@ -11,6 +11,14 @@ angular.module("MagicStick.services").factory "User", [
         @loggedIn = false
         @username = ""
         @roles = {}
+      clone: ->
+        {
+          @username
+          @id
+          @name
+          @catchphrase
+          @avatar_url
+        }
       loadFromStorage: ->
         user = localStorageService.get('currentUser')
         return unless user?
@@ -51,13 +59,19 @@ angular.module("MagicStick.services").factory "User", [
             @logout() if status is 401
       parsePrincipal: (data) ->
         return unless data?
+        @id = data.id
+        @name = data.name
         @username = data.username
         @avatar_url = data.avatar_url
+        @catchphrase = data.catchphrase
         @roles = {}
         for role in data.roles
           @roles[role.name] = true
       logout: ->
+        @id = null
         @loggedIn = false
+        @name = ""
+        @catchphrase = ""
         @username = ""
         @roles = {}
         @avatar_url = null

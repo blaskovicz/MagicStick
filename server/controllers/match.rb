@@ -246,18 +246,36 @@ class MatchController < ApplicationController
     match_group.delete
     status 204
   end
-  put '/seasons/:season_id/members/:member_id' do |season_id, member_id|
-    # TODO
-    # cases: (owner vs not), (invite_only vs not), (invited vs not), (auto join vs not), (archived vs not) 
+  put '/seasons/:season_id/join-mode' do |season_id|
     requires_season_owner!
-    if @season.members_dataset.where(users__id: member_id).first.nil?
+    season_param_presence!
+    @season.set_fields params[:season], [:allow_auto_join, :invite_only]
+    json_halt 400, @season.errors unless @season.valid?
+    @season.save_changes
+    status 204
+  end
+  put '/seasons/:season_id/members/:member_id' do |season_id, member_id|
+    # we can add a member to the season if we're the season or it has open enrollment
+    unless season_owner? || @season.allow_auto_join
+      halt_403
+    end
+    # TODO
+    # cases: (invite_only vs not), (invited vs not), (archived vs not)
+    unless @season.has_member? @member
       @season.add_member @member
+      email_user_added_to_season @season, @member, principal
     end
     status 204
   end
   delete '/seasons/:season_id/members/:member_id' do |season_id, member_id|
-    requires_season_owner!
-    @season.remove_member @member
+    # season owners can remove anyone, members can remove themselves
+    unless season_owner? || principal == @member
+      halt_403
+    end
+    if @season.has_member? @member
+      @season.remove_member @member
+      email_user_removed_from_season @season, @member, principal
+    end
     status 204
   end
   post '/seasons' do
@@ -287,8 +305,11 @@ class MatchController < ApplicationController
         @match.user_season_match.map{|m| m.user.id}.include?(principal.id) #TODO is there a more correct way to do this?
       )
     end
+    def season_owner?
+      @season.owner == principal
+    end
     def requires_season_owner!
-      halt_403 unless @season.owner == principal
+      halt_403 unless season_owner?
     end
     def season_param_presence!
       json_halt 400, "No season object found in request payload" if params[:season].nil?

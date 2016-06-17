@@ -5,6 +5,15 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
   "season"
   "toastr"
   ($scope, User, $http, season, toastr) ->
+    getReason = (res) ->
+      ": " + unless res?
+        "Try again later."
+      else if res.error?
+        res.error
+      else if res.errors?
+        res.errors
+      else
+        "An error occurred (#{res})."
     $scope.season = season
     $scope.comment =
       comment: ""
@@ -16,11 +25,12 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
       {id: 7, name: "seven"}
       {id: 11, name: "eleven"}
     ]
-    $scope.isCurrentUser = (username) -> username is User.username
+    $scope.isCurrentUser = (user) -> user?.username is User.username
     $scope.userLabel = (user) ->
       user.username + if user.name? then " (#{user.name})" else ""
-    $scope.seasonOwner = ->
-      season?.owner?.username is User.username
+    $scope.seasonOwner = -> $scope.isCurrentUser(season?.owner)
+    $scope.seasonParticipant = ->
+      _.find season?.members, {'username': User.username}
     $scope.matchStatusAlias = (status) ->
       if status is false
         "Loss"
@@ -33,6 +43,26 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
     $scope.matchIsComplete = (match) ->
       match.user_season_match?.length > 0 and \
       _.any(match.user_season_match, ((userMatch) -> userMatch?.won?))
+    $scope.updateJoinType = ->
+      return unless season?
+      $scope.updatingSeason = yes
+      to = ""
+      if season.invite_only
+        season.allow_auto_join = no
+        to = "invite only"
+      else
+        season.allow_auto_join = yes
+        to = "anyone can join"
+      $http.put("/api/match/seasons/#{season.id}/join-mode", {
+        season:
+          invite_only: season.invite_only
+          allow_auto_join: season.allow_auto_join
+      }).then (res) ->
+          toastr.success "Updated join mode to '#{to}'"
+        .catch (err) ->
+          toastr.error "Couldn't update join mode to '#{to}': #{getReason err}"
+        .finally ->
+          $scope.updatingSeason = no
     $scope.createSeasonGrouping = (groupingName) ->
       $http.post("/api/match/seasons/#{season.id}/match-groups", {
         name: groupingName
@@ -53,17 +83,26 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
           _.remove season.season_match_groups,
             (nextGroup) -> nextGroup.id is group.id
         .error (reason) ->
-          toastr.error "Failed to remove season match grouping" +
-            reason?.error ? ""
+          toastr.error \
+            "Failed to remove season match grouping #{getReason reason}"
+    $scope.joinSeason = -> $scope.addSeasonMember User.clone()
     $scope.addSeasonMember = (newMember) ->
+      if _.find season.members, {'username': newMember.username}
+        $scope.newMember = null
+        toastr.info "User already present in season"
+        return
+      isCurrentUser = $scope.isCurrentUser newMember
       $http.put("/api/match/seasons/#{season.id}/members/#{newMember.id}")
         .success ->
-          toastr.success "User added to season"
+          if isCurrentUser
+            toastr.success "Joined the season"
+          else
+            toastr.success "User added to season"
           season.members.push newMember
           $scope.newMember = null
         .error (reason) ->
-          toastr.error "Failed to add #{newMember.username} to season" +
-           reason?.error ? ""
+          toastr.error \
+            "Failed to add #{newMember.username} to season #{getReason reason}"
     $scope.findMembersMatching = (text) ->
       $http.get("/api/auth/users", {
         params:
@@ -71,13 +110,31 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
           matching: text
       }).then (response) -> response.data.users
     $scope.removeSeasonMember = (member) ->
+      isCurrentUser = $scope.isCurrentUser member
+      if isCurrentUser && (
+        !confirm "Do you really want to leave the season? \
+        All of your match records will be deleted."
+      )
+        return
+      else if !isCurrentUser && !(confirm "Do you really want to remove \
+        #{member.username} from the season? \
+        All of their match records will be deleted."
+      )
+        return
       $http.delete("/api/match/seasons/#{season.id}/members/#{member.id}")
         .success ->
-          toastr.success "User removed from season"
+          if isCurrentUser
+            toastr.success "Left the season"
+          else
+            toastr.success "User removed from the season"
           _.remove season.members, (nextMember) -> nextMember.id is member.id
         .error (reason) ->
-          toastr.error "Failed to remove user #{member.username} from season" +
-            reason?.error ? ""
+          if isCurrentUser
+            toastr.error "Failed to leave season #{getReason reason}"
+          else
+            toastr.error \
+              "Failed to remove user #{member.username} from season \
+              #{getReason reason}"
     $scope.newMatch =
       scheduled_for: new Date()
       best_of: $scope.bestOfOptions[1].id
@@ -95,7 +152,7 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
           group.matches.push newMatch if group?
         .error (data) ->
           toastr.error "Couldn't create match"
-          $scope.newMatchError = data?.errors
+          $scope.newMatchError = getReason data
     $scope.deleteMatch = (groupId, matchId) ->
       $http.delete(matchPath(groupId, matchId))
         .success ->
@@ -104,7 +161,7 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
           return unless group?
           _.remove group.matches, ((item) -> item.id is matchId)
         .error (data) ->
-          toastr.error "Couldn't delete match: #{data}"
+          toastr.error "Couldn't delete match: #{getReason data}"
     $scope.addNextMatchMember = (nextMatchMember, groupId, matchId) ->
       member = angular.copy nextMatchMember
       $http.put("#{matchPath(groupId, matchId)}/members/#{member.id}")
@@ -121,13 +178,13 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
           refreshMatchMembers groupId, matchId
         .error (data) ->
           toastr.error \
-            "Couldn't remove member from match: #{data.errors ? data}"
+            "Couldn't remove member from match: #{getReason data}"
 
     findMatchMember = (match) ->
       return unless match?.user_season_match?.length > 0
       member = _.find(
         match.user_season_match,
-        ((item) -> item.user_season.user.username is User.username)
+        ((item) -> $scope.isCurrentUser(item.user_season.user))
       )
       member
     $scope.isMatchMember = (match) ->
@@ -148,8 +205,7 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
           $scope.statusIsUpdating = false
           toastr.error \
             "Couldn't update member match status: #{data.errors ? data}"
-    $scope.hasCommentPrivs = (comment) ->
-      comment?.user?.username is User.username
+    $scope.hasCommentPrivs = (comment) -> $scope.isCurrentUser comment?.user
     $scope.deleteComment = (comment) ->
       $http.delete("/api/match/seasons/#{season.id}/comments/#{comment.id}")
         .success ->

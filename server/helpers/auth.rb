@@ -13,6 +13,9 @@ module Auth
     halt_403
   end
   def principal
+#    if @user
+#      return @user
+#    end
     @auth ||= Rack::Auth::Basic::Request.new(request.env)
     provided_basic_creds =
       @auth.provided? and
@@ -32,6 +35,8 @@ module Auth
       user = User.where(attr => username_or_email).first
       if user and user.password_matches? password
         return user
+#        @user = user
+#        return @user
       end
     end
     logger.warn "Invalid login attempt with username_or_email #{username_or_email}"
