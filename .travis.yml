@@ -6,3 +6,7 @@ before_script:
     - npm install
 script:
     - grunt test
+cache:
+  bundler: true
+  directories:
+    - node_modules
