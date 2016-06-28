@@ -60,12 +60,12 @@ p.navbar-text.profile {
   min-height: 100%;
   -ms-interpolation-mode: bicubic; /* Scaled images look a bit better in IE now */
 }
-#avatar-selector {
+#avatar-selector:not(.disabled) {
   cursor: pointer;
   position: relative;
 }
-#avatar-selector:hover:after {
-  content: 'Upload';
+#avatar-selector:not(.disabled):hover:after {
+  content: 'upload';
   display: block;
   position: absolute;
   font-size: 2em;

@@ -1,7 +1,15 @@
 <div class="me" ng-show="user">
-  <div ng-show="!edit" class="pull-right btn-group" role="group">
-    <button class="btn btn-default" type="submit" ng-click="editProfile()">Update</button>
-    <button class="btn btn-warning" type="submit" ng-click="logout()">Logout</button>
+  <div
+    ng-show="!edit"
+    class="pull-right">
+    <button
+      class="btn btn-primary"
+      type="button"
+      ng-click="editProfile()">Edit Profile</button>
+    <button
+      class="btn btn-default"
+      type="button"
+      ng-click="logout()">Logout</button>
   </div>
   <div class="page-header">
     <h2>
@@ -78,6 +86,14 @@
       error-model="errors.passwordConfirmation"
       >
     </form-input>
-    <button type="submit" class="btn btn-default">Update</button>
+    <div style="left:-15px;position:relative">
+      <button
+        type="submit"
+        class="btn btn-primary">Update</button>
+      <button
+        ng-click="cancelEdits()"
+        type="button"
+        class="btn btn-default">Cancel</button>
+    </div>
   </form>
 </div>

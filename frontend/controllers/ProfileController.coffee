@@ -27,10 +27,16 @@ angular.module("MagicStick.controllers").controller "ProfileController", [
       $scope.user = response.data
 
     $scope.logout = -> User.logout()
-    $scope.editProfile = -> $scope.edit = true
+    $scope.cancelEdits = ->
+      $scope.user = $scope.saved
+      $scope.edit = no
+    $scope.editProfile = ->
+      $scope.saved = angular.copy $scope.user
+      $scope.edit = yes
     $scope.saveProfile = ->
       $http.post("/api/auth/me", user: $scope.user)
         .success ->
+          $scope.saved = null
           $scope.edit = false
           $scope.errors = undefined
 

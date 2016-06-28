@@ -2,6 +2,9 @@
   <div class="page-header">
     <h2>
       {{user.username}}
+      <small ng-if="isCurrentUser">
+        <a href="/#!/profile">edit</a>
+      </small>
     </h2>
   </div>
   <div class="row">
@@ -22,10 +25,10 @@
       </dl>
     </div>
     <div class="col-sm-2">
-      <div class="thumbnail" id="avatar-selector">
-        <a ng-model="avatars">
-          <img ng-src="{{user.avatar_url}}" alt="avatar" />
-        </a>
+      <div
+        class="disabled thumbnail"
+        id="avatar-selector">
+        <img ng-src="{{user.avatar_url}}" alt="avatar" />
       </div>
     </div>
   </div>
