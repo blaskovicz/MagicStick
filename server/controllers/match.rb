@@ -30,10 +30,12 @@ class MatchController < ApplicationController
     json_halt 404, "User #{params[:user_id]} not found" if @member.nil?
   end
   get '/seasons' do
-    if params[:owned].nil?
-      seasons = Season
+    seasons = if params[:owned]
+      Season.filter(owner_id: principal.id)
+    elsif params[:member]
+      Season.where(id: UserSeason.where(user_id: principal.id).select(:season_id))
     else
-      seasons = Season.filter(owner_id: principal.id)
+      Season
     end
     seasons.to_json(root: true, include: {:owner => {:only => User.public_attrs}})
   end
