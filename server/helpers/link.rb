@@ -4,7 +4,7 @@ module Link
     "https://github.com/blaskovicz/MagicStick"
   end
   def link_to_site_root
-    ENV['SITE_BASE_URI'].sub(/\/$/,"")
+    (ENV['SITE_BASE_URI'] || '').sub(/\/$/,"")
   end
   def link_to_reset
     "#{link_to_site_root}/#!/password-reset"

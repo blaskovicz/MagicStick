@@ -74,7 +74,7 @@ class AuthController < ApplicationController
       id = user.id
       encrypted, iv = encrypt("#{id}/#{expires}")
       link = "#{link_to_reset}/#{Base64.urlsafe_encode64(encrypted)}/#{Base64.urlsafe_encode64(iv)}"
-      email_password_reset_request user, link
+      email_password_reset_link user, link
       logger.info "Generated reset link and sent email for user #{user.username}, id #{user.id}, email #{user.email}"
       if ENV['RACK_ENV'] == 'development'
         logger.info ">> #{link}"
