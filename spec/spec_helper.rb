@@ -1,7 +1,8 @@
 require 'rack/test'
 require 'rspec'
-
 require 'sequel'
+require 'coveralls'
+Coveralls.wear!
 
 require_relative '../db/init'
 require_relative '../app'

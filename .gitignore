@@ -13,3 +13,4 @@ public/js/tests.js
 *.db
 vendor/bundle
 .env
+coverage/
