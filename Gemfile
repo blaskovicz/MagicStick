@@ -11,12 +11,12 @@ gem 'sass'
 gem 'slack-notifier'
 gem 'dotenv'
 gem 'pony'
+gem 'rubocop', require: false # outside developement group for Rakefile
 group :production do
   gem 'pg'
 end
 group :development do
   gem 'sqlite3'
   gem 'shotgun'
-  gem 'rubocop', require: false
   gem 'coveralls', require: false
 end
