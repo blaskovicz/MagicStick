@@ -8,7 +8,7 @@ require_relative '../app'
 
 # TODO: Abstract this to avoid copy and paste from config.ru
 root_dir = File.dirname(__FILE__) + '/..'
-%w{helpers models controllers}.each do |type|
+%w(helpers models controllers).each do |type|
   Dir["#{root_dir}/server/{*/,}#{type}/*.rb"].each do |file|
     require file
   end

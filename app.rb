@@ -14,7 +14,7 @@ Dotenv.load
 class ApplicationController < Sinatra::Base
   use Rack::Logger
   register Sinatra::ConfigFile
-  @@version = "0.3.0"
+  @version = '0.3.0'
   config_file 'config.yml'
   configure do
     enable :sessions
@@ -22,20 +22,20 @@ class ApplicationController < Sinatra::Base
     set :method_override, false
   end
   Pony.options = {
-    :from => 'noreply@magic-stick.herokuapp.com',
-    :via => (ENV['RACK_ENV'] == 'production' ? :smtp : :test),
-    :via_options => {
-      :address => 'smtp.sendgrid.net',
-      :port => '587',
-      :domain => 'heroku.com',
-      :user_name => ENV['SENDGRID_USERNAME'],
-      :password => ENV['SENDGRID_PASSWORD'],
-      :authentication => :plain,
-      :enable_starttls_auto => true
+    from: 'noreply@magic-stick.herokuapp.com',
+    via: (ENV['RACK_ENV'] == 'production' ? :smtp : :test),
+    via_options: {
+      address: 'smtp.sendgrid.net',
+      port: '587',
+      domain: 'heroku.com',
+      user_name: ENV['SENDGRID_USERNAME'],
+      password: ENV['SENDGRID_PASSWORD'],
+      authentication: :plain,
+      enable_starttls_auto: true
     }
   }
   before do
-    content_type "application/json"
+    content_type 'application/json'
   end
   helpers do
     def logger

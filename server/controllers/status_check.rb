@@ -1,8 +1,8 @@
 class StatusCheckController < ApplicationController
   get '/status' do
-    "SUCCESS"
+    'SUCCESS'
   end
   get '/version' do
-    json :version => @@version
+    json version: @version
   end
 end

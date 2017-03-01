@@ -7,18 +7,18 @@ class AuthController < ApplicationController
   end
   get '/roles' do
     requires_role! :admin
-    json :roles => Role.all
+    json roles: Role.all
   end
   get '/users' do
     if params[:limitted]
       requires_login!
-      params[:matching] ||= ""
+      params[:matching] ||= ''
       User.where(Sequel.expr(active: true) & (
           Sequel.ilike(:username, '%' + params[:matching] + '%') |
           Sequel.ilike(:name, '%' + params[:matching] + '%') |
           Sequel.ilike(:email, params[:matching])
-        ))
-        .to_json(root: true, :only => User.public_attrs)
+      ))
+          .to_json(root: true, only: User.public_attrs)
     else
       requires_role! :admin
       User.to_json(root: true, exclude: :avatar)
@@ -26,7 +26,7 @@ class AuthController < ApplicationController
   end
   get '/users/:user_id' do
     requires_role! :admin
-    json :user => @user
+    json user: @user
   end
   get '/users/:user_id/avatar' do
     content_type @user.avatar_content_type
@@ -39,18 +39,18 @@ class AuthController < ApplicationController
   end
   get '/users/:user_id/roles' do
     requires_role! :admin
-    json :roles => @user.roles
+    json roles: @user.roles
   end
   post '/users/:user_id/roles/:role_id' do |user_id, role_id|
     requires_role! :admin
     role = find_role! role_id
-    unless $DB[:users_roles].where(user_id: user_id, role_id: role_id).first.nil?
+    unless ::Database[:users_roles].where(user_id: user_id, role_id: role_id).first.nil?
       json_halt 409, "User #{user_id} already in role #{role_id}"
     end
     @user.add_role role
     status 204
   end
-  delete '/users/:user_id/roles/:role_id' do |user_id, role_id|
+  delete '/users/:user_id/roles/:role_id' do |_user_id, role_id|
     requires_role! :admin
     @user.remove_role find_role!(role_id)
     status 204
@@ -58,7 +58,7 @@ class AuthController < ApplicationController
   post '/forgot-password' do
     user_param_presence!
     # requesting a password reset
-    #TODO rate limit / regen limit
+    # TODO rate limit / regen limit
     if params[:user][:username] && params[:user][:email]
       status 204
       user = User[username: params[:user][:username]]
@@ -76,16 +76,14 @@ class AuthController < ApplicationController
       link = "#{link_to_reset}/#{Base64.urlsafe_encode64(encrypted)}/#{Base64.urlsafe_encode64(iv)}"
       email_password_reset_link user, link
       logger.info "Generated reset link and sent email for user #{user.username}, id #{user.id}, email #{user.email}"
-      if ENV['RACK_ENV'] == 'development'
-        logger.info ">> #{link}"
-      end
+      logger.info ">> #{link}" if ENV['RACK_ENV'] == 'development'
     # trying to update a password based on a reset link
     elsif params[:user][:token] && params[:user][:iv] && params[:user][:password]
       status 204
       begin
         iv = Base64.urlsafe_decode64(params[:user][:iv])
         decrypted = decrypt(Base64.urlsafe_decode64(params[:user][:token]), iv)
-        id, date_s = decrypted.split("/", 2)
+        id, date_s = decrypted.split('/', 2)
         logger.info "Reset request, id #{id}, expires #{date_s}"
         user = User[id: id]
         if user.nil?
@@ -113,7 +111,7 @@ class AuthController < ApplicationController
       end
     # other nefarious things
     else
-      json_halt 400, "Invalid user object found in request payload"
+      json_halt 400, 'Invalid user object found in request payload'
     end
   end
   post '/users' do
@@ -125,11 +123,11 @@ class AuthController < ApplicationController
     new_user.save
     status 201
     logger.info "#{new_user.username} successfully registered"
-    json :id => new_user.id
+    json id: new_user.id
   end
   get '/me' do
     requires_login!
-    principal.to_json(include: [:roles,:avatar_url], except: [:active, :password, :salt, :avatar])
+    principal.to_json(include: [:roles, :avatar_url], except: [:active, :password, :salt, :avatar])
   end
   post '/me' do
     requires_login!
@@ -138,7 +136,7 @@ class AuthController < ApplicationController
     password_changed = false
     if params[:user][:passwordCurrent]
       password_changed = true
-      error_message = { :passwordCurrent => [ 'incorrect password' ] }
+      error_message = { passwordCurrent: ['incorrect password'] }
       json_halt 400, error_message unless user.password_matches?(params[:user][:passwordCurrent])
 
       params[:user].delete 'passwordConfirmation'
@@ -147,7 +145,7 @@ class AuthController < ApplicationController
       user.set_fields params[:user], [:password]
       json_halt 400, user.errors unless user.valid?
 
-      e_password = user.encrypted_password(params[:user][:password] || "", user.salt)
+      e_password = user.encrypted_password(params[:user][:password] || '', user.salt)
       user.set_fields e_password, [:password]
     end
 
@@ -157,10 +155,10 @@ class AuthController < ApplicationController
     status 200
     logger.info "#{user.username} successfully updated"
     email_password_changed(user) if password_changed
-    json :id => user.id
+    json id: user.id
   end
   post '/me/avatar' do
-    json_halt 413, { :avatar => [ 'avatar must be less than 1mb' ] } if request.content_length.to_i > 1024 * 1024
+    json_halt 413, avatar: ['avatar must be less than 1mb'] if request.content_length.to_i > 1024 * 1024
     requires_login!
     user = User[principal.id]
     user.avatar_content_type = params[:file][:type]
@@ -176,8 +174,9 @@ class AuthController < ApplicationController
       json_halt 400, "Role #{role_id} not found" if role.nil?
       role
     end
+
     def user_param_presence!
-      json_halt 400, "No user object found in request payload" if params[:user].nil?
+      json_halt 400, 'No user object found in request payload' if params[:user].nil?
     end
   end
 end
