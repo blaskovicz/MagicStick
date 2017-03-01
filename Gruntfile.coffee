@@ -108,6 +108,9 @@ module.exports = (grunt) ->
         ]
       ruby:
         files: [
+          '.rubocop*.yml'
+          'app.rb'
+          'db/**/*.rb'
           'server/**/*.rb'
           'spec/**/*.rb'
           'Rakefile'

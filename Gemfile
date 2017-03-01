@@ -4,7 +4,7 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'unicorn'
 gem 'sequel'
-gem 'rack-parser', :require => 'rack/parser'
+gem 'rack-parser', require: 'rack/parser'
 gem 'rake'
 gem 'rspec'
 gem 'sass'
@@ -17,4 +17,6 @@ end
 group :development do
   gem 'sqlite3'
   gem 'shotgun'
+  gem 'rubocop', require: false
+  gem 'coveralls', require: false
 end
