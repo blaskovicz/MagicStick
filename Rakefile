@@ -1,3 +1,5 @@
+require 'rubocop/rake_task'
+
 namespace :db do
   desc "Run migrations"
   task :migrate, [:version] do |t, args|
@@ -12,6 +14,19 @@ namespace :db do
       Sequel::Migrator.run($DB, "db/migrations")
     end
   end
+end
+RuboCop::RakeTask.new(:rubocop) do |task|
+  task.patterns = [
+    'app.rb',
+    'server/**/*.rb',
+    'spec/**/*.rb',
+    'Rakefile',
+    'config.ru',
+  ]
+  # only show the files with failures
+  # task.formatters = ['files']
+  # don't abort rake on failure
+  # task.fail_on_error = true
 end
 namespace :test do
   desc "Configure test environment"
@@ -30,4 +45,4 @@ namespace :test do
   task :test => ['test:configure', 'db:migrate', 'test:spec'] do
   end
 end
-task :default => ['test:test']
+task :default => ['rubocop', 'test:test']

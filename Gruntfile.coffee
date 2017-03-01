@@ -108,6 +108,7 @@ module.exports = (grunt) ->
         ]
       ruby:
         files: [
+          'app.rb'
           'server/**/*.rb'
           'spec/**/*.rb'
           'Rakefile'

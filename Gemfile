@@ -17,4 +17,5 @@ end
 group :development do
   gem 'sqlite3'
   gem 'shotgun'
+  gem 'rubocop'
 end
