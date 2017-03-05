@@ -6,7 +6,6 @@ require_relative '../server/helpers/request'
 require_relative '../server/helpers/link'
 
 describe 'Authentication' do
-  AuthController.helpers Slack, Auth, Request, Link, Email
   def app
     AuthController
   end
@@ -41,6 +40,10 @@ describe 'Authentication' do
       get '/me'
       expect(last_response.status).to equal(200)
       expect(JSON.parse(last_response.body)).to include('catchphrase' => 'catchphrase')
+
+      get '/me/slack'
+      expect(last_response.status).to equal(200)
+      expect(JSON.parse(last_response.body)).to include('in_slack' => false)
     end
 
     it 'should permit password update' do

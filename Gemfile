@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 ruby '2.1.5'
 gem 'sinatra'
 gem 'sinatra-contrib'
@@ -11,6 +11,7 @@ gem 'sass'
 gem 'slack-notifier'
 gem 'dotenv'
 gem 'pony'
+gem 'httparty'
 gem 'redcarpet'
 gem 'rubocop', require: false # outside developement group for Rakefile
 group :production do
