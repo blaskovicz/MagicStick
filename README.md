@@ -84,14 +84,23 @@ $ heroku create
 # Add the postgres addon
 $ heroku addons:add heroku-postgresql
 
-# The heroku-buildpack-multi is configured via .buildpacks to install both rake and grunt
-$ heroku config:add BUILDPACK_URL=https://github.com/ddollar/heroku-buildpack-multi.git
+# Optionally, to enable email, also add the sendgrid addon.
+$ heroku addons:add sendgrid
+
+# To install node, rake and grunt, configure the buildpacks:
+$ heroku buildpacks:set -i 1 heroku/ruby
+$ heroku buildpacks:set -i 2 heroku/nodejs
 
 # Ensures dev-dependencies like grunt are installed for the build
 $ heroku config:add NPM_CONFIG_PRODUCTION=false
 
 # Configure ruby rack to run in production mode
 $ heroku config:add RACK_ENV=production
+
+# Check out env.sample for other env variables of note
+$ cat env.sample
+$ heroku config:add OTHER_VAR=OTHER_VAL
+$ ...
 
 # Push to Heroku
 $ git push heroku master
