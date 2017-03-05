@@ -125,9 +125,16 @@ class AuthController < ApplicationController
     logger.info "#{new_user.username} successfully registered"
     json id: new_user.id
   end
+  put '/me/slack' do
+    requires_login!
+    invite_to_slack(principal)
+  end
   get '/me' do
     requires_login!
     principal.to_json(include: [:roles, :avatar_url], except: [:active, :password, :salt, :avatar])
+  end
+  get '/me/slack' do
+    { in_slack: in_slack?(principal) }.to_json
   end
   post '/me' do
     requires_login!

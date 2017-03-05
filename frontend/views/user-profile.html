@@ -16,6 +16,9 @@
         <dt ng-show="user.catchphrase">Catchphrase</dt>
         <dd ng-show="user.catchphrase">“{{user.catchphrase}}”</dd>
 
+        <dt>Slack Status</dt>
+        <dd>{{slack.in_slack ? 'Joined' : 'Not Joined'}}</dd>
+
         <dt ng-show="user.roles.length">Roles</dt>
         <dd ng-show="user.roles.length">
           <ul class="list-unstyled">

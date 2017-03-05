@@ -26,7 +26,7 @@ module Email
         to: email,
         from: "#{h by_user.username} <noreply@magic-stick.herokuapp.com>",
         subject: "[Comment] Season '#{h season.name}'",
-        html_body: "#{Markdown.render(comment.comment)}\n\n---\n<i>Reply to this comment by visiting <a href='#{link_to_season season}'>the season page</a></i>.\n<i>You're receiving this email because you #{reason}. If you think this is an error, please <a href='#{link_to_github}'>file an issue</a>.</i>\n"
+        html_body: "#{::MarkdownService.render(comment.comment)}\n\n---\n<i>Reply to this comment by visiting <a href='#{link_to_season season}'>the season page</a></i>.\n<i>You're receiving this email because you #{reason}. If you think this is an error, please <a href='#{link_to_github}'>file an issue</a>.</i>\n"
       )
     end
     log_debug_email

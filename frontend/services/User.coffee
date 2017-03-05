@@ -48,6 +48,8 @@ angular.module("MagicStick.services").factory "User", [
           .error (data, status, headers) ->
             promise.reject(data?.errors ? "Invalid credentials")
         promise.promise
+      slackInfo: ->
+        $http.get("/api/auth/me/slack")
       get: ->
         $http.get("/api/auth/me")
       loadPrincipal: ->

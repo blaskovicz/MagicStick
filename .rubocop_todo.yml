@@ -8,12 +8,12 @@
 
 # Offense count: 3
 Metrics/AbcSize:
-  Max: 30
+  Max: 45
 
 # Offense count: 5
 # Configuration parameters: CountComments, ExcludedMethods.
 Metrics/BlockLength:
-  Max: 76
+  Max: 80
 
 # Offense count: 2
 # Configuration parameters: CountComments.
@@ -22,7 +22,7 @@ Metrics/ClassLength:
 
 # Offense count: 1
 Metrics/CyclomaticComplexity:
-  Max: 7
+  Max: 10
 
 # Offense count: 76
 # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
@@ -33,11 +33,11 @@ Metrics/LineLength:
 # Offense count: 3
 # Configuration parameters: CountComments.
 Metrics/MethodLength:
-  Max: 22
+  Max: 30
 
 # Offense count: 1
 Metrics/PerceivedComplexity:
-  Max: 8
+  Max: 10
 
 # Offense count: 18
 Style/Documentation:
