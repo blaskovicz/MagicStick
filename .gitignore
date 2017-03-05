@@ -14,3 +14,4 @@ public/js/tests.js
 vendor/bundle
 .env
 coverage/
+.coveralls.yml

@@ -11,6 +11,7 @@ gem 'sass'
 gem 'slack-notifier'
 gem 'dotenv'
 gem 'pony'
+gem 'redcarpet'
 gem 'rubocop', require: false # outside developement group for Rakefile
 group :production do
   gem 'pg'

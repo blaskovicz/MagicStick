@@ -4,6 +4,7 @@ require 'sinatra/config_file'
 require 'slack-notifier'
 require 'pony'
 require 'dotenv'
+require 'redcarpet'
 Dotenv.load
 # common controller for other controllers to inherit from.
 # routes should not be defined here since this controller
@@ -21,6 +22,7 @@ class ApplicationController < Sinatra::Base
     enable :logging
     set :method_override, false
   end
+  ::Markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true)
   Pony.options = {
     from: 'noreply@magic-stick.herokuapp.com',
     via: (ENV['RACK_ENV'] == 'production' ? :smtp : :test),

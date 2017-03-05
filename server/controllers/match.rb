@@ -80,6 +80,7 @@ class MatchController < ApplicationController
     slack_message(
       "\n*<#{link_to_user principal.username}|#{slack_escape principal.username}>* *commented* on *<#{link_to_season season_id}|#{slack_escape @season.name}>*\n>#{slack_escape comment.comment}"
     )
+    email_season_comment @season, comment, principal
     comment.to_json(root: true, include: {
                       user: {
                         only: User.public_attrs
