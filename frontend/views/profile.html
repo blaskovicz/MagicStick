@@ -30,15 +30,14 @@
         <dt>Slack Status</dt>
         <dd>
           {{slack.in_slack ? 'Joined' : 'Not Joined'}}.
-          <span ng-if="slack.in_slack">
-            <button
-              ng-disabled="slackInviteSent"
-              ng-click="sendSlackInvite()"
-              type="button"
-              class="btn btn-xs btn-primary">
-              {{slackInviteSent ? 'Invite sent' : 'Send me an invite!'}}
-            </button>
-          </span>
+          <button
+            ng-if="!slack.in_slack"
+            ng-disabled="slackInviteSent"
+            ng-click="sendSlackInvite()"
+            type="button"
+            class="btn btn-xs btn-primary">
+            {{slackInviteSent ? 'Invite sent' : 'Send me an invite!'}}
+          </button>
         </dd>
 
         <dt ng-show="user.roles.length">Roles</dt>
