@@ -11,23 +11,33 @@ angular.module("MagicStick.services").factory "User", [
         @loggedIn = false
         @username = ""
         @roles = {}
+        $rootScope.$on "currentUser:login:force_logout", =>
+          $log.info "performing logout"
+          @logout()
       clone: ->
         {
           @username
           @id
           @name
+          @token
+          @exp
           @catchphrase
           @avatar_url
         }
+      parseToken: ->
+        return unless @token?
+        JSON.parse(atob(@token.split('.')[1]))
       loadFromStorage: ->
         user = localStorageService.get('currentUser')
         return unless user?
+        @token = user.token if user.token?
+        @exp = user.exp if user.exp?
         @username = user.username if user.username?
-        @authHeader = user.authHeader if user.authHeader? and @username?
-        if @authHeader?
+        @authHeader = user.authHeader if user.authHeader?
+        if @token?
           $http.defaults.headers.common['Authorization'] = @authHeader
           @loggedIn = true
-          @loadPrincipal()
+          @parsePrincipal(@parseToken().user)
           @broadcastLoginStateChange()
       login: (username, password) ->
         promise = $q.defer()
@@ -36,12 +46,17 @@ angular.module("MagicStick.services").factory "User", [
           return promise.promise
         authHeader =
           "Basic #{btoa(username + ':' + password)}"
-        $http.get("/api/auth/me", { headers: {Authorization: authHeader} })
+        $http.post("/api/auth/login", '',
+          { headers: {Authorization: authHeader} })
           .success (data, status, headers) =>
+            # header.payload.sig
+            @token = atob(data.token)
+            payload = @parseToken()
+            @exp = payload.exp
             $http.defaults.headers.common['Authorization'] =
-              @authHeader = authHeader
+              @authHeader = "Bearer #{@token}"
             @loggedIn = true
-            @parsePrincipal(data)
+            @parsePrincipal(payload.user)
             @saveToStorage()
             @broadcastLoginStateChange()
             promise.resolve()
@@ -71,6 +86,8 @@ angular.module("MagicStick.services").factory "User", [
           @roles[role.name] = true
       logout: ->
         @id = null
+        @token = null
+        @exp = null
         @loggedIn = false
         @name = ""
         @catchphrase = ""
@@ -85,5 +102,4 @@ angular.module("MagicStick.services").factory "User", [
         localStorageService.set('currentUser', @)
       broadcastLoginStateChange: ->
         $rootScope.$broadcast("currentUser:login:changed")
-
 ]

@@ -4,8 +4,6 @@ module Request
   end
 
   def logger
-    return request.logger if respond_to? :request
-    require 'logger'
-    Logger.new(STDOUT)
+    self.class.logger
   end
 end

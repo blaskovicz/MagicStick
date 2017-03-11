@@ -1,8 +1,16 @@
+require 'base64'
+require 'logger'
 require_relative 'spec_helper'
 require_relative '../server/helpers/auth'
 
 describe 'Auth Helper' do
   include Auth
+  def logger
+    l = Logger.new(STDOUT)
+    l.level = Logger::DEBUG
+    l
+  end
+
   def with_secret
     ENV['SECRET'] = 'very secret'
     yield
@@ -29,6 +37,26 @@ describe 'Auth Helper' do
         decrypted = decrypt(encrypted, iv)
         expect(decrypted).to eq(target_phrase)
       end
+    end
+  end
+  context 'jwt' do
+    it 'can generate and veryify' do
+      user = User.new(username: 'sample-jwt-user', password: 'test-password', email: 'no-reply@gmail.com', name: 'same user')
+      user.save
+      expect(user).not_to be_nil
+      token = nil
+      found_user = nil
+      expect do
+        token = encode_jwt(user)
+      end.not_to raise_error
+      expect(token).not_to be_nil
+      expect do
+        found_user = decode_jwt_user(token)
+      end.not_to raise_error
+      expect(found_user).to be_instance_of(User)
+      expect(found_user.id).to eq(user.id)
+      dt = JWT.decode token, hmac_secret, true, algorithm: 'HS256'
+      expect(dt[0]).to have_key('user')
     end
   end
 end

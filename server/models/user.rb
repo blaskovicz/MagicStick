@@ -18,6 +18,10 @@ class User < Sequel::Model
     errors.add(:avatar_mime_type, 'unsupported content-type') unless [nil, 'image/png', 'image/jpeg', 'image/gif'].include? avatar_content_type
   end
 
+  def auth_payload
+    to_json(include: [:roles, :avatar_url], except: [:active, :password, :salt, :avatar])
+  end
+
   def before_create
     super
     self.active = true

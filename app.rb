@@ -15,13 +15,22 @@ require_relative 'db/init'
 # available in other random places).
 # only common config and setup should be defined here
 class ApplicationController < Sinatra::Base
-  use Rack::Logger
+  def self.logger
+    if @_logger.nil?
+      @_logger = Logger.new STDOUT
+      @_logger.level = Logger.const_get((ENV['LOG_LEVEL'] || 'debug').upcase)
+      @_logger.datetime_format = '%a %d-%m-%Y %H%M '
+    end
+    @_logger
+  end
   register Sinatra::ConfigFile
   @version = '0.3.0'
   config_file 'config.yml'
   configure do
     enable :sessions
     enable :logging
+    logger = ApplicationController.logger
+    set :logger, logger
     set :method_override, false
   end
   ::MarkdownService = Redcarpet::Markdown.new(Redcarpet::Render::HTML, autolink: true, tables: true)

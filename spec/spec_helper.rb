@@ -6,6 +6,9 @@ Coveralls.wear!
 
 require_relative '../app'
 
+ENV['SECRET'] = 'test secret'
+ENV['HMAC_SECRET'] = 'hmac test secret'
+
 module RSpecMixin
   include Rack::Test::Methods
 end

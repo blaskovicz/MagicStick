@@ -118,13 +118,17 @@ module.exports = (grunt) ->
         ]
         tasks: [
           'bgShell:rake'
+          'bgShell:pumaRestart'
         ]
     bgShell:
+      pumaRestart:
+        cmd: 'touch tmp/restart.txt'
+        fail: true
       rake:
         cmd: 'bundle exec rake'
         fail: true
       shotgun:
-        cmd: 'bundle exec shotgun config.ru'
+        cmd: 'bundle exec puma config.ru -p 9393'
         bg: true
   grunt.loadNpmTasks 'grunt-karma'
   grunt.loadNpmTasks 'grunt-html2js'

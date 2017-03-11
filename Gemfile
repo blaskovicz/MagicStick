@@ -14,10 +14,12 @@ gem 'pony'
 gem 'httparty'
 gem 'redcarpet'
 gem 'rubocop', require: false # outside developement group for Rakefile
+gem 'jwt'
 group :production do
   gem 'pg'
 end
 group :development do
+  gem 'puma'
   gem 'sqlite3'
   gem 'shotgun'
   gem 'coveralls', require: false

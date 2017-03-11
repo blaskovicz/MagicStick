@@ -120,6 +120,44 @@ app.config([
       gfm: true
       tables: true
     }
+]).config([
+  "$httpProvider"
+  ($httpProvider) ->
+    $httpProvider.interceptors.push [
+      "$q"
+      "$rootScope"
+      "$location"
+      "toastr"
+       # cannot directly talk to User service due to circular dep
+       "localStorageService"
+      ($q, $rootScope, $location, toastr, localStorageService) ->
+        apiRequest = (c) ->
+          c.url isnt "/api/auth/login" && c.url.indexOf("/api") is 0
+        {
+          request: (config) ->
+            if apiRequest config
+              u = localStorageService.get('currentUser')
+              if u?.exp? && u?.token?
+                exp = new Date(u.exp * 1000)
+                # check if we expire in 2 seconds or less
+                if exp <= new Date((new Date()).getTime() + 5*1000)
+                  console.log "jwt has expired at #{exp}, forcing logout"
+                  $location.path("/").replace()
+                  toastr.warning \
+                    "Your login token has expired. Please re-login."
+                  $rootScope.$broadcast("currentUser:login:force_logout")
+            config
+          response: (response) ->
+            if apiRequest response.config
+              if response.status is 401 # expired token
+                console.log "jwt has expired during request, forcing logout"
+                $location.path("/").replace()
+                toastr.warning \
+                  "Your login token has expired. Please re-login."
+                $rootScope.$broadcast("currentUser:login:force_logout")
+            response
+        }
+    ]
 ])
 
 # auth shim
