@@ -7,9 +7,12 @@ angular.module("MagicStick.directives").directive "memberSeasonView", ->
     "User"
     "toastr"
     ($scope, $http, User, toastr) ->
-      return unless User.loggedIn
       $scope.seasons = []
-      $http.get("/api/match/seasons", params: member: true)
-        .success (data) ->
-          $scope.seasons = data?.seasons
+      refreshSeasons = () ->
+        return unless User.loggedIn
+        $http.get("/api/match/seasons", params: member: true)
+          .success (data) ->
+            $scope.seasons = data?.seasons
+      refreshSeasons()
+      $scope.$on("currentUser:login:changed", -> refreshSeasons())
 ]
