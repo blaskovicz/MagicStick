@@ -1,7 +1,5 @@
-require 'sinatra/base'
-require 'sequel'
-require 'rack/parser'
 require_relative 'app'
+require 'rack/parser'
 
 use Rack::Parser, content_types: {
   'application/json' => proc { |body| ::MultiJson.decode body }

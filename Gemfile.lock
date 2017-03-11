@@ -15,6 +15,7 @@ GEM
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     json (2.0.3)
+    jwt (1.5.6)
     kgio (2.9.3)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
@@ -29,6 +30,7 @@ GEM
     pony (1.11)
       mail (>= 2.0)
     powerpack (0.1.1)
+    puma (3.8.1)
     rack (1.6.0)
     rack-parser (0.6.1)
       rack
@@ -100,8 +102,10 @@ DEPENDENCIES
   coveralls
   dotenv
   httparty
+  jwt
   pg
   pony
+  puma
   rack-parser
   rake
   redcarpet

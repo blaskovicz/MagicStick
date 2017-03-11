@@ -1,3 +1,4 @@
+require 'base64'
 require_relative 'spec_helper'
 require_relative '../server/controllers/auth'
 require_relative '../server/helpers/slack'
@@ -27,6 +28,37 @@ describe 'Authentication' do
   end
 
   context 'authenticated' do
+    it 'should generate a jwt upon login' do
+      authorize 'unit-test-account', 'unit-test-password'
+      post '/login', {}
+      expect(last_response.status).to equal(200)
+      expect(JSON.parse(last_response.body)).to have_key('token')
+
+      authorize 'unit-test-account', 'wrong-pass'
+      post '/login', {}
+      expect(last_response.status).to equal(401)
+      expect(JSON.parse(last_response.body)).not_to have_key('token')
+      expect(JSON.parse(last_response.body)).to include('errors' => 'Insufficient credentials provided')
+    end
+
+    it 'should accept a valid jwt for api auth' do
+      authorize 'unit-test-account', 'unit-test-password'
+      post '/login', {}
+      token = Base64.urlsafe_decode64(JSON.parse(last_response.body)['token'])
+
+      authorize 'noone', 'noone'
+      header('Authorization', "Bearer #{token.split('.').map { |p| p + '3' }.join('.')}")
+      get '/me'
+      expect(last_response.status).to equal(401)
+      expect(JSON.parse(last_response.body)).not_to have_key('token')
+      expect(JSON.parse(last_response.body)).to include('errors' => 'Insufficient credentials provided')
+
+      header('Authorization', "Bearer #{token}")
+      get '/me'
+      expect(last_response.status).to equal(200)
+      expect(JSON.parse(last_response.body)).to include('username' => 'unit-test-account')
+    end
+
     it 'should permit profile update' do
       authorize 'unit-test-account', 'unit-test-password'
       post '/me', user: {

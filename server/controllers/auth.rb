@@ -131,10 +131,17 @@ class AuthController < ApplicationController
   end
   get '/me' do
     requires_login!
-    principal.to_json(include: [:roles, :avatar_url], except: [:active, :password, :salt, :avatar])
+    principal.auth_payload
   end
   get '/me/slack' do
     { in_slack: in_slack?(principal) }.to_json
+  end
+  post '/login' do
+    # get a user row from Auth header
+    user = principal
+    halt_401 if user.nil?
+    status 200
+    { token: Base64.urlsafe_encode64(encode_jwt(user)) }.to_json
   end
   post '/me' do
     requires_login!
