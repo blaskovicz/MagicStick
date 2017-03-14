@@ -3,6 +3,6 @@ class StatusCheckController < ApplicationController
     'SUCCESS'
   end
   get '/version' do
-    json version: @version
+    json version: VERSION
   end
 end

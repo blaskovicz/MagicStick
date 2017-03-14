@@ -15,6 +15,7 @@ require_relative 'db/init'
 # available in other random places).
 # only common config and setup should be defined here
 class ApplicationController < Sinatra::Base
+  VERSION = '0.3.0'.freeze
   def self.logger
     if @_logger.nil?
       @_logger = Logger.new STDOUT
@@ -24,7 +25,6 @@ class ApplicationController < Sinatra::Base
     @_logger
   end
   register Sinatra::ConfigFile
-  @version = '0.3.0'
   config_file 'config.yml'
   configure do
     enable :sessions
