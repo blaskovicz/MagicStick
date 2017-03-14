@@ -1,7 +1,7 @@
 require 'base64'
 require 'logger'
 require_relative 'spec_helper'
-require_relative '../server/helpers/auth'
+require_relative '../helpers/auth'
 
 describe 'Auth Helper' do
   include Auth
@@ -41,9 +41,13 @@ describe 'Auth Helper' do
   end
   context 'jwt' do
     it 'can generate and veryify' do
-      user = User.new(username: 'sample-jwt-user', password: 'test-password', email: 'no-reply@gmail.com', name: 'same user')
-      user.save
-      expect(user).not_to be_nil
+      # TODO: cleanse test db between runs
+      user = User.find(username: 'sample-jwt-user')
+      if user.nil?
+        user = User.new(username: 'sample-jwt-user', password: 'test-password', email: 'no-reply@gmail.com', name: 'same user')
+        user.save
+        expect(user).not_to be_nil
+      end
       token = nil
       found_user = nil
       expect do

@@ -1,9 +1,9 @@
 require_relative 'spec_helper'
-require_relative '../server/controllers/user'
-require_relative '../server/helpers/slack'
-require_relative '../server/helpers/auth'
-require_relative '../server/helpers/request'
-require_relative '../server/helpers/link'
+require_relative '../controllers/user'
+require_relative '../helpers/slack'
+require_relative '../helpers/auth'
+require_relative '../helpers/request'
+require_relative '../helpers/link'
 
 describe 'User' do
   def app

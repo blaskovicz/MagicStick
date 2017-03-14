@@ -20,7 +20,6 @@ RuboCop::RakeTask.new(:rubocop) do |task|
     'db/init.rb',
     'app.rb',
     'server/**/*.rb',
-    'spec/**/*.rb',
     'Rakefile',
     'config.ru'
   ]
@@ -43,7 +42,7 @@ namespace :test do
   require 'rspec/core/rake_task'
   RSpec::Core::RakeTask.new(:spec) do |t|
     t.rspec_opts = ['--color', '-f documentation']
-    t.pattern = Dir.glob('spec/**/*_spec.rb')
+    t.pattern = Dir.glob('server/tests/**/*_spec.rb')
   end
 
   desc 'Prepare environment and run test suite'

@@ -112,13 +112,12 @@ module.exports = (grunt) ->
           'app.rb'
           'db/**/*.rb'
           'server/**/*.rb'
-          'spec/**/*.rb'
           'Rakefile'
           'config.ru'
         ]
         tasks: [
-          'bgShell:rake'
           'bgShell:pumaRestart'
+          'bgShell:rake'
         ]
     bgShell:
       pumaRestart:

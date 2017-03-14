@@ -4,7 +4,7 @@ require 'sequel'
 require 'coveralls'
 Coveralls.wear!
 
-require_relative '../app'
+require_relative '../../app'
 
 ENV['SECRET'] = 'test secret'
 ENV['HMAC_SECRET'] = 'hmac test secret'
