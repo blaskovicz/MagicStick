@@ -58,6 +58,7 @@ module.exports = (grunt) ->
           # a better way to do this (ie injecting them into that file)
           files: [
             "public/js/jwt-decode.js"
+            "public/bower_components/raygun4js/dist/raygun.min.js"
             "public/bower_components/jquery/dist/jquery.min.js"
             "public/bower_components/lodash/lodash.min.js"
             "public/bower_components/momentjs/min/moment.min.js"
