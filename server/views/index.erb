@@ -82,5 +82,9 @@
     <div class="container">
       <ng-view></ng-view>
     </div>
+    <script>
+      var MagicStick = MagicStick || {};
+      MagicStick.Env = <%= @env.to_json %>;
+    </script>
   </body>
 </html>
