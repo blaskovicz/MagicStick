@@ -15,6 +15,7 @@ gem 'httparty'
 gem 'redcarpet'
 gem 'rubocop', require: false # outside developement group for Rakefile
 gem 'jwt'
+gem 'raygun4ruby'
 group :production do
   gem 'pg'
 end
