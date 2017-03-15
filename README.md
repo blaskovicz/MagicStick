@@ -85,7 +85,10 @@ $ heroku create
 $ heroku addons:add heroku-postgresql
 
 # Optionally, to enable email, also add the sendgrid addon.
-$ heroku addons:add sendgrid
+$ heroku addons:create sendgrid
+
+# Optionally, to enable alerts, also add the raygun addon.
+$ heroku addons:create raygun
 
 # To install node, rake and grunt, configure the buildpacks:
 $ heroku buildpacks:set -i 1 heroku/ruby
