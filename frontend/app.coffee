@@ -158,6 +158,26 @@ app.config([
             response
         }
     ]
+]).config([
+  "$provide"
+  ($provide) ->
+    # raygun
+    Raygun.init(MagicStick?.Env?.RAYGUN_API_KEY, {
+      allowInsecureSubmissions: true
+    }).attach()
+    Raygun.setVersion(MagicStick?.Env?.MAGIC_STICK_VERSION)
+    Raygun.filterSensitiveData(['password', 'email', 'token'])
+    Raygun.withTags([ "ENV:#{MagicStick?.Env?.RACK_ENV}" ])
+
+    $provide.decorator "$exceptionHandler", [
+      '$delegate'
+      '$log'
+      ($delegate, $log) ->
+        (exception, cause) ->
+          $log.debug 'Sending to Raygun'
+          Raygun.send exception
+          $delegate exception, cause
+    ]
 ])
 
 # auth shim
