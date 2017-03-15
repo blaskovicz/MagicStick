@@ -30,6 +30,7 @@ class ApplicationController < Sinatra::Base
     enable :sessions
     enable :logging
     logger = ApplicationController.logger
+    set :views, ['server/views']
     set :logger, logger
     set :method_override, false
   end
