@@ -11,6 +11,8 @@ describe "MagicStick.services.User", ->
           Authorization: "Basic #{btoa('zach:somepass')}"
         invalid:
           Authorization: "Basic #{btoa('zach:wrongpass')}"
+        bad_jwt:
+          Authorization: "Basic #{btoa('zach:special')}"
       bearer:
         valid:
           Authorization: "Bearer #{validJwt}"
@@ -26,6 +28,13 @@ describe "MagicStick.services.User", ->
     User = $injector.get "User"
     $httpBackend = $injector.get "$httpBackend"
     $http = $injector.get "$http"
+    $httpBackend
+      .whenPOST("/api/auth/login",
+        () -> true,
+        (h) ->
+          headers.auth.basic.bad_jwt.Authorization is h.Authorization
+      ) # malformed token
+      .respond(200, { token: "/-___--+===" })
     $httpBackend
       .whenPOST("/api/auth/login",
         () -> true,
@@ -83,6 +92,24 @@ describe "MagicStick.services.User", ->
         expect(User.loggedIn).toBeFalsy()
         expect(User.roles).toEqual({})
         expect($http.defaults.headers.common['Authorization']).toBeUndefined()
+    $httpBackend.flush()
+
+  it 'can handle a bad token', ->
+    User.logout()
+    expect(User).toBeDefined()
+    expect(->
+      User.login("zach", "special")
+        .then (res) ->
+          expect(res).toBeUndefined()
+          expect(true).toBeFalsy() # shouldn't have called here
+        .catch (e)->
+          expect(e).toBeDefined()
+          expect(User.username).toEqual("")
+          expect(User.token).toBeFalsy()
+          expect(User.loggedIn).toBeFalsy()
+          expect(User.roles).toEqual({})
+          expect($http.defaults.headers.common['Authorization']).toBeUndefined()
+    ).not.toThrow()
     $httpBackend.flush()
 
   it 'can log out', ->

@@ -26,7 +26,7 @@ angular.module("MagicStick.services").factory "User", [
         }
       parseToken: ->
         return unless @token?
-        JSON.parse(atob(@token.split('.')[1]))
+        jwt_decode(@token)
       loadFromStorage: ->
         user = localStorageService.get('currentUser')
         return unless user?
@@ -34,11 +34,16 @@ angular.module("MagicStick.services").factory "User", [
         @exp = user.exp if user.exp?
         @username = user.username if user.username?
         @authHeader = user.authHeader if user.authHeader?
-        if @token?
-          $http.defaults.headers.common['Authorization'] = @authHeader
+        unless @token?
+          @logout(true)
+          return
+        $http.defaults.headers.common['Authorization'] = @authHeader
+        try
+          @parsePrincipal(@parseToken()?.user)
           @loggedIn = true
-          @parsePrincipal(@parseToken().user)
           @broadcastLoginStateChange()
+        catch
+          @logout(true)
       login: (username, password) ->
         promise = $q.defer()
         unless password? and username?
@@ -50,8 +55,13 @@ angular.module("MagicStick.services").factory "User", [
           { headers: {Authorization: authHeader} })
           .success (data, status, headers) =>
             # header.payload.sig
-            @token = atob(data.token)
-            payload = @parseToken()
+            try
+              @token = base64_url_decode(data.token)
+              payload = @parseToken()
+            catch e
+              @token = null
+              promise.reject("failed to log in")
+              return
             @exp = payload.exp
             $http.defaults.headers.common['Authorization'] =
               @authHeader = "Bearer #{@token}"
@@ -84,7 +94,7 @@ angular.module("MagicStick.services").factory "User", [
         @roles = {}
         for role in data.roles
           @roles[role.name] = true
-      logout: ->
+      logout: (quiet = false) ->
         @id = null
         @token = null
         @exp = null
@@ -96,6 +106,7 @@ angular.module("MagicStick.services").factory "User", [
         @avatar_url = null
         delete $http.defaults.headers.common['Authorization']
         localStorageService.set('currentUser', null)
+        return if quiet
         @broadcastLoginStateChange()
         $location.path("/")
       saveToStorage: ->
