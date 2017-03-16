@@ -1,10 +1,10 @@
 require 'base64'
-require_relative 'spec_helper'
-require_relative '../controllers/auth'
-require_relative '../helpers/slack'
-require_relative '../helpers/auth'
-require_relative '../helpers/request'
-require_relative '../helpers/link'
+require_relative '../spec_helper'
+require_relative '../../controllers/auth'
+require_relative '../../helpers/slack'
+require_relative '../../helpers/auth'
+require_relative '../../helpers/request'
+require_relative '../../helpers/link'
 
 describe 'Authentication' do
   def app

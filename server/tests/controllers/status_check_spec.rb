@@ -1,5 +1,5 @@
-require_relative 'spec_helper'
-require_relative '../controllers/status_check'
+require_relative '../spec_helper'
+require_relative '../../controllers/status_check'
 
 describe 'Meta' do
   def app
