@@ -1,6 +1,5 @@
 require 'rack/test'
 require 'rspec'
-require 'sequel'
 require 'coveralls'
 Coveralls.wear!
 
