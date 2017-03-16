@@ -1,4 +1,5 @@
 module.exports = (grunt) ->
+  _ = require('lodash')
   require('time-grunt')(grunt)
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
@@ -128,6 +129,10 @@ module.exports = (grunt) ->
       rake:
         cmd: 'bundle exec rake'
         fail: true
+        execOpts:
+          env: _.assign(_.cloneDeep(process.env), {
+            LOG_LEVEL: 'error',
+          })
       shotgun:
         cmd: 'bundle exec puma config.ru -p 9393'
         bg: true

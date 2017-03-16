@@ -1,15 +1,11 @@
 require 'base64'
-require 'logger'
 require_relative 'spec_helper'
 require_relative '../helpers/auth'
+require_relative '../helpers/logger'
 
 describe 'Auth Helper' do
   include Auth
-  def logger
-    l = Logger.new(STDOUT)
-    l.level = Logger::DEBUG
-    l
-  end
+  include MagicLogger
 
   def with_secret
     ENV['SECRET'] = 'very secret'
