@@ -48,7 +48,7 @@ end
 # load all server helpers and files
 root_dir = File.dirname(__FILE__)
 %w(helpers models controllers).each do |type|
-  Dir["#{root_dir}/server/{*/,}#{type}/*.rb"].each do |file|
+  Dir["#{root_dir}/server/#{type}/*.rb"].each do |file|
     require file
   end
 end

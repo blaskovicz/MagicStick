@@ -127,12 +127,13 @@ module.exports = (grunt) ->
         cmd: 'touch tmp/restart.txt'
         fail: true
       rake:
-        cmd: 'bundle exec rake'
+        cmd: "rm -f #{__dirname}/test.db && bundle exec rake"
         fail: true
         execOpts:
-          env: _.assign(_.cloneDeep(process.env), {
-            LOG_LEVEL: 'error',
-          })
+          env: _.assign(_.cloneDeep(process.env),
+            LOG_LEVEL: 'error'
+            RACK_ENV: 'test'
+          )
       shotgun:
         cmd: 'bundle exec puma config.ru -p 9393'
         bg: true

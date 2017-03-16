@@ -18,7 +18,7 @@ class Season < Sequel::Model
     super
   end
 
-  def before_create
+  def before_validation
     self.invite_only = false unless invite_only
     self.allow_auto_join = false unless allow_auto_join
     self.is_archived = false
