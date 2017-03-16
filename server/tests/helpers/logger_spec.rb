@@ -1,6 +1,6 @@
 require 'logger'
-require_relative 'spec_helper'
-require_relative '../helpers/logger'
+require_relative '../spec_helper'
+require_relative '../../helpers/logger'
 
 describe 'Logger Helper' do
   include MagicLogger

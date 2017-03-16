@@ -1,7 +1,7 @@
 require 'base64'
-require_relative 'spec_helper'
-require_relative '../helpers/auth'
-require_relative '../helpers/logger'
+require_relative '../spec_helper'
+require_relative '../../helpers/auth'
+require_relative '../../helpers/logger'
 
 describe 'Auth Helper' do
   include Auth
