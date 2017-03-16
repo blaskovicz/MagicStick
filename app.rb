@@ -6,7 +6,7 @@ require 'pony'
 require 'dotenv'
 require 'redcarpet'
 Dotenv.load
-
+require_relative 'server/helpers/logger'
 require_relative 'db/init'
 # common controller for other controllers to inherit from.
 # routes should not be defined here since this controller
@@ -16,20 +16,12 @@ require_relative 'db/init'
 # only common config and setup should be defined here
 class ApplicationController < Sinatra::Base
   VERSION = '0.3.0'.freeze
-  def self.logger
-    if @_logger.nil?
-      @_logger = Logger.new STDOUT
-      @_logger.level = Logger.const_get((ENV['LOG_LEVEL'] || 'debug').upcase)
-      @_logger.datetime_format = '%a %d-%m-%Y %H%M '
-    end
-    @_logger
-  end
+  extend MagicLogger
   register Sinatra::ConfigFile
   config_file 'config.yml'
   configure do
     enable :sessions
     enable :logging
-    logger = ApplicationController.logger
     set :views, ['server/views']
     set :logger, logger
     set :method_override, false
