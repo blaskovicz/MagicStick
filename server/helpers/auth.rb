@@ -76,9 +76,7 @@ module Auth
     user = principal
     halt_401 if user.nil?
     halt_403 unless user.active
-    # TODO: don't touch updated at
-    user.last_login = DateTime.now
-    user.save_changes
+    user.this.update(last_login: DateTime.now)
   end
 
   def halt_500
