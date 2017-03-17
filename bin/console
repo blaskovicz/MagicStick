@@ -2,6 +2,6 @@
 require "bundler/setup"
 require "irb"
 require_relative '../app'
-[Slack, Request, Auth, Link, Email].each {|o| Object.include o}
+[Slack, Request, Auth, Link, Email, MagicLogger].each {|o| Object.include o}
 puts "Console loaded..."
 IRB.start(__FILE__)

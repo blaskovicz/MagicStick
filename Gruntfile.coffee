@@ -131,7 +131,7 @@ module.exports = (grunt) ->
         fail: true
         execOpts:
           env: _.assign(_.cloneDeep(process.env),
-            LOG_LEVEL: 'error'
+            LOG_LEVEL: 'warn'
             RACK_ENV: 'test'
           )
       shotgun:
