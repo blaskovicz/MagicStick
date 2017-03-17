@@ -9,7 +9,13 @@ module Email
       to: user.email,
       subject: 'Password Was Changed',
       headers: { 'X-SMTPAPI' => '2695' },
-      html_body: "Hi #{h user.username},\nYour password on #{link_to_site_root} was recently changed.\nIf it was you, please ignore this email. If you did not make the change, please file an issue with us on <a href='#{link_to_github}'>Github</a>.\n\n-MagicStick"
+      html_body: "<p>Hi #{h user.username},</p>
+      <br/>
+      <p>Your password on #{link_to_site_root} was recently changed.</p>
+      <p>If it was you, please ignore this email.</p>
+      <p>If you did not make the change, please file an issue with us on <a href='#{link_to_github}'>Github</a>.</p>
+      <br/>
+      <p>-MagicStick</p>"
     )
     log_debug_email
   end
@@ -30,7 +36,12 @@ module Email
         from: "#{h by_user.username} <noreply@magic-stick.herokuapp.com>",
         subject: "[Comment] Season '#{h season.name}'",
         headers: { 'X-SMTPAPI' => '2697' },
-        html_body: "#{::MarkdownService.render(comment.comment)}\n\n---\n<i>Reply to this comment by visiting <a href='#{link_to_season season}'>the season page</a></i>.\n<i>You're receiving this email because you #{reason}. If you think this is an error, please <a href='#{link_to_github}'>file an issue</a>.</i>\n"
+        html_body: "#{::MarkdownService.render(comment.comment)}
+        <br/>
+        <br/>
+        <p>---</p>
+        <p><i>Reply to this comment by visiting <a href='#{link_to_season season}'>the season page</a></i>.</p>
+        <p><i>You're receiving this email because you #{reason}. If you think this is an error, please <a href='#{link_to_github}'>file an issue</a>.</i></p>"
       )
     end
     log_debug_email
@@ -42,7 +53,13 @@ module Email
     Pony.mail(
       to: user.email,
       subject: 'Password Reset Request',
-      html_body: "Hi #{h user.username},\nSomeone requested a reset of your password on #{link_to_site_root}.\nIf it was you, visit the following link to continue: #{link}.\nIf you didn't request this, please ignore this email.\n\n-MagicStick"
+      html_body: "<p>Hi #{h user.username},</p>
+      <br/>
+      <p>Someone requested a reset of your password on #{link_to_site_root}.</p>
+      <p>If it was you, visit the following link to continue: #{link}.</p>
+      <p>If you didn't request this, please ignore this email.</p>
+      <br/>
+      <p>-MagicStick</p>"
     )
     log_debug_email
   end
@@ -53,14 +70,24 @@ module Email
       to: user.email,
       subject: "Removed from Season '#{h season.name}'",
       headers: { 'X-SMTPAPI' => '2699' },
-      html_body: "Hi #{h user.username},\nYou were removed from season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.\nIf you think this was done in error, please attempt to contact another members or file an issue with us on <a href='#{link_to_github}'>Github</a>.\n\n-MagicStick"
+      html_body: "<p>Hi #{h user.username},</p>
+      <br/>
+      <p>You were removed from season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
+      <p>If you think this was done in error, please attempt to contact another member or file an issue with us on <a href='#{link_to_github}'>Github</a>.</p>
+      <br/>
+      <p>-MagicStick</p>"
     )
     logger.info "[email] notifying #{season.owner.email} about #{season.id} (#{season.name}) removal of #{user.email} by #{by_user.email}"
     Pony.mail(
       to: season.owner.email,
       subject: "'#{h user.username}' Left Season '#{h season.name}'",
       headers: { 'X-SMTPAPI' => '2699' },
-      html_body: "Hi #{h season.owner.username},\n#{h user.username} was just removed from season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.\nIf you think this was done in error, please visit the site and re-add them.\n\n-MagicStick"
+      html_body: "<p>Hi #{h season.owner.username},</p>
+      <br/>
+      <p>#{h user.username} was just removed from season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
+      <p>If you think this was done in error, please visit the site and re-add them.</p>
+      <br/>
+      <p>-MagicStick</p>"
     )
     log_debug_email
   end
@@ -71,14 +98,24 @@ module Email
       to: user.email,
       subject: "Added to Season '#{h season.name}'",
       headers: { 'X-SMTPAPI' => '2699' },
-      html_body: "Hi #{h user.username},\nYou were added to season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.\nIf you think this was done in error, please visit the page and post a comment, or leave the season.\n\n-MagicStick"
+      html_body: "<p>Hi #{h user.username},</p>
+      <br/>
+      <p>You were added to season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
+      <p>If you think this was done in error, please visit the page and post a comment, or leave the season.</p>
+      <br/>
+      <p>-MagicStick</p>"
     )
     logger.info "[email] notifying #{season.owner.email} about #{season.id} (#{season.name}) addition of #{user.email} by #{by_user.email}"
     Pony.mail(
       to: season.owner.email,
       subject: "'#{h user.username}' Joined Season '#{h season.name}'",
       headers: { 'X-SMTPAPI' => '2699' },
-      html_body: "Hi #{h season.owner.username},\n#{h user.username} just was added to season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.\nIf you think this was done in error, please visit the site and remove them.\n\n-MagicStick"
+      html_body: "<p>Hi #{h season.owner.username},</p>
+      <br/>
+      <p>#{h user.username} just was added to season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
+      <p>If you think this was done in error, please visit the site and remove them.</p>
+      <br/>
+      <p>-MagicStick</p>"
     )
     log_debug_email
   end
