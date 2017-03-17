@@ -11,10 +11,12 @@ describe 'Authentication' do
     AuthController
   end
 
+  def email_deliveries
+    Mail::TestMailer.deliveries
+  end
+
   context 'unauthenticated' do
     it 'should permit account creation' do
-      last_test = User.select[username: 'unit-test-account']
-      last_test.delete if last_test
       post '/users', user: {
         username: 'unit-test-account',
         password: 'unit-test-password',
@@ -24,6 +26,44 @@ describe 'Authentication' do
       }
       expect(last_response.status).to equal(201)
       expect(JSON.parse(last_response.body)).to have_key('id')
+    end
+
+    it 'should allow resetting a password' do
+      expect(email_deliveries.count).to eq(0)
+      post '/forgot-password', {}
+      expect(last_response.status).to eq(400)
+      expect(JSON.parse(last_response.body)).to include('errors' => 'No user object found in request payload')
+      expect(email_deliveries.count).to eq(0)
+
+      post '/forgot-password', user: { username: 'unit-test-account', email: 'unit-test-email@example.com-wrong' }
+      expect(last_response.status).to eq(204)
+      expect(email_deliveries.count).to eq(0)
+
+      post '/forgot-password', user: { username: 'unit-test-account', email: 'unit-test-email@example.com' }
+      expect(last_response.status).to eq(204)
+      expect(email_deliveries.count).to eq(1)
+      # nutty logic to grab the link from the encoded email.
+      %r{(?<magic_link>/password-reset/.+?)\.}m =~ email_deliveries.last.html_part.to_s
+      expect(magic_link).not_to be_nil
+      magic_link.gsub!("=\r\n", '')
+      parts = magic_link.split('/')
+      expect(parts.length).to eq(4)
+      token = parts[parts.length - 2]
+      iv = parts.last
+
+      post '/forgot-password', user: { token: token, iv: iv, password: 'new-password' }
+      expect(last_response.status).to eq(204)
+      expect(email_deliveries.count).to eq(2)
+
+      user = User.find(username: 'unit-test-account')
+      expect(user.password_matches?('new-password')).to eq(true)
+      expect(user.password_matches?('unit-test-password')).to eq(false)
+
+      # reset the password so we don't break tests below
+      user.plaintext_password = 'unit-test-password'
+      user.save
+      expect(user.password_matches?('new-password')).to eq(false)
+      expect(user.password_matches?('unit-test-password')).to eq(true)
     end
   end
 
@@ -53,10 +93,15 @@ describe 'Authentication' do
       expect(JSON.parse(last_response.body)).not_to have_key('token')
       expect(JSON.parse(last_response.body)).to include('errors' => 'Insufficient credentials provided')
 
+      sleep 1
       header('Authorization', "Bearer #{token}")
       get '/me'
       expect(last_response.status).to equal(200)
-      expect(JSON.parse(last_response.body)).to include('username' => 'unit-test-account')
+      body = JSON.parse(last_response.body)
+      expect(body).to include('username' => 'unit-test-account')
+      expect(body['last_login']).not_to be_nil
+      expect(body['updated_at']).not_to be_nil
+      expect(body['last_login']).not_to eq(body['updated_at'])
     end
 
     it 'should permit profile update' do

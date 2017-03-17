@@ -1,5 +1,6 @@
 require 'date'
 require 'base64'
+require 'cgi'
 class AuthController < ApplicationController
   before %r{^/users/+([^/]+)} do |user_id|
     @user = User[id: user_id]
@@ -70,42 +71,39 @@ class AuthController < ApplicationController
         return
       end
 
+      generated = DateTime.now.iso8601
       expires = DateTime.now.next_day.iso8601
       id = user.id
-      encrypted, iv = encrypt("#{id}/#{expires}")
-      link = "#{link_to_reset}/#{Base64.urlsafe_encode64(encrypted)}/#{Base64.urlsafe_encode64(iv)}"
+      encrypted, iv = encrypt("#{id}/#{expires}/#{generated}")
+      link = "#{link_to_reset}/#{CGI.escape(Base64.urlsafe_encode64(encrypted))}/#{CGI.escape(Base64.urlsafe_encode64(iv))}"
       email_password_reset_link user, link
     # trying to update a password based on a reset link
     elsif params[:user][:token] && params[:user][:iv] && params[:user][:password]
-      status 204
       begin
-        iv = Base64.urlsafe_decode64(params[:user][:iv])
-        decrypted = decrypt(Base64.urlsafe_decode64(params[:user][:token]), iv)
-        id, date_s = decrypted.split('/', 2)
-        logger.info "Reset request, id #{id}, expires #{date_s}"
+        iv = Base64.urlsafe_decode64(CGI.unescape(params[:user][:iv]))
+        decrypted = decrypt(Base64.urlsafe_decode64(CGI.unescape(params[:user][:token])), iv)
+        id, expires_at, generated_at = decrypted.split('/', 3)
+        logger.info "Password reset request, id #{id}, expires #{expires_at}, generated #{generated_at}"
         user = User[id: id]
-        if user.nil?
-          status 500
-          raise "User with id #{id} not found"
+        raise "User with id #{id} not found" if user.nil?
+        # did the token already expire?
+        expire_at_p = DateTime.iso8601(expires_at)
+        if expire_at_p < DateTime.now
+          raise "Token already expired at #{expires_at}"
         end
-        date = DateTime.iso8601(date_s)
-        if date < DateTime.now
-          status 400
-          raise "Token already expired at #{date_s}"
+        # did we already use the token?
+        generated_at_p = DateTime.iso8601(generated_at)
+        if DateTime.parse(user.updated_at.to_s) > generated_at_p
+          raise "User was updated at #{user.updated_at}, which is newer than token generation, #{generated_at}"
         end
         user.plaintext_password = params[:user][:password]
-        if user.valid?
-          user.save
-          logger.info "Set new password for user #{user.username}, id #{user.id}, email #{user.email}"
-          if ENV['RACK_ENV'] == 'development'
-            logger.info ">> #{params[:user][:password]}"
-          end
-          email_password_changed user
-        else
-          logger.warn "Couldn't set new password for user #{user.username}, #{user.id}, email #{user.email}: #{user.errors.inspect}"
-        end
+        raise 'password not valid' unless user.valid?
+        user.save
+        email_password_changed user
+        status 204
       rescue => e
         logger.warn "Couldn't perform password reset: #{e}"
+        json_halt 400, 'The request could not be completed'
       end
     # other nefarious things
     else
