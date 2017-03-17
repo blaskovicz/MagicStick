@@ -75,8 +75,6 @@ class AuthController < ApplicationController
       encrypted, iv = encrypt("#{id}/#{expires}")
       link = "#{link_to_reset}/#{Base64.urlsafe_encode64(encrypted)}/#{Base64.urlsafe_encode64(iv)}"
       email_password_reset_link user, link
-      logger.info "Generated reset link and sent email for user #{user.username}, id #{user.id}, email #{user.email}"
-      logger.info ">> #{link}" if ENV['RACK_ENV'] == 'development'
     # trying to update a password based on a reset link
     elsif params[:user][:token] && params[:user][:iv] && params[:user][:password]
       status 204
