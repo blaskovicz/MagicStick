@@ -68,6 +68,7 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         name: groupingName
       }).success (newGroup) ->
           toastr.success "Grouping successfully created"
+          newGroup.matches ?= []
           season.season_match_groups.push newGroup
           $scope.newGroupingNameError = null
           $scope.newGroupingName = null
@@ -148,8 +149,10 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
       }).success (newMatch) ->
           toastr.success "Match #{newMatch.id} successfully created"
           group = findGroup newMatchSlug.season_match_group_id
+          return unless group?
           group.matches ?= []
-          group.matches.push newMatch if group?
+          newMatch.user_season_match ?= []
+          group.matches.push newMatch
         .error (data) ->
           toastr.error "Couldn't create match"
           $scope.newMatchError = getReason data
