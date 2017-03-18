@@ -51,7 +51,7 @@ module Email
       Pony.mail(
         to: email,
         from: "#{h by_user.username} <noreply@magic-stick.herokuapp.com>",
-        subject: "[Comment] Season '#{h season.name}'",
+        subject: "[Comment] Season '#{season.name}'",
         headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2697 }.to_json },
         html_body: "#{::MarkdownService.render(comment.comment)}
         <br/>
@@ -85,7 +85,7 @@ module Email
     logger.info "[email] notifying #{user.email} about match #{match.id} (#{match.title}) addition by #{by_user.email}"
     Pony.mail(
       to: user.email,
-      subject: "Added to Match '#{h match.title}'",
+      subject: "Added to Match '#{match.title}'",
       headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2711 }.to_json },
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
@@ -101,7 +101,7 @@ module Email
     logger.info "[email] notifying #{user.email} about match #{match.id} (#{match.title}) removal by #{by_user.email}"
     Pony.mail(
       to: user.email,
-      subject: "Removed from Match '#{h match.title}'",
+      subject: "Removed from Match '#{match.title}'",
       headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2711 }.to_json },
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
@@ -117,7 +117,7 @@ module Email
     logger.info "[email] notifying #{user.email} about season #{season.id} (#{season.name}) removal by #{by_user.email}"
     Pony.mail(
       to: user.email,
-      subject: "Removed from Season '#{h season.name}'",
+      subject: "Removed from Season '#{season.name}'",
       headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
@@ -129,7 +129,7 @@ module Email
     logger.info "[email] notifying #{season.owner.email} about season #{season.id} (#{season.name}) removal of #{user.email} by #{by_user.email}"
     Pony.mail(
       to: season.owner.email,
-      subject: "'#{h user.username}' Left Season '#{h season.name}'",
+      subject: "'#{user.username}' Left Season '#{season.name}'",
       headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h season.owner.username},</p>
       <br/>
@@ -145,7 +145,7 @@ module Email
     logger.info "[email] notifying #{user.email} about season #{season.id} (#{season.name}) addition by #{by_user.email}"
     Pony.mail(
       to: user.email,
-      subject: "Added to Season '#{h season.name}'",
+      subject: "Added to Season '#{season.name}'",
       headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
@@ -157,7 +157,7 @@ module Email
     logger.info "[email] notifying #{season.owner.email} about season #{season.id} (#{season.name}) addition of #{user.email} by #{by_user.email}"
     Pony.mail(
       to: season.owner.email,
-      subject: "'#{h user.username}' Joined Season '#{h season.name}'",
+      subject: "'#{user.username}' Joined Season '#{season.name}'",
       headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h season.owner.username},</p>
       <br/>
