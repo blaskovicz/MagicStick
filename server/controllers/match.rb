@@ -117,21 +117,35 @@ class MatchController < ApplicationController
   put '/seasons/:season_id/match-groups/:group_id/matches/:match_id/members/:member_id' do |season_id, _group_id, _match_id, member_id|
     requires_season_owner!
     requires_season_membership! season: season_id, member: member_id
+    member = User.find(id: member_id)
+    if @match.member?(member)
+      status 204
+      return
+    end
     ::Database.transaction do
       user_season = UserSeason.where(user_id: member_id, season_id: season_id).first
       user_season_match = UserSeasonMatch.new
       user_season_match.user_season = user_season
       user_season_match.match = @match
-      user_season_match.save if user_season_match.valid?
+      if user_season_match.valid?
+        user_season_match.save
+        email_user_added_to_match(@match, member, principal)
+      end
     end
     status 204
   end
   delete '/seasons/:season_id/match-groups/:group_id/matches/:match_id/members/:member_id' do |season_id, _group_id, _match_id, member_id|
     requires_season_owner!
     requires_season_membership! season: season_id, member: member_id
+    member = User.find(id: member_id)
+    unless @match.member?(member)
+      status 204
+      return
+    end
     ::Database.transaction do
       user_season = UserSeason.where(user_id: member_id, season_id: season_id).first
       UserSeasonMatch.where(user_season: user_season, match: @match).delete
+      email_user_removed_from_match(@match, member, principal)
     end
     status 204
   end
@@ -176,9 +190,7 @@ class MatchController < ApplicationController
         slack_message(
           "*<#{link_to_user principal.username}|#{slack_escape principal.username}>* just *updated* " +
           (@member.id == principal.id ? 'their own *status* ' : "the *status* of *<#{link_to_user @member.username}|#{slack_escape @member.username}>* ") +
-          "in match *<#{link_to_season season_id}|#{slack_escape @season.name}>* &gt; " \
-          "#{slack_escape SeasonMatchGroup.where(season_id: season_id, id: group_id).first.name} &gt; " \
-          "#{slack_escape @match.description}\n" \
+          "in match *<#{link_to_season season_id}|#{slack_escape @match.title}>*}\n" \
           "from #{format_win_state previous_state.won, bold: false, emoji: false} to #{format_win_state user_season_match.won}"
         )
       end
@@ -297,7 +309,7 @@ class MatchController < ApplicationController
     def requires_match_membership!
       halt_403 unless
         @season.owner == principal ||
-        @match.user_season_match.map { |m| m.user.id }.include?(principal.id) # TODO: is there a more correct way to do this?
+        @match.member?(principal)
     end
 
     def season_owner?

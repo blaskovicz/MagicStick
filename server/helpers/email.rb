@@ -3,6 +3,23 @@ module Email
     Rack::Utils.escape_html text
   end
 
+  def email_welcome(user)
+    logger.info "[email] notifying #{user.email} about new account"
+    Pony.mail(
+      to: user.email,
+      subject: 'Welcome to MagicStick',
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2695 }.to_json },
+      html_body: "<p>Hi #{h user.username},</p>
+      <br/>
+      <p>Your account just got created on #{link_to_site_root}.</p>
+      <p>Why not log in and create or join a season?</p>
+      <p>If you think you recieved this email in error, please file an issue with us on <a href='#{link_to_github}'>Github</a>.</p>
+      <br/>
+      <p>-MagicStick</p>"
+    )
+    log_debug_email
+  end
+
   def email_password_changed(user)
     logger.info "[email] notifying #{user.email} about password changed"
     Pony.mail(
@@ -30,7 +47,7 @@ module Email
       o[c.user.email] ||= 'commented on season'
     end
     users.each do |email, reason|
-      logger.info "[email] notifying #{email} about #{season.id} (#{season.name}) comment #{comment.id}"
+      logger.info "[email] notifying #{email} about season #{season.id} (#{season.name}) comment #{comment.id}"
       Pony.mail(
         to: email,
         from: "#{h by_user.username} <noreply@magic-stick.herokuapp.com>",
@@ -64,8 +81,40 @@ module Email
     log_debug_email
   end
 
+  def email_user_added_to_match(match, user, by_user)
+    logger.info "[email] notifying #{user.email} about match #{match.id} (#{match.title}) addition by #{by_user.email}"
+    Pony.mail(
+      to: user.email,
+      subject: "Added to Match '#{h match.title}'",
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2711 }.to_json },
+      html_body: "<p>Hi #{h user.username},</p>
+      <br/>
+      <p>You were added to match <a href='#{link_to_season match.season_match_group.season}'><i>#{h match.title}</i></a> by #{h by_user.username}.</p>
+      <p>If you think this was done in error, please visit the page and post a comment, or leave the match.</p>
+      <br/>
+      <p>-MagicStick</p>"
+    )
+    log_debug_email
+  end
+
+  def email_user_removed_from_match(match, user, by_user)
+    logger.info "[email] notifying #{user.email} about match #{match.id} (#{match.title}) removal by #{by_user.email}"
+    Pony.mail(
+      to: user.email,
+      subject: "Removed from Match '#{h match.title}'",
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2711 }.to_json },
+      html_body: "<p>Hi #{h user.username},</p>
+      <br/>
+      <p>You were removed from match <a href='#{link_to_season match.season_match_group.season}'><i>#{h match.title}</i></a> by #{h by_user.username}.</p>
+      <p>If you think this was done in error, please attempt to contact another season member or file an issue with us on <a href='#{link_to_github}'>Github</a>.</p>
+      <br/>
+      <p>-MagicStick</p>"
+    )
+    log_debug_email
+  end
+
   def email_user_removed_from_season(season, user, by_user)
-    logger.info "[email] notifying #{user.email} about #{season.id} (#{season.name}) removal by #{by_user.email}"
+    logger.info "[email] notifying #{user.email} about season #{season.id} (#{season.name}) removal by #{by_user.email}"
     Pony.mail(
       to: user.email,
       subject: "Removed from Season '#{h season.name}'",
@@ -73,11 +122,11 @@ module Email
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
       <p>You were removed from season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
-      <p>If you think this was done in error, please attempt to contact another member or file an issue with us on <a href='#{link_to_github}'>Github</a>.</p>
+      <p>If you think this was done in error, please attempt to contact another season member or file an issue with us on <a href='#{link_to_github}'>Github</a>.</p>
       <br/>
       <p>-MagicStick</p>"
     )
-    logger.info "[email] notifying #{season.owner.email} about #{season.id} (#{season.name}) removal of #{user.email} by #{by_user.email}"
+    logger.info "[email] notifying #{season.owner.email} about season #{season.id} (#{season.name}) removal of #{user.email} by #{by_user.email}"
     Pony.mail(
       to: season.owner.email,
       subject: "'#{h user.username}' Left Season '#{h season.name}'",
@@ -93,7 +142,7 @@ module Email
   end
 
   def email_user_added_to_season(season, user, by_user)
-    logger.info "[email] notifying #{user.email} about #{season.id} (#{season.name}) addition by #{by_user.email}"
+    logger.info "[email] notifying #{user.email} about season #{season.id} (#{season.name}) addition by #{by_user.email}"
     Pony.mail(
       to: user.email,
       subject: "Added to Season '#{h season.name}'",
@@ -105,7 +154,7 @@ module Email
       <br/>
       <p>-MagicStick</p>"
     )
-    logger.info "[email] notifying #{season.owner.email} about #{season.id} (#{season.name}) addition of #{user.email} by #{by_user.email}"
+    logger.info "[email] notifying #{season.owner.email} about season #{season.id} (#{season.name}) addition of #{user.email} by #{by_user.email}"
     Pony.mail(
       to: season.owner.email,
       subject: "'#{h user.username}' Joined Season '#{h season.name}'",
