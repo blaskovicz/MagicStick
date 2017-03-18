@@ -16,7 +16,7 @@ describe 'Email Helper' do
       email: 'owner_email_spec_tests_user@magic-stick.herokuapp.com',
       name: 'owner_email specuser'
     )
-    @owner.save
+    raise 'failed to save owner' unless @owner.save
     @season = Season.new(
       name: 'email_spec_tests',
       description: 'sweet season',
@@ -40,20 +40,16 @@ describe 'Email Helper' do
     )
     raise 'failed to save comment' unless @comment.save
     @season.add_member @user
+    @smg = SeasonMatchGroup.new(season: @season, name: 'another-group')
+    raise 'failed to save smg' unless @smg.save
+    @match = Match.new(season_match_group: @smg, best_of: 3, scheduled_for: Time.now + 3_124, description: 'sweetness')
+    raise 'failed to save match' unless @match.save
   end
 
   before(:each) do
     @settings = double('settings')
-    Mail::TestMailer.deliveries.clear
+    clear_deliveries
     expect(delivery_count).to eq(0)
-  end
-
-  def delivery_count
-    Mail::TestMailer.deliveries.count
-  end
-
-  def deliveries
-    Mail::TestMailer.deliveries.map(&:to).flatten
   end
 
   def expect_settings_check
@@ -62,17 +58,35 @@ describe 'Email Helper' do
   end
 
   context 'can send' do
-    it 'member add' do
+    it 'user create' do
+      expect_settings_check
+      email_welcome(@user)
+      expect(delivery_count).to eq(1)
+      expect(deliveries).to include(@user.email)
+    end
+    it 'season member add' do
       expect_settings_check
       email_user_added_to_season(@season, @user, @owner)
       expect(delivery_count).to eq(2)
       expect(deliveries).to include(@user.email, @season.owner.email)
     end
-    it 'member remove' do
+    it 'season member remove' do
       expect_settings_check
       email_user_removed_from_season(@season, @user, @owner)
       expect(delivery_count).to eq(2)
       expect(deliveries).to include(@user.email, @season.owner.email)
+    end
+    it 'match member add' do
+      expect_settings_check
+      email_user_added_to_match(@match, @user, @owner)
+      expect(delivery_count).to eq(1)
+      expect(deliveries).to include(@user.email)
+    end
+    it 'match member remove' do
+      expect_settings_check
+      email_user_removed_from_match(@match, @user, @owner)
+      expect(delivery_count).to eq(1)
+      expect(deliveries).to include(@user.email)
     end
     it 'password reset' do
       expect_settings_check

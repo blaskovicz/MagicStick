@@ -118,7 +118,7 @@ class AuthController < ApplicationController
     json_halt 400, new_user.errors unless new_user.valid?
     new_user.save
     status 201
-    logger.info "#{new_user.username} successfully registered"
+    email_welcome(new_user)
     json id: new_user.id
   end
   put '/me/slack' do

@@ -11,8 +11,9 @@ describe 'Authentication' do
     AuthController
   end
 
-  def email_deliveries
-    Mail::TestMailer.deliveries
+  before(:each) do
+    clear_deliveries
+    expect(email_deliveries.count).to eq(0)
   end
 
   context 'unauthenticated' do
@@ -26,10 +27,10 @@ describe 'Authentication' do
       }
       expect(last_response.status).to equal(201)
       expect(JSON.parse(last_response.body)).to have_key('id')
+      expect(email_deliveries.count).to eq(1)
     end
 
     it 'should allow resetting a password' do
-      expect(email_deliveries.count).to eq(0)
       post '/forgot-password', {}
       expect(last_response.status).to eq(400)
       expect(JSON.parse(last_response.body)).to include('errors' => 'No user object found in request payload')
