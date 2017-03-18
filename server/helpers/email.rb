@@ -8,7 +8,7 @@ module Email
     Pony.mail(
       to: user.email,
       subject: 'Password Was Changed',
-      headers: { 'X-SMTPAPI' => '2695' },
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2695 }.to_json },
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
       <p>Your password on #{link_to_site_root} was recently changed.</p>
@@ -35,7 +35,7 @@ module Email
         to: email,
         from: "#{h by_user.username} <noreply@magic-stick.herokuapp.com>",
         subject: "[Comment] Season '#{h season.name}'",
-        headers: { 'X-SMTPAPI' => '2697' },
+        headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2697 }.to_json },
         html_body: "#{::MarkdownService.render(comment.comment)}
         <br/>
         <br/>
@@ -69,7 +69,7 @@ module Email
     Pony.mail(
       to: user.email,
       subject: "Removed from Season '#{h season.name}'",
-      headers: { 'X-SMTPAPI' => '2699' },
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
       <p>You were removed from season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
@@ -81,7 +81,7 @@ module Email
     Pony.mail(
       to: season.owner.email,
       subject: "'#{h user.username}' Left Season '#{h season.name}'",
-      headers: { 'X-SMTPAPI' => '2699' },
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h season.owner.username},</p>
       <br/>
       <p>#{h user.username} was just removed from season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
@@ -97,7 +97,7 @@ module Email
     Pony.mail(
       to: user.email,
       subject: "Added to Season '#{h season.name}'",
-      headers: { 'X-SMTPAPI' => '2699' },
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
       <p>You were added to season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
@@ -109,7 +109,7 @@ module Email
     Pony.mail(
       to: season.owner.email,
       subject: "'#{h user.username}' Joined Season '#{h season.name}'",
-      headers: { 'X-SMTPAPI' => '2699' },
+      headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2699 }.to_json },
       html_body: "<p>Hi #{h season.owner.username},</p>
       <br/>
       <p>#{h user.username} just was added to season <a href='#{link_to_season season}'><i>#{h season.name}</i></a> by #{h by_user.username}.</p>
