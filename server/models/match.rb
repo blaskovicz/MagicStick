@@ -15,13 +15,25 @@ class Match < Sequel::Model
   end
 
   def member?(user)
+    !find_member(user).nil?
+  end
+
+  def find_member(user)
     user_id = if user.is_a? User
                 user.id
               else
                 user
               end
     # user season match is like 'match member'
-    UserSeasonMatch.join(:users_seasons, id: :user_season_id).where(user_id: user_id, match_id: id).count != 0
+    UserSeasonMatch.join(:users_seasons, id: :user_season_id).where(user_id: user_id, match_id: id).select_all(:users_seasons_matches).first
+  end
+
+  def add_member(user)
+    add_user_season_match(
+      UserSeasonMatch.new(
+        user_season: UserSeason.find(user_id: user.id, season_id: season_match_group.season_id)
+      )
+    )
   end
 
   def title

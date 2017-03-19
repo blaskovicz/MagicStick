@@ -79,4 +79,19 @@ module Slack
     @slack_users ||= slack_user_list
     @slack_users.include? user.email
   end
+
+  def slack_format_win_state(state, bold: true, italic: true, emoji: true)
+    display = if state.nil?
+                ['Not Played', ':clock9:']
+              elsif state
+                ['WIN', ':thumbsup:']
+              else
+                ['LOSS', ':thumbsdown:']
+              end
+    status_text = display.first
+    emoji_text = emoji ? " #{display.last}" : ''
+    bold_mod = bold ? '*' : ''
+    italic_mod = italic ? '_' : ''
+    "#{bold_mod}#{italic_mod}#{status_text}#{italic_mod}#{bold_mod}#{emoji_text}"
+  end
 end

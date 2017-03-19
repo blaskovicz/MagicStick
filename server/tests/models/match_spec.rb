@@ -38,6 +38,8 @@ describe 'Match' do
     raise 'failed to save smg' unless @smg.save
     @match = Match.new(season_match_group: @smg, best_of: 3, scheduled_for: Time.now + 1_100, description: 'somethin')
     raise 'failed to save match' unless @match.save
+    @season.add_member @user
+    @season.add_member @user2
   end
 
   context 'validations' do
@@ -59,5 +61,27 @@ describe 'Match' do
   it 'should check match membership' do
     expect(@match.member?(@user)).to be(false)
     expect(@match.member?(@user2)).to be(false)
+  end
+
+  it 'should allow user addition to match' do
+    expect(@match.member?(@user)).to be(false)
+    expect(@match.member?(@user2)).to be(false)
+    expect(@match.find_member(@user.id)).to be_nil
+    expect(@match.find_member(@user2.id)).to be_nil
+
+    @match.add_member(@user)
+    @match.reload
+    expect(@match.member?(@user)).to be(true)
+    expect(@match.member?(@user2)).to be(false)
+    expect(@match.find_member(@user.id)).not_to be_nil
+    expect(@match.find_member(@user2.id)).to be_nil
+
+    @match.add_member(@user2)
+    @match.reload
+    expect(@match.member?(@user)).to be(true)
+    expect(@match.member?(@user2)).to be(true)
+    expect(@match.find_member(@user.id)).not_to be_nil
+    expect(@match.find_member(@user2.id)).not_to be_nil
+    expect { @match.find_member(@user2.id).save }.not_to raise_error
   end
 end

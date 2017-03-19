@@ -123,14 +123,8 @@ class MatchController < ApplicationController
       return
     end
     ::Database.transaction do
-      user_season = UserSeason.where(user_id: member_id, season_id: season_id).first
-      user_season_match = UserSeasonMatch.new
-      user_season_match.user_season = user_season
-      user_season_match.match = @match
-      if user_season_match.valid?
-        user_season_match.save
-        email_user_added_to_match(@match, member, principal)
-      end
+      @match.add_member member
+      email_user_added_to_match(@match, member, principal)
     end
     status 204
   end
@@ -151,7 +145,7 @@ class MatchController < ApplicationController
   end
   put '/seasons/:season_id/match-groups/:group_id/matches/:match_id/members/:member_id/status' do |season_id, group_id, match_id, member_id|
     requires_match_membership!
-    user_season_match = UserSeasonMatch.where(user_season: UserSeason.where(user_id: member_id, season_id: season_id).first, match: @match).first
+    user_season_match = @match.find_member(member_id)
     json_halt 404, "Member #{member_id} not found as part of match #{match_id}, group #{group_id}, season #{season_id}" if user_season_match.nil?
     attempt_save = false
     previous_state = user_season_match.clone
@@ -163,39 +157,24 @@ class MatchController < ApplicationController
       attempt_save = true
       user_season_match.game_wins = params[:game_wins]
     end
-    if attempt_save
-      json_halt 400, user_season_match.errors unless user_season_match.valid?
-      user_season_match.save
-      logger.info(
-        "#{principal.username} just updated the status of season-#{season_id}/group-#{group_id}/match-#{match_id}/user-#{member_id}" \
-        "from #{previous_state.inspect} to #{user_season_match.inspect}"
+    json_halt 400, 'game_wins or status keys must be specified' unless attempt_save
+    json_halt 400, user_season_match.errors unless user_season_match.valid?
+    user_season_match.save
+    logger.info(
+      "#{principal.username} just updated the status of season-#{season_id}/group-#{group_id}/match-#{match_id}/user-#{member_id}" \
+      "from #{previous_state.inspect} to #{user_season_match.inspect}"
+    )
+    # we want to say "[Principal] just updated the status of [Season Name] >> [Group Name] > [Match Name] >> [Member Name]
+    # only report overall match reporting to slack
+    if previous_state.won != user_season_match.won
+      slack_message(
+        "*<#{link_to_user principal.username}|#{slack_escape principal.username}>* just *updated* " +
+        (@member.id == principal.id ? 'their own *status* ' : "the *status* of *<#{link_to_user @member.username}|#{slack_escape @member.username}>* ") +
+        "in match *<#{link_to_season season_id}|#{slack_escape @match.title}>*}\n" \
+        "from #{slack_format_win_state(previous_state.won, bold: false, emoji: false)} to #{slack_format_win_state(user_season_match.won)}"
       )
-      def format_win_state(state, bold: true, italic: true, emoji: true)
-        display = if state.nil?
-                    ['Not Played', ':clock9:']
-                  elsif state
-                    ['WIN', ':thumbsup:']
-                  else
-                    ['LOSS', ':thumbsdown:']
-                  end
-        status_text = display.first
-        emoji_text = emoji ? " #{display.last}" : ''
-        bold_mod = bold ? '*' : ''
-        italic_mod = italic ? '_' : ''
-        "#{bold_mod}#{italic_mod}#{status_text}#{italic_mod}#{bold_mod}#{emoji_text}"
-      end
-      # we want to say "[Principal] just updated the status of [Season Name] >> [Group Name] > [Match Name] >> [Member Name]
-      # only report overall match reporting to slack
-      if previous_state.won != user_season_match.won
-        slack_message(
-          "*<#{link_to_user principal.username}|#{slack_escape principal.username}>* just *updated* " +
-          (@member.id == principal.id ? 'their own *status* ' : "the *status* of *<#{link_to_user @member.username}|#{slack_escape @member.username}>* ") +
-          "in match *<#{link_to_season season_id}|#{slack_escape @match.title}>*}\n" \
-          "from #{format_win_state previous_state.won, bold: false, emoji: false} to #{format_win_state user_season_match.won}"
-        )
-      end
-      # TODO: should we also mark other people as finished here?
     end
+    # TODO: should we also mark other people as finished here?
     status 204
   end
   post '/seasons/:season_id/match-groups/:group_id/matches' do |season_id, group_id|
