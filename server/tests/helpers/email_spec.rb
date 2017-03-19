@@ -32,6 +32,13 @@ describe 'Email Helper' do
       name: 'email specuser'
     )
     raise 'failed to save user' unless @user.save
+    @user2 = User.new(
+      username: 'email_spec_tests_user2',
+      password: 'test-password',
+      email: 'email_spec_tests_user2@magic-stick.herokuapp.com',
+      name: 'email specuser2'
+    )
+    raise 'failed to save user2' unless @user2.save
     raise 'failed to save season' unless @season.save
     @comment = SeasonComment.new(
       season: @season,
@@ -40,10 +47,13 @@ describe 'Email Helper' do
     )
     raise 'failed to save comment' unless @comment.save
     @season.add_member @user
+    @season.add_member @user2
     @smg = SeasonMatchGroup.new(season: @season, name: 'another-group')
     raise 'failed to save smg' unless @smg.save
     @match = Match.new(season_match_group: @smg, best_of: 3, scheduled_for: Time.now + 3_124, description: 'sweetness')
     raise 'failed to save match' unless @match.save
+    @match.add_member @user
+    @match.add_member @user2
   end
 
   before(:each) do
@@ -103,8 +113,14 @@ describe 'Email Helper' do
     it 'season comment' do
       expect_settings_check
       email_season_comment(@season, @comment, @comment.user)
+      expect(delivery_count).to eq(3)
+      expect(deliveries).to include(@season.owner.email, @comment.user.email, *@season.members.map(&:email))
+    end
+    it 'match status updated' do
+      expect_settings_check
+      email_match_status_updated(@match, @user)
       expect(delivery_count).to eq(2)
-      expect(deliveries).to include(@comment.user.email, *@season.members.map(&:email))
+      expect(deliveries).to include(@user.email, @user2.email)
     end
   end
 end
