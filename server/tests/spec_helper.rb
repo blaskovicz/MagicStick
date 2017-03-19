@@ -30,3 +30,7 @@ end
 def email_deliveries
   Mail::TestMailer.deliveries
 end
+
+def last_response_json
+  JSON.parse(last_response.body)
+end

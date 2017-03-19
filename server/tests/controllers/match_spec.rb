@@ -10,6 +10,8 @@ describe 'Match' do
     'test-password'
   end
 
+  attr_reader :slack_double
+
   before(:all) do
     @user = User.new(
       username: 'match_spec_tests_user',
@@ -25,6 +27,20 @@ describe 'Match' do
       name: 'match specuser2'
     )
     raise 'failed to save user2' unless @user2.save
+    @user3 = User.new(
+      username: 'match_spec_tests_user3',
+      password: password,
+      email: 'match_spec_tests_user3@magic-stick.herokuapp.com',
+      name: 'match specuser3'
+    )
+    raise 'failed to save user3' unless @user3.save
+    @user4 = User.new(
+      username: 'match_spec_tests_user4',
+      password: password,
+      email: 'match_spec_tests_user4@magic-stick.herokuapp.com',
+      name: 'match specuser4'
+    )
+    raise 'failed to save user4' unless @user4.save
     @season = Season.new(
       name: 'match_spec_tests',
       description: 'sweet season',
@@ -34,15 +50,24 @@ describe 'Match' do
       ends: (Time.now + 5_000)
     )
     raise 'failed to save season' unless @season.save
+    @season.add_member @user3
+    @season.add_member @user4
     @smg = SeasonMatchGroup.new(season: @season, name: 'another-group')
     raise 'failed to save smg' unless @smg.save
     @match = Match.new(season_match_group: @smg, best_of: 3, scheduled_for: Time.now + 3_124, description: 'sweetness')
     raise 'failed to save match' unless @match.save
+    expect(@match.member?(@user3)).to eq(false)
+    @match.add_member @user3
+    expect(@match.member?(@user3)).to eq(true)
+    expect(@match.member?(@user4)).to eq(false)
+    @match.add_member @user4
+    expect(@match.member?(@user4)).to eq(true)
   end
 
   before(:each) do
     clear_deliveries
     expect(email_deliveries.count).to eq(0)
+    @slack_double = double('slack_double')
   end
 
   it 'should allow season creation' do
@@ -126,7 +151,6 @@ describe 'Match' do
     put "/seasons/#{@season.id}/match-groups/#{@smg.id}/matches/#{@match.id}/members/#{@user2.id}"
     expect(last_response.status).to eq(204)
     @match.reload
-    expect(@match.user_season_match.last.user.id).to eq(@user2.id)
     expect(@match.member?(@user2)).to eq(true)
     expect(email_deliveries.count).to eq(1)
     expect(deliveries).to include(@user2.email)
@@ -143,7 +167,6 @@ describe 'Match' do
     delete "/seasons/#{@season.id}/match-groups/#{@smg.id}/matches/#{@match.id}/members/#{@user2.id}"
     expect(last_response.status).to eq(204)
     @match.reload
-    expect(@match.user_season_match.last).to be_nil
     expect(@match.member?(@user2)).to eq(false)
     expect(email_deliveries.count).to eq(1)
     expect(deliveries).to include(@user2.email)
@@ -155,5 +178,52 @@ describe 'Match' do
     expect(last_response.status).to eq(204)
     expect(@match.member?(@user2)).to eq(false)
     expect(email_deliveries.count).to eq(0)
+  end
+
+  it 'should allow reporting match status' do
+    authorize @user3.username, password
+
+    # dne member of match
+    put "/seasons/#{@season.id}/match-groups/#{@smg.id}/matches/#{@match.id}/members/#{@user2.id}/status"
+    expect(last_response.status).to eq(404)
+    expect(last_response_json['errors']).to eq("Member #{@user2.id} not found as part of match #{@match.id}, group #{@smg.id}, season #{@season.id}")
+
+    # good member, bad request body
+    put "/seasons/#{@season.id}/match-groups/#{@smg.id}/matches/#{@match.id}/members/#{@user3.id}/status"
+    expect(last_response.status).to eq(400)
+    expect(last_response_json['errors']).to eq('game_wins or status keys must be specified')
+
+    # now make real requests, but first verify state and mock notifier
+    allow(Slack::Notifier).to receive(:new).and_return(slack_double)
+    allow(slack_double).to receive(:escape).and_return('escaped')
+    allow(slack_double).to receive(:ping).and_return(nil)
+    usm3 = @match.find_member(@user3)
+    usm4 = @match.find_member(@user4)
+    expect(usm3.won).to be_nil
+    expect(usm4.won).to be_nil
+    expect(usm3.game_wins).to eq(0)
+    expect(usm4.game_wins).to eq(0)
+
+    # good member, good request body
+    put "/seasons/#{@season.id}/match-groups/#{@smg.id}/matches/#{@match.id}/members/#{@user3.id}/status", status: true, game_wins: 2
+    expect(last_response.status).to eq(204)
+    usm3.reload
+    usm4.reload
+    expect(usm3.won).to eq(true)
+    expect(usm4.won).to be_nil
+    expect(usm3.game_wins).to eq(2)
+    expect(usm4.game_wins).to eq(0)
+
+    # good member2, good request body
+    put "/seasons/#{@season.id}/match-groups/#{@smg.id}/matches/#{@match.id}/members/#{@user4.id}/status", status: false, game_wins: 1
+    expect(last_response.status).to eq(204)
+    usm3.reload
+    usm4.reload
+    expect(usm3.won).to eq(true)
+    expect(usm4.won).to eq(false)
+    expect(usm3.game_wins).to eq(2)
+    expect(usm4.game_wins).to eq(1)
+
+    # TODO: add a check for reporting game_wins > best_of
   end
 end
