@@ -160,22 +160,23 @@ class MatchController < ApplicationController
     json_halt 400, 'game_wins or status keys must be specified' unless attempt_save
     json_halt 400, user_season_match.errors unless user_season_match.valid?
     user_season_match.save
+    status 204
     logger.info(
       "#{principal.username} just updated the status of season-#{season_id}/group-#{group_id}/match-#{match_id}/user-#{member_id}" \
       "from #{previous_state.inspect} to #{user_season_match.inspect}"
     )
+    # if the overall status (win/loss) for a player didn't change, dont fire the notify
+    return if previous_state.won == user_season_match.won
+    @match.reload
+    email_match_status_updated(@match, principal)
     # we want to say "[Principal] just updated the status of [Season Name] >> [Group Name] > [Match Name] >> [Member Name]
-    # only report overall match reporting to slack
-    if previous_state.won != user_season_match.won
-      slack_message(
-        "*<#{link_to_user principal.username}|#{slack_escape principal.username}>* just *updated* " +
-        (@member.id == principal.id ? 'their own *status* ' : "the *status* of *<#{link_to_user @member.username}|#{slack_escape @member.username}>* ") +
-        "in match *<#{link_to_season season_id}|#{slack_escape @match.title}>*}\n" \
-        "from #{slack_format_win_state(previous_state.won, bold: false, emoji: false)} to #{slack_format_win_state(user_season_match.won)}"
-      )
-    end
+    slack_message(
+      "*<#{link_to_user principal.username}|#{slack_escape principal.username}>* just *updated* " +
+      (@member.id == principal.id ? 'their own *status* ' : "the *status* of *<#{link_to_user @member.username}|#{slack_escape @member.username}>* ") +
+      "in match *<#{link_to_season season_id}|#{slack_escape @match.title}>*\n" \
+      "from #{slack_format_win_state(previous_state.won, bold: false, emoji: false)} to #{slack_format_win_state(user_season_match.won)}"
+    )
     # TODO: should we also mark other people as finished here?
-    status 204
   end
   post '/seasons/:season_id/match-groups/:group_id/matches' do |season_id, group_id|
     requires_season_owner!

@@ -194,6 +194,7 @@ describe 'Match' do
     expect(last_response_json['errors']).to eq('game_wins or status keys must be specified')
 
     # now make real requests, but first verify state and mock notifier
+    clear_deliveries
     allow(Slack::Notifier).to receive(:new).and_return(slack_double)
     allow(slack_double).to receive(:escape).and_return('escaped')
     allow(slack_double).to receive(:ping).and_return(nil)
@@ -213,8 +214,11 @@ describe 'Match' do
     expect(usm4.won).to be_nil
     expect(usm3.game_wins).to eq(2)
     expect(usm4.game_wins).to eq(0)
+    expect(delivery_count).to eq(2)
+    expect(deliveries).to include(@user3.email, @user4.email)
 
     # good member2, good request body
+    clear_deliveries
     put "/seasons/#{@season.id}/match-groups/#{@smg.id}/matches/#{@match.id}/members/#{@user4.id}/status", status: false, game_wins: 1
     expect(last_response.status).to eq(204)
     usm3.reload
@@ -223,6 +227,8 @@ describe 'Match' do
     expect(usm4.won).to eq(false)
     expect(usm3.game_wins).to eq(2)
     expect(usm4.game_wins).to eq(1)
+    expect(delivery_count).to eq(2)
+    expect(deliveries).to include(@user3.email, @user4.email)
 
     # TODO: add a check for reporting game_wins > best_of
   end

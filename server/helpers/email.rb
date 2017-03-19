@@ -39,12 +39,13 @@ module Email
 
   def email_season_comment(season, comment, by_user)
     users = {}
+    users[season.owner.email] = 'are the season owner'
     season.members.each_with_object(users) do |m, o|
-      o[m.email] ||= 'are season member'
+      o[m.email] ||= 'are a season member'
     end
     season.season_comments.each_with_object(users) do |c, o|
       next if c.hidden
-      o[c.user.email] ||= 'commented on season'
+      o[c.user.email] ||= 'commented on the season'
     end
     users.each do |email, reason|
       logger.info "[email] notifying #{email} about season #{season.id} (#{season.name}) comment #{comment.id}"
@@ -110,6 +111,46 @@ module Email
       <br/>
       <p>-MagicStick</p>"
     )
+    log_debug_email
+  end
+
+  def email_match_status_updated(match, by_user)
+    match_body = ''
+    match.user_season_match.each do |usm|
+      won_status = if usm.won.nil?
+                     'Incomplete'
+                   elsif usm.won
+                     'Win'
+                   else
+                     'Loss'
+                   end
+      match_body += "<tr><td>#{h usm.user.username}</td><td>#{usm.game_wins}</td><td>#{won_status}</td></tr>\n"
+    end
+
+    match.user_season_match.each do |usm|
+      user = usm.user
+      logger.info "[email] notifying #{user.email} about match #{match.id} (#{match.title}) status update by #{by_user.email}"
+      Pony.mail(
+        to: user.email,
+        subject: "Match '#{match.title}' Status Updated",
+        headers: { 'X-SMTPAPI' => { 'asm_group_id' => 2715 }.to_json },
+        html_body: "<p>Hi #{h user.username},</p>
+        <br/>
+        <p>The status of your match, <a href='#{link_to_season match.season_match_group.season}'><i>#{h match.title}</i></a>, was just updated by #{h by_user.username}:</p>
+        <table>
+          <thead>
+            <tr><th>User</th><th>Games Won</th><th>Overall Status</th></tr>
+          </thead>
+          <tbody>
+            #{match_body}
+          </tbody>
+        </table>
+        <br/>
+        <p>If you think this was done in error, navigate to the season page and update your status or leave a comment.</p>
+        <br/>
+        <p>-MagicStick</p>"
+      )
+    end
     log_debug_email
   end
 
