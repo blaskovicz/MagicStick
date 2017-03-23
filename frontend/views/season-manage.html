@@ -98,7 +98,14 @@
         <leaderboard season="season">
         </leaderboard>
       </tab>
-      <tab ng-repeat="group in season.season_match_groups" heading="{{group.name}}">
+      <tab ng-repeat="group in season.season_match_groups">
+        <tab-heading>
+          {{group.name}}
+          <i
+            ng-if="matchGroupIsComplete(group)"
+            class="glyphicon glyphicon-ok">
+          </i>
+        </tab-heading>
         <div class="season-matchup-tab">
           <div class="row" ng-if="seasonOwner()">
             <div class="col-md-1 col-md-offset-10">

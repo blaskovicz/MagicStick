@@ -40,9 +40,17 @@ angular.module("MagicStick.controllers").controller "SeasonManageController", [
         "Not Played"
       else
         "??"
+
     $scope.matchIsComplete = (match) ->
-      match.user_season_match?.length > 0 and \
-      _.any(match.user_season_match, ((userMatch) -> userMatch?.won?))
+      match?.user_season_match?.length > 0 and \
+      _.some match.user_season_match, (userMatch) ->
+        userMatch?.won?
+
+    $scope.matchGroupIsComplete = (group) ->
+      group?.matches?.length > 0 and \
+      _.every group.matches, (match) ->
+        $scope.matchIsComplete(match)
+
     $scope.updateJoinType = ->
       return unless season?
       $scope.updatingSeason = yes
