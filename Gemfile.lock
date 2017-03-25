@@ -66,7 +66,6 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.8.1)
-    sass (3.4.13)
     sequel (4.21.0)
     shotgun (0.9.1)
       rack (>= 1.0)
@@ -116,7 +115,6 @@ DEPENDENCIES
   redcarpet
   rspec
   rubocop
-  sass
   sequel
   shotgun
   sinatra

@@ -36,7 +36,6 @@ $ git clone https://github.com/blaskovicz/MagicStick && cd MagicStick
 
 ```sh
 $ bundle install
-$ gem install sass
 $ npm install
 ```
 
