@@ -1,0 +1,18 @@
+{
+  "scripts": [
+    "/js/jwt-decode.js",
+    "/bower_components/jquery/dist/jquery.min.js",
+    "/bower_components/lodash/lodash.min.js",
+    "/bower_components/raygun4js/dist/raygun.min.js",
+    "/bower_components/momentjs/min/moment.min.js",
+    "/bower_components/bootstrap/dist/js/bootstrap.min.js",
+    "/bower_components/angular/angular.min.js",
+    "/bower_components/angular-route/angular-route.min.js",
+    "/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js",
+    "/bower_components/angular-toastr/dist/angular-toastr.tpls.js",
+    "/bower_components/angular-local-storage/dist/angular-local-storage.min.js",
+    "/bower_components/ng-file-upload/ng-file-upload.min.js",
+    "/bower_components/marked/marked.min.js",
+    "/bower_components/angular-marked/angular-marked.min.js"
+  ]
+}

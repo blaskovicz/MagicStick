@@ -1,6 +1,27 @@
+_ = require 'lodash'
+timegrunt = require 'time-grunt'
+fs = require 'fs'
+path = require 'path'
+karmaFiles = JSON
+                .parse(
+                  fs.readFileSync(
+                    path.join(__dirname, 'server', 'views', 'js.json')
+                  ).toString()
+                )
+                .scripts
+                .map((script) ->
+                  "public/#{script}"
+                )
+karmaFiles
+  .push(
+    "public/bower_components/angular-mocks/angular-mocks.js"
+    "public/js/app.js"
+    "public/js/templates.js"
+    "public/js/tests.js"
+  )
+
 module.exports = (grunt) ->
-  _ = require('lodash')
-  require('time-grunt')(grunt)
+  timegrunt(grunt)
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
     sass:
@@ -54,29 +75,7 @@ module.exports = (grunt) ->
           frameworks: ['jasmine']
           singleRun: true
           browsers: ['PhantomJS']
-          #TODO this needs to be kept in sync almost 100%
-          # with public/index.html scripts; we should find
-          # a better way to do this (ie injecting them into that file)
-          files: [
-            "public/js/jwt-decode.js"
-            "public/bower_components/raygun4js/dist/raygun.min.js"
-            "public/bower_components/jquery/dist/jquery.min.js"
-            "public/bower_components/lodash/lodash.min.js"
-            "public/bower_components/momentjs/min/moment.min.js"
-            "public/bower_components/bootstrap/dist/js/bootstrap.min.js"
-            "public/bower_components/angular/angular.min.js"
-            "public/bower_components/angular-route/angular-route.min.js"
-            "public/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"
-            "public/bower_components/angular-toastr/dist/angular-toastr.tpls.js"
-            "public/bower_components/angular-local-storage/dist/angular-local-storage.min.js"
-            "public/bower_components/ng-file-upload/ng-file-upload.min.js"
-            "public/bower_components/marked/marked.min.js"
-            "public/bower_components/angular-marked/angular-marked.min.js"
-            "public/bower_components/angular-mocks/angular-mocks.js"
-            "public/js/app.js"
-            "public/js/templates.js"
-            "public/js/tests.js"
-          ]
+          files: karmaFiles
     watch:
       html:
         files: [
@@ -115,6 +114,7 @@ module.exports = (grunt) ->
           'app.rb'
           'db/**/*.rb'
           'server/**/*.rb'
+          'server/views/js.json'
           'Rakefile'
           'config.ru'
         ]
