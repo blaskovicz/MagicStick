@@ -139,7 +139,7 @@ module.exports = (grunt) ->
         bg: true
   grunt.loadNpmTasks 'grunt-karma'
   grunt.loadNpmTasks 'grunt-html2js'
-  grunt.loadNpmTasks 'grunt-contrib-sass'
+  grunt.loadNpmTasks 'grunt-sass'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-htmlhint'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
