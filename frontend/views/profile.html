@@ -18,7 +18,7 @@
   </div>
   <div ng-show="!edit" class="row">
     <div class="col-sm-10">
-      <dl class="dl-horizontal">
+      <dl>
         <dt ng-show="user.name">Name</dt>
         <dd ng-show="user.name">{{user.name}}</dd>
 
@@ -37,6 +37,22 @@
             type="button"
             class="btn btn-xs btn-primary">
             {{slackInviteSent ? 'Invite sent' : 'Send me an invite!'}}
+          </button>
+        </dd>
+
+        <dt>Connected To:</dt>
+        <dd>
+          <button
+            ng-click='toggleConnection("facebook", has_facebook)'
+            class='btn btn-xs'
+            ng-class='{"btn-primary": has_facebook}'>
+            Facebook
+          </button>
+          <button
+            ng-click='toggleConnection("google-oauth2", has_google)'
+            class='btn btn-xs'
+            ng-class='{"btn-danger": has_google}'>
+            Google
           </button>
         </dd>
 

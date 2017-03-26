@@ -2,6 +2,7 @@ require 'digest/sha2'
 class User < Sequel::Model
   plugin :validation_helpers
   one_to_many :season_comments
+  one_to_many :user_identities
   many_to_many :roles, left_key: :user_id, right_key: :role_id, join_table: :users_roles
   many_to_many :season_memberships, class: :Season, left_key: :user_id, right_key: :season_id, join_table: :users_seasons
   one_to_many :managed_seasons, class: :Season, key: :owner_id
@@ -19,7 +20,11 @@ class User < Sequel::Model
   end
 
   def auth_payload
-    to_json(include: [:roles, :avatar_url], except: [:active, :password, :salt, :avatar])
+    to_json(include: [:roles, :avatar_url, :user_identities], except: [:active, :password, :salt, :avatar])
+  end
+
+  def self.generate_password
+    %w{! @ # $ % ^ & * ( ) - + 0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z}.sample(20).join
   end
 
   def before_create

@@ -3,11 +3,14 @@ angular.module("MagicStick.controllers").controller "ProfileController", [
   "localStorageService"
   "User"
   "$http"
+  "$location"
   "toastr"
   "Upload"
-  ($scope, localStorageService, User, $http, toastr, Upload) ->
-
+  ($scope, localStorageService, User, $http, $location, toastr, Upload) ->
+    $scope.user = {}
     $scope.avatars = []
+    $scope.slack =
+      in_slack: false
 
     $scope.$watch 'avatars', ->
       return unless $scope.avatars
@@ -18,24 +21,52 @@ angular.module("MagicStick.controllers").controller "ProfileController", [
             file: avatar
           })
             .success (data, status, headers, config) ->
+              loadUser()
               toastr.success "Avatar updated"
-              User.get().then (response) ->
-                $scope.user = response.data
-
-                # hack to force image reloading
-                $scope.user.avatar_url += "?" + Math.random()
-                User.avatar_url = $scope.user.avatar_url
             .error (data) ->
               toastr.error "Failed to upload avatar: " +
                 "#{data?.errors?.avatar?.join('; ') ? 'try again later.'}"
 
-    User.get().then (response) ->
-      $scope.user = response.data
+    loadUser = () ->
+      User.slackInfo().then (response) ->
+        $scope.slack = response.data
+      User.get().then (response) ->
+        $scope.user = response.data
+        # hack to force image reloading
+        $scope.user.avatar_url += "?" + Math.random()
+        User.avatar_url = $scope.user.avatar_url
+        $scope.has_facebook = _.find $scope.user.user_identities, (id) ->
+          id.provider_id.indexOf('facebook') is 0
+        $scope.has_google = _.find $scope.user.user_identities, (id) ->
+          id.provider_id.indexOf('google-oauth2') is 0
 
-    $scope.slack =
-      in_slack: false
-    User.slackInfo().then (response) ->
-      $scope.slack = response.data
+    loadUser()
+
+    $scope.toggleConnection = (name, state) ->
+      nextState = if state
+        'unlink your account from'
+      else
+        'link your account to'
+      return unless confirm("Do you really want to #{nextState} #{name}?")
+      unless state
+        xtAuth = new auth0.WebAuth
+          domain: MagicStick?.Env?.AUTH0_DOMAIN
+          clientID: MagicStick?.Env?.AUTH0_CLIENT_ID
+          scope: 'openid email name given_name family_name'
+          state: 'link_account'
+          redirectUri: if $location.host()
+            "#{$location.protocol()}://#{$location.host()}" + \
+            "#{if $location.port() then ':' + $location.port() else ''}/"
+          else
+            'http://localhost:9393/'
+        xtAuth.authorize({ responseType: 'token', connection: name })
+        return
+      $http.delete("/api/auth/me/identities/#{state.id}")
+        .success ->
+          loadUser()
+        .error ->
+          toastr.error "Failed to remove #{name} link. Try again later."
+
     # obv this may break if a user has n accounts, but they should only have 1
     $scope.slackInviteSent = localStorageService.get("slackInviteSent")
     $scope.sendSlackInvite = () ->
