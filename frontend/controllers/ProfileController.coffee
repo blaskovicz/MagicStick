@@ -14,15 +14,20 @@ angular.module("MagicStick.controllers").controller "ProfileController", [
       for avatar in $scope.avatars
         do (avatar) ->
           Upload.upload({
-                url: '/api/auth/me/avatar',
-                file: avatar
-            }).success (data, status, headers, config) ->
+            url: '/api/auth/me/avatar',
+            file: avatar
+          })
+            .success (data, status, headers, config) ->
               toastr.success "Avatar updated"
               User.get().then (response) ->
                 $scope.user = response.data
 
                 # hack to force image reloading
                 $scope.user.avatar_url += "?" + Math.random()
+                User.avatar_url = $scope.user.avatar_url
+            .error (data) ->
+              toastr.error "Failed to upload avatar: " +
+                "#{data?.errors?.avatar?.join('; ') ? 'try again later.'}"
 
     User.get().then (response) ->
       $scope.user = response.data
