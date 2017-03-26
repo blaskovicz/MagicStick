@@ -15,6 +15,9 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Max: 1000
 
+Metrics/BlockNesting:
+  Max: 5
+
 Metrics/ModuleLength:
   Max: 1000
 
@@ -25,7 +28,7 @@ Metrics/ClassLength:
 
 # Offense count: 1
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Max: 20
 
 # Offense count: 76
 # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
@@ -40,7 +43,7 @@ Metrics/MethodLength:
 
 # Offense count: 1
 Metrics/PerceivedComplexity:
-  Max: 10
+  Max: 20
 
 # Offense count: 18
 Style/Documentation:

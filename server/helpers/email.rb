@@ -3,7 +3,7 @@ module Email
     Rack::Utils.escape_html text
   end
 
-  def email_welcome(user)
+  def email_welcome(user, password: nil)
     logger.info "[email] notifying #{user.email} about new account"
     Pony.mail(
       to: user.email,
@@ -12,6 +12,7 @@ module Email
       html_body: "<p>Hi #{h user.username},</p>
       <br/>
       <p>Your account just got created on #{link_to_site_root}.</p>
+      #{password.nil? ? '' : "<p>You password was set to <b>#{h password}</b> - we recommend you change it immediately.</p>"}
       <p>Why not log in and create or join a season?</p>
       <p>If you think you recieved this email in error, please file an issue with us on <a href='#{link_to_github}'>Github</a>.</p>
       <br/>

@@ -2,10 +2,16 @@ require 'date'
 require 'openssl'
 require 'digest/sha1'
 require 'jwt'
+require 'uri'
 module Auth
   def hmac_secret
     raise 'HMAC_SECRET not set' unless ENV.key? 'HMAC_SECRET'
     ENV['HMAC_SECRET']
+  end
+
+  def auth0_secret
+    raise 'AUTH0_CLIENT_SECRET not set' unless ENV.key? 'AUTH0_CLIENT_SECRET'
+    ENV['AUTH0_CLIENT_SECRET']
   end
 
   def requires_role!(*roles)
@@ -47,20 +53,54 @@ module Auth
   end
 
   def decode_jwt_user(token = @auth.params)
+    payload_unsafe = nil
     begin
-      decoded_token = JWT.decode token, hmac_secret, true, algorithm: 'HS256'
-      payload = decoded_token.first
-      return unless payload['iss'] == 'magic-stick' # we only issue our own tokens for v1
-      # TODO: maybe create user here if coming from oauth provider
-      user = User[id: payload['sub']] # the subject is the user id
+      user = nil
+      payload = nil
+      # check the payload without validating to determine which issuer
+      payload_unsafe = JWT.decode(token, nil, false, algorithm: 'HS256').first
+      # if we're from magic stick, use our own secret and payload for lookup
+      if payload_unsafe['iss'] == 'magic-stick'
+        payload = JWT.decode(token, hmac_secret, true, algorithm: 'HS256').first
+        user = User[id: payload['sub']] # the subject is the user id
+      # if we're from auth0, use their format, potentially creating a user
+      elsif URI(payload_unsafe['iss']).host.end_with? 'auth0.com'
+        payload = JWT.decode(token, auth0_secret, true, algorithm: 'HS256').first
+        identity = UserIdentity[provider_id: payload['sub']]
+        if identity
+          user = identity.user
+        else
+          user = User[email: payload['email']]
+          if user.nil?
+            logger.info "[auth/bearer] attempting to create user (#{payload.inspect})"
+            # google-oauth2|12345 -> google_user_12345
+            sub = payload['sub'].split('|')
+            user = User.new(
+              email: payload['email'],
+              username: "#{sub.first.split('-').first}_user_#{sub.last}"
+            )
+            user.name = payload['name'] ? payload['name'] : user.username
+            raw_password = User.generate_password
+            user.plaintext_password = raw_password
+            raise "Failed to create user #{user.errors.inspect}" unless user.save
+            email_welcome user, password: raw_password
+            invite_to_slack user
+          end
+          # add identity
+          if user.user_identities_dataset.where(provider_id: payload['sub']).first.nil?
+            logger.info "[auth/bearer] attempting to associate user #{user.id} (#{user.email}) with identity (#{payload.inspect})"
+            user.add_user_identity UserIdentity.new(provider_id: payload['sub'])
+          end
+        end
+      end
       if user
-        logger.info "[auth/bearer] #{user.username} now logged in"
+        logger.info "[auth/bearer] #{user.username} logged in (#{payload.inspect})"
         return user
       else
-        logger.warn "[auth/bearer] Invalid login attempt with jwt with payload #{payload.inspect}"
+        logger.warn "[auth/bearer] Invalid login attempt with jwt with payload #{payload_unsafe.inspect}"
       end
     rescue => e # may be a jwt error like expired token
-      logger.warn "[auth/bearer] Invalid login attempt with jwt #{token} (#{e})"
+      logger.warn "[auth/bearer] Invalid login attempt with jwt #{token} => #{payload_unsafe ? payload_unsafe.inspect : '?'} (#{e.class}: #{e})"
     end
     nil
   end

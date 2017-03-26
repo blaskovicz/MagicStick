@@ -26,7 +26,8 @@
     "angular-bootstrap": "~0.12.1",
     "ng-file-upload": "~4.0.3",
     "angular-marked": "~0.0.12",
-    "raygun4js": "~2.5.3"
+    "raygun4js": "~2.5.3",
+    "auth0.js": "~8.4.0"
   },
   "resolutions": {
     "angular": "1.3"

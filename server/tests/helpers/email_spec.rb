@@ -74,6 +74,13 @@ describe 'Email Helper' do
       expect(delivery_count).to eq(1)
       expect(deliveries).to include(@user.email)
     end
+    it 'user create with password' do
+      expect_settings_check
+      email_welcome(@user, password: 'some-pass-secret')
+      expect(delivery_count).to eq(1)
+      expect(deliveries).to include(@user.email)
+      expect(email_deliveries.first.to_s).to include('some-pass-secret')
+    end
     it 'season member add' do
       expect_settings_check
       email_user_added_to_season(@season, @user, @owner)

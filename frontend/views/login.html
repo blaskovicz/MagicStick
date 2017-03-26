@@ -11,13 +11,19 @@
             <label for="password">Password</label>
             <input class="form-control" id="password" type="password" ng-model="login.password">
           </div>
-          <button
-            ng-disabled="login.password == '' || login.password == null || login.username == '' || login.username == null"
-            class="btn btn-primary"
-            type="submit">
-            Login
-          </button>
-          <button class="btn" type="button" ng-click='tabs.forgotPassword = true'>Forgot Password?</button>
+          <div class="panel">
+            <button
+              ng-disabled="login.password == '' || login.password == null || login.username == '' || login.username == null"
+              class="btn btn-primary"
+              type="submit">
+              Login
+            </button>
+            <button class="btn" type="button" ng-click='tabs.forgotPassword = true'>Forgot Password?</button>
+          </div>
+          <div>
+            <button class="btn btn-primary" type="button" ng-click='redirectLogin("facebook")'>Facebook Login</button>
+            <button class="btn btn-danger" type="button" ng-click='redirectLogin("google-oauth2")'>Google Login</button>
+          </div>
         </form>
       </div>
     </tab>

@@ -59,7 +59,7 @@ class AuthController < ApplicationController
   post '/forgot-password' do
     user_param_presence!
     # requesting a password reset
-    # TODO rate limit / regen limit
+    # TODO: rate limit / regen limit
     if params[:user][:username] && params[:user][:email]
       status 204
       user = User[username: params[:user][:username]]
@@ -111,6 +111,7 @@ class AuthController < ApplicationController
     end
   end
   post '/users' do
+    # TODO: require email confirm, dont generate account row until user clicks button
     user_param_presence!
     params[:user].delete 'passwordConfirmation'
     # is there a better way to do this? TODO
@@ -118,18 +119,42 @@ class AuthController < ApplicationController
     json_halt 400, new_user.errors unless new_user.valid?
     new_user.save
     status 201
-    email_welcome(new_user)
+    email_welcome new_user
+    invite_to_slack new_user
     json id: new_user.id
   end
   put '/me/slack' do
     requires_login!
     invite_to_slack(principal)
   end
+  post '/me/identities' do
+    requires_login!
+    json_halt 400, 'No token found in request payload' if params[:token].nil?
+    begin
+      payload = JWT.decode(Base64.urlsafe_decode64(params[:token]), auth0_secret, true, algorithm: 'HS256').first
+      identity = UserIdentity[provider_id: payload['sub']]
+      json_halt 409, 'Provider identity already linked to account' unless identity.nil?
+      principal.add_user_identity UserIdentity.new(provider_id: payload['sub'])
+      logger.info "[link-account] linked #{payload.inspect} to account #{principal.id} <#{principal.email}>"
+      status 204
+    rescue => e
+      logger.warn "[link-account] failed to link #{params[:token]} to account #{principal.id} <#{principal.email}> (#{e.class}: #{e})"
+      json_halt 400, 'Unable to link account to provider identity'
+    end
+  end
+  delete '/me/identities/:identity_id' do |id|
+    requires_login!
+    identity = principal.user_identities_dataset[id]
+    return if identity.nil?
+    identity.destroy
+    status 204
+  end
   get '/me' do
     requires_login!
     principal.auth_payload
   end
   get '/me/slack' do
+    requires_login!
     { in_slack: in_slack?(principal) }.to_json
   end
   post '/login' do

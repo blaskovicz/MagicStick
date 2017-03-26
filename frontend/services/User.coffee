@@ -44,13 +44,12 @@ angular.module("MagicStick.services").factory "User", [
           @broadcastLoginStateChange()
         catch
           @logout(true)
+      loginWithToken: (token) ->
+        return @_login("Bearer #{token ? ''}")
       login: (username, password) ->
+        return @_login("Basic #{btoa((username ? '') + ':' + (password ? ''))}")
+      _login: (authHeader) ->
         promise = $q.defer()
-        unless password? and username?
-          promise.reject("Insufficient credentials provided")
-          return promise.promise
-        authHeader =
-          "Basic #{btoa(username + ':' + password)}"
         $http.post("/api/auth/login", '',
           { headers: {Authorization: authHeader} })
           .success (data, status, headers) =>

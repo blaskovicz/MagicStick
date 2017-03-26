@@ -1,4 +1,5 @@
 {
+  "#comment": "add imports in order here",
   "scripts": [
     "/js/jwt-decode.js",
     "/bower_components/jquery/dist/jquery.min.js",
@@ -13,6 +14,7 @@
     "/bower_components/angular-local-storage/dist/angular-local-storage.min.js",
     "/bower_components/ng-file-upload/ng-file-upload.min.js",
     "/bower_components/marked/marked.min.js",
-    "/bower_components/angular-marked/angular-marked.min.js"
+    "/bower_components/angular-marked/angular-marked.min.js",
+    "/bower_components/auth0.js/build/auth0.min.js"
   ]
 }

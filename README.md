@@ -89,7 +89,10 @@ $ heroku addons:create sendgrid
 # Optionally, to enable alerts, also add the raygun addon.
 $ heroku addons:create raygun
 
-# To install node, rake and grunt, configure the buildpacks:
+# To support jwts generated via auth0
+$ heroku addons:create auth0
+
+# To build the site, configure the buildpacks:
 $ heroku buildpacks:set -i 1 heroku/ruby
 $ heroku buildpacks:set -i 2 heroku/nodejs
 
