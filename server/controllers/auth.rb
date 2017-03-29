@@ -128,6 +128,8 @@ class AuthController < ApplicationController
     invite_to_slack(principal)
   end
   post '/me/identities' do
+    # TODO: send an email here, also potentially reset password in the event
+    # someone reserved an email address+password via normal signup (until we verify email)
     requires_login!
     json_halt 400, 'No token found in request payload' if params[:token].nil?
     begin
@@ -144,10 +146,10 @@ class AuthController < ApplicationController
   end
   delete '/me/identities/:identity_id' do |id|
     requires_login!
-    identity = principal.user_identities_dataset[id]
+    identity = principal.user_identities_dataset.first(id: id)
+    status 204
     return if identity.nil?
     identity.destroy
-    status 204
   end
   get '/me' do
     requires_login!
