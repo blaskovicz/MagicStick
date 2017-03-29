@@ -107,6 +107,7 @@ module.exports = (grunt) ->
           'coffeelint:tests'
           'coffee:tests'
           'karma'
+          'output-coverage'
         ]
       ruby:
         files: [
@@ -121,6 +122,7 @@ module.exports = (grunt) ->
         tasks: [
           'bgShell:pumaRestart'
           'bgShell:rake'
+          'output-coverage'
         ]
     bgShell:
       pumaRestart:
@@ -148,4 +150,17 @@ module.exports = (grunt) ->
   grunt.registerTask 'build', ['htmlhint','html2js','sass','coffeelint','coffee']
   grunt.registerTask 'test', ['build','bgShell:rake','karma']
   grunt.registerTask 'dist', ['build']
+  grunt.registerTask 'output-coverage', 'output coverage data', () ->
+    cover_out = path.join __dirname, 'coverage/.last_run.json'
+    done = @async()
+    fs.readFile cover_out, 'utf8', (err, data) ->
+      unless err
+        try
+          coverage = JSON.parse(data)?.result?.covered_percent
+          if coverage
+            grunt.log.writeln "coverage: #{coverage}%"
+            done()
+            return
+      grunt.log.writeln "coverage: not found"
+      done()
   grunt.registerTask 'default', ['bgShell:shotgun','watch']
