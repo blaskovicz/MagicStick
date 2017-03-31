@@ -115,6 +115,7 @@ module.exports = (grunt) ->
           'app.rb'
           'db/**/*.rb'
           'server/**/*.rb'
+          'server/tests/**/*.phantom.js'
           'server/views/js.json'
           'Rakefile'
           'config.ru'
