@@ -35,6 +35,7 @@
     "karma-jasmine": "^0.3.5",
     "karma-phantomjs-launcher": "^0.1.4",
     "lodash": "^4.17.4",
+    "phantomjs": "^2.1.7",
     "time-grunt": "^1.1.0"
   }
 }
