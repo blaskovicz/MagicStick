@@ -1,4 +1,5 @@
 require 'base64'
+require 'digest'
 require_relative '../spec_helper'
 require_relative '../../controllers/auth'
 require_relative '../../helpers/slack'
@@ -17,6 +18,21 @@ describe 'Authentication' do
 
   def app
     AuthController
+  end
+
+  before(:all) do
+    @role_admin = Role.find name: 'admin'
+    raise 'no admin role' unless @role_admin
+    @role_mod = Role.find name: 'moderator'
+    raise 'no mod role' unless @role_mod
+    @user_admin = User.new(
+      username: 'an-admin-user',
+      password: 'great-pass',
+      email: 'auth-spec-admin-test@magic-stick.herokuapp.com',
+      name: 'admin user dudeman'
+    )
+    raise 'failed to save user admin' unless @user_admin.save
+    @user_admin.add_role @role_admin
   end
 
   before(:each) do
@@ -280,6 +296,106 @@ describe 'Authentication' do
       get '/users', limitted: true,
                     matching: 'unit-test-email@example.com'
       verify_user_search_response(last_response.body)
+    end
+
+    it 'should allow an admin to see roles' do
+      authorize 'an-admin-user', 'great-pass'
+      get '/roles'
+      expect(last_response.status).to eq(200)
+      b = JSON.parse(last_response.body)
+      expect(b['roles']).to be_kind_of(Array)
+      expect(b['roles'].length).not_to eq(0)
+      expect(b['roles'][0]['name']).not_to be_empty
+      expect(b['roles'][0]['description']).not_to be_empty
+    end
+
+    it 'should allow an admin direct lookup of a user' do
+      authorize 'an-admin-user', 'great-pass'
+      u = User.find(username: 'unit-test-account')
+      expect(u).not_to be_nil
+      get "/users/#{u.id}"
+      expect(last_response.status).to eq(200)
+      b = JSON.parse(last_response.body)
+      expect(b['user']).to be_kind_of(Hash)
+      expect(b['user']['email']).to eq(u.email)
+      expect(b['user']['username']).to eq(u.username)
+      expect(b['user']['name']).to eq(u.name)
+      expect(b['user']['id']).to eq(u.id)
+    end
+
+    it 'should allow upload and view of an avatar' do
+      # the user has no avatar set, make sure we redirect to gravatar
+      u = User.find(username: 'unit-test-account')
+      expect(u).not_to be_nil
+      get "/users/#{u.id}/avatar"
+      expect(last_response.status).to eq(302)
+      expect(last_response.body).to be_empty
+      expect(last_response.headers['Location']).to match(%r{^https://secure.gravatar.com})
+
+      # user uploads an avatar
+      authorize 'unit-test-account', 'unit-test-new-password'
+      avatar_path = File.join(
+        File.dirname(__FILE__), '..', '..', '..', 'public', 'img', 'magic-wand.jpeg'
+      )
+      local_digest = Digest::MD5.file(avatar_path).hexdigest
+      file_size = File.stat(avatar_path).size
+      post '/me/avatar', 'file' => Rack::Test::UploadedFile.new(avatar_path, 'image/jpeg')
+      expect(last_response.body).to be_empty
+      expect(last_response.status).to eq(204)
+
+      # make sure anyone can see it successfully
+      authorize '', ''
+      get "/users/#{u.id}/avatar"
+      expect(last_response.status).to eq(200)
+      expect(last_response.headers['Content-Type']).to eq('image/jpeg')
+      remote_digest = Digest::MD5.new.update(last_response.body).hexdigest
+      expect(remote_digest).to eq(local_digest)
+      expect(last_response.headers['Content-Length'].to_i).to eq(file_size)
+      expect(last_response.headers['Last-Modified']).not_to be_nil
+    end
+
+    it 'should allow an admin to adjust user roles' do
+      authorize 'an-admin-user', 'great-pass'
+      u = User.find(username: 'unit-test-account')
+      expect(u).not_to be_nil
+
+      # we start with no roles
+      get "/users/#{u.id}/roles"
+      expect(last_response.status).to eq(200)
+      b = JSON.parse(last_response.body)
+      expect(b['roles']).to be_kind_of(Array)
+      expect(b['roles'].length).to eq(0)
+
+      # add the user to moderator role
+      post "/users/#{u.id}/roles/#{@role_mod.id}"
+      expect(last_response.status).to eq(204)
+
+      # can't add them again
+      post "/users/#{u.id}/roles/#{@role_mod.id}"
+      expect(last_response.status).to eq(409)
+      expect(JSON.parse(last_response.body)).to include('errors' => "User #{u.id} already in role #{@role_mod.id}")
+
+      # make sure they were added
+      get "/users/#{u.id}/roles"
+      expect(last_response.status).to eq(200)
+      b = JSON.parse(last_response.body)
+      expect(b['roles']).to be_kind_of(Array)
+      expect(b['roles'].length).to eq(1)
+      expect(b['roles'][0]['name']).to eq(@role_mod.name)
+      expect(b['roles'][0]['description']).to eq(@role_mod.description)
+
+      # now remove them from the role
+      2.times do
+        delete "/users/#{u.id}/roles/#{@role_mod.id}"
+        expect(last_response.status).to eq(204)
+      end
+
+      # make sure it's gone
+      get "/users/#{u.id}/roles"
+      expect(last_response.status).to eq(200)
+      b = JSON.parse(last_response.body)
+      expect(b['roles']).to be_kind_of(Array)
+      expect(b['roles'].length).to eq(0)
     end
   end
 end
