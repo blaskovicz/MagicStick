@@ -34,13 +34,22 @@ $ git clone https://github.com/blaskovicz/MagicStick && cd MagicStick
 
 ## Install Dependencies
 
+_Note:_ libpq-dev and libsqlite3-dev packages will be required to compile native database extensions.
+Please install those through your OS package provider (eg: `sudo apt-get install libpq-dev libsqlite3-dev` on ubuntu 16).
+
 ```sh
-$ bundle install
-$ npm install
+$ bundle install # backend dependences (`--path vendor/bundle` to install gems locally)
+$ npm install # build dependencies (installed locally to `./node_modules`)
+$ bower install # frontend sources (installed locally to `./public/bower_components`)
 ```
 
 If you run into issues with `$ bundle install` and are using `rbenv`, please
 consult [this post on stackoverflow](http://stackoverflow.com/a/11146496/626810).
+
+## Set Up Your Development Config
+$ cp env.sample .env && chmod 0600 .env
+
+You may want to change `DATABASE_URL` and `SITE_BASE_URI`, at a minimum.
 
 ## Initialize the Database
 
@@ -50,19 +59,20 @@ $ bundle exec rake db:migrate
 
 ## Run Grunt
 
-This will compile/test all source files and watch them for changes.
-Additionally it will launch a server via shotgun in development mode. All files
-are reloaded for each request ensuring changes will be picked up on subsequent
-requests.
-
 ```sh
 $ grunt
 ```
 
+`grunt` will compile and test all source files as they change.
+Additionally, it will launch the site via puma in development mode and
+restarted it upon file changes.
+
+You can watch the output stream (STDOUT, STDERR) for debug emails, test failures,
+HTTP requests, etc.
+
 ## View
 
-The server should be running at [http://localhost:9393](http://localhost:9393)
-
+The server should now be running at [http://localhost:9393](http://localhost:9393)
 
 ## Testing & Deployment
 
