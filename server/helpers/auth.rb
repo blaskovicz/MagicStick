@@ -134,10 +134,9 @@ module Auth
   end
 
   def encrypt(string)
-    assert_key
-    cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+    cipher = OpenSSL::Cipher.new('aes-256-cbc')
     cipher.encrypt
-    cipher.key = Digest::SHA1.hexdigest(ENV['SECRET'])
+    cipher.key = assert_secret
     iv = cipher.random_iv
     cipher.iv = iv
     encrypted = cipher.update(string)
@@ -146,10 +145,9 @@ module Auth
   end
 
   def decrypt(string, iv)
-    assert_key
-    cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+    cipher = OpenSSL::Cipher.new('aes-256-cbc')
     cipher.decrypt
-    cipher.key = Digest::SHA1.hexdigest(ENV['SECRET'])
+    cipher.key = assert_secret
     cipher.iv = iv
     decrypted = cipher.update(string)
     decrypted << cipher.final
@@ -158,7 +156,10 @@ module Auth
 
   private
 
-  def assert_key
-    raise 'SECRET unset' unless ENV.key? 'SECRET'
+  def assert_secret
+    secret = ENV['SECRET']
+    raise 'SECRET unset' unless secret
+    raise "SECRET invalid, must be 32 bytes (#{secret.bytesize})" unless secret.bytesize == 32
+    secret
   end
 end

@@ -23,7 +23,7 @@ describe 'Auth Helper' do
   end
 
   def with_secret
-    ENV['SECRET'] = 'very secret'
+    ENV['SECRET'] = SecureRandom.random_bytes(32)
     yield
     ENV.delete 'SECRET'
   end
