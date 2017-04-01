@@ -48,3 +48,7 @@ Metrics/PerceivedComplexity:
 # Offense count: 18
 Style/Documentation:
   Enabled: false
+
+# TODO: deal with in ruby 3.0
+Style/FrozenStringLiteralComment:
+  Enabled: false

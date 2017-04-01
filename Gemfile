@@ -1,9 +1,10 @@
 source 'https://rubygems.org'
-ruby '2.1.5'
-gem 'sinatra'
+ruby '2.4.1'
+
+gem 'sinatra', '~>1.4'
 gem 'sinatra-contrib'
 gem 'unicorn'
-gem 'sequel'
+gem 'sequel', '~>4.21'
 gem 'rack-parser', require: 'rack/parser'
 gem 'rake'
 gem 'rspec'

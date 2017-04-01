@@ -7,7 +7,7 @@
 ## Install Ruby
 
 Although you technically don't need to utilize ruby through rbenv, this setup is recommended.
-If you already have ruby 2.0 installed, then you can proceed to the _Download the Code_ section.
+If you already have ruby `2.4.1` installed, then you can proceed to the _Download the Code_ section.
 
 ### Get [rbenv](https://github.com/sstephenson/rbenv/blob/master/README.md)
 
@@ -15,7 +15,7 @@ If you already have ruby 2.0 installed, then you can proceed to the _Download th
 
 ### Install ruby
 
-Follow the instructions on the ruby-build page to install ruby 2.1.5.
+Follow the instructions on the ruby-build page to install ruby `2.4.1`.
 Note that if you want readline support, you can take a look at [this guide](http://vvv.tobiassjosten.net/ruby/readline-in-ruby-with-rbenv/).
 
 ### Install Bundler
@@ -26,7 +26,7 @@ $ rbenv rehash
 ```
 
 
-## Download the code
+## Download the Code
 
 ```sh
 $ git clone https://github.com/blaskovicz/MagicStick && cd MagicStick
