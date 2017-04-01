@@ -32,6 +32,7 @@ class AuthController < ApplicationController
   get '/users/:user_id/avatar' do
     if @user.avatar
       last_modified(@user.updated_at || @user.created_at)
+      cache_control :public, :must_revalidate, max_age: 300 # 5min
       content_type @user.avatar_content_type
       @user.avatar
     else

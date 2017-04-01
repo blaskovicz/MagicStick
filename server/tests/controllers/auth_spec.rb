@@ -352,6 +352,7 @@ describe 'Authentication' do
       expect(remote_digest).to eq(local_digest)
       expect(last_response.headers['Content-Length'].to_i).to eq(file_size)
       expect(last_response.headers['Last-Modified']).not_to be_nil
+      expect(last_response.headers['Cache-Control']).not_to be_nil
     end
 
     it 'should allow an admin to adjust user roles' do
