@@ -10,7 +10,7 @@ angular.module("MagicStick.controllers").controller "SeasonDashController", [
       description: ""
       starts: moment().toDate()
       ends: moment().add(1, 'months').toDate()
-      allow_auto_join: false
+      allow_auto_join: true
       invite_only: false
     savedSeason = angular.copy $scope.newSeason
     $scope.newSeasonError = {}

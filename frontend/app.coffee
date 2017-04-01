@@ -137,7 +137,7 @@ app.config([
         {
           requestError: (request) ->
             $log.info "requestError", request
-            request
+            $q.reject(request)
           request: (config) ->
             if apiRequest config
               u = localStorageService.get('currentUser')
@@ -151,7 +151,7 @@ app.config([
                   toastr.warning \
                     "Your login token has expired. Please re-login."
                   $rootScope.$broadcast("currentUser:login:force_logout")
-            config
+            config || $q.when(config)
           responseError: (response) ->
             $log.info "responseError", response
             if apiRequest response.config
@@ -162,7 +162,7 @@ app.config([
                 toastr.warning \
                   "Your login token has expired. Please re-login."
                 $rootScope.$broadcast("currentUser:login:force_logout")
-            response
+            $q.reject(response)
           response: (response) ->
             if apiRequest response.config
               if response.status is 401 # expired token
@@ -172,7 +172,7 @@ app.config([
                 toastr.warning \
                   "Your login token has expired. Please re-login."
                 $rootScope.$broadcast("currentUser:login:force_logout")
-            response
+            response || $q.when(response)
         }
     ]
 ]).config([
