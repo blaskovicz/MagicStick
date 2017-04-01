@@ -1,4 +1,4 @@
-# MagicStick [![Build Status](https://travis-ci.org/blaskovicz/MagicStick.svg?branch=master)](https://travis-ci.org/blaskovicz/MagicStick) [![Heroku](https://heroku-badge.herokuapp.com/?app=magic-stick)](https://dashboard.heroku.com/apps/magic-stick/activity) [![Coverage Status](https://coveralls.io/repos/github/blaskovicz/MagicStick/badge.svg)](https://coveralls.io/github/blaskovicz/MagicStick)
+# MagicStick ![](https://github.com/blaskovicz/MagicStick/raw/master/public/img/magic-wand-32.jpeg)  [![Build Status](https://travis-ci.org/blaskovicz/MagicStick.svg?branch=master)](https://travis-ci.org/blaskovicz/MagicStick) [![Heroku](https://heroku-badge.herokuapp.com/?app=magic-stick)](https://dashboard.heroku.com/apps/magic-stick/activity) [![Coverage Status](https://coveralls.io/repos/github/blaskovicz/MagicStick/badge.svg)](https://coveralls.io/github/blaskovicz/MagicStick)
 
 > Create leagues and matches for yourself and friends.
 
