@@ -30,8 +30,13 @@ class AuthController < ApplicationController
     json user: @user
   end
   get '/users/:user_id/avatar' do
-    content_type @user.avatar_content_type
-    @user.avatar
+    if @user.avatar
+      last_modified(@user.updated_at || @user.created_at)
+      content_type @user.avatar_content_type
+      @user.avatar
+    else
+      redirect @user.avatar_url
+    end
   end
   delete '/users/:user_id' do
     requires_role! :admin
