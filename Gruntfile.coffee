@@ -1,4 +1,5 @@
 _ = require 'lodash'
+Promise = require 'es6-promise'
 timegrunt = require 'time-grunt'
 fs = require 'fs'
 path = require 'path'
