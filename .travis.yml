@@ -1,9 +1,10 @@
 language: ruby
 rvms:
-    - 2.1.5
+    - 2.4.1
 before_script:
-    - gem install sass
+    - bundle install
     - npm install
+    - bower install
 script:
     - grunt test
 cache:
