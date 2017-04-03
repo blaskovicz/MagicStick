@@ -8,7 +8,7 @@ Coveralls.wear!
 require_relative '../../app'
 
 # secret must now be 32 bytes (https://github.com/rails/rails/issues/25185)
-ENV['SECRET'] = SecureRandom.random_bytes(32)
+ENV['SECRET'] = SecureRandom.hex(16) # 16 * 2
 ENV['SLACK_WEBHOOK_URL'] = 'http://localhost:12345/cool'
 ENV['HMAC_SECRET'] = 'hmac test secret'
 ENV['AUTH0_CLIENT_SECRET'] = 'auth0-test secret'
