@@ -47,6 +47,8 @@ module.exports = (grunt) ->
         dest: "public/js/templates.js"
     coffee:
       app:
+        options:
+          sourceMap: true
         files:
           'public/js/app.js': [
             'frontend/app.coffee'
@@ -57,6 +59,8 @@ module.exports = (grunt) ->
             '!frontend/tests/**/*.coffee'
           ]
       tests:
+        options:
+          sourceMap: true
         files:
           'public/js/tests.js': [
             'frontend/tests/**/*.coffee'
