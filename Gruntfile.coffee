@@ -76,6 +76,18 @@ module.exports = (grunt) ->
           singleRun: true
           browsers: ['PhantomJS']
           files: karmaFiles
+          reporters: ['progress', 'coverage']
+          preprocessors:
+            'public/js/app.js': ['coverage']
+            'public/js/templates.js': ['coverage']
+          coverageReporter:
+            reporters: [
+              {
+                type: 'json'
+                subdir: '.' # ./coverage
+                file: '.frontend.json'
+              }
+            ]
     watch:
       html:
         files: [
@@ -98,6 +110,7 @@ module.exports = (grunt) ->
           'coffeelint:app'
           'coffee:app'
           'karma'
+          'karma-simplecov-format'
         ]
       'coffee-tests':
         files: [
@@ -107,7 +120,6 @@ module.exports = (grunt) ->
           'coffeelint:tests'
           'coffee:tests'
           'karma'
-          'output-coverage'
         ]
       ruby:
         files: [
@@ -123,7 +135,6 @@ module.exports = (grunt) ->
         tasks: [
           'bgShell:pumaRestart'
           'bgShell:rake'
-          'output-coverage'
         ]
     bgShell:
       pumaRestart:
@@ -134,12 +145,67 @@ module.exports = (grunt) ->
         fail: true
         execOpts:
           env: _.assign(_.cloneDeep(process.env),
-            LOG_LEVEL: 'warn'
+            LOG_LEVEL: 'error'
             RACK_ENV: 'test'
+            COVERALLS_NOISY: 'true'
           )
       shotgun:
         cmd: 'bundle exec puma config.ru -p 9393'
         bg: true
+  grunt.registerTask 'karma-simplecov-format', 'transform karma coverage json into simplecov format', () ->
+    coverInFile = path.join __dirname, 'coverage', '.frontend.json'
+    coverOutFile = path.join __dirname, 'coverage', '.resultset.json'
+    done = @async()
+    coverOut = new Promise (resolve, reject) ->
+      # https://github.com/colszowka/simplecov
+      # { "Prog": { "coverage": { "file-path": [1,3,null,0] }, "timestamp": 1491185211 } }
+      fs.readFile coverOutFile, 'utf8', (err, data) ->
+        if err
+          if err.code is 'ENOENT'
+            resolve {}
+          else
+            reject(err)
+        else
+          resolve JSON.parse(data)
+    coverIn = new Promise (resolve, reject) ->
+      # https://github.com/gotwarlost/istanbul
+      # { "file-path": { "path": "file-path", "l": {"1": 3, "4": 0 } }
+      fs.readFile coverInFile, 'utf8', (err, data) ->
+        if err
+          reject(err)
+        else
+          covered = {}
+          for file, coverage of JSON.parse(data)
+            knownLines = _.keys(coverage.l).sort((a,b) -> +a - +b)
+            lastLine = +knownLines[knownLines.length - 1] # 1-based index
+            results = new Array(lastLine)
+            for i in [0 .. lastLine - 1]
+              results[i] = coverage.l[(+i)+1]
+              if results[i] is undefined
+                results[i] = null
+            covered[file] = results
+          resolve {
+            Karma:
+              timestamp: ((new Date()).getTime()/1000)
+              coverage: covered
+          }
+    Promise.all([coverIn, coverOut])
+      .then (results) ->
+        simplecov = results[1]
+        simplecov.Karma = results[0].Karma
+        fs.writeFile coverOutFile, JSON.stringify(simplecov, null, ' '), (err) ->
+          if err
+            grunt.log.error("Failed to merge coverage info.")
+            grunt.log.error(err)
+            done(false)
+          else
+            grunt.log.writeln('Merged coverage info.')
+            done()
+      .catch (reason) ->
+        grunt.log.error("Failed to discern coverage info.")
+        grunt.log.error(reason)
+        done(false)
+
   grunt.loadNpmTasks 'grunt-karma'
   grunt.loadNpmTasks 'grunt-html2js'
   grunt.loadNpmTasks 'grunt-sass'
@@ -149,19 +215,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-coffeelint'
   grunt.loadNpmTasks 'grunt-bg-shell'
   grunt.registerTask 'build', ['htmlhint','html2js','sass','coffeelint','coffee']
-  grunt.registerTask 'test', ['build','bgShell:rake','karma']
+  grunt.registerTask 'test', ['build', 'karma', 'karma-simplecov-format', 'bgShell:rake']
   grunt.registerTask 'dist', ['build']
-  grunt.registerTask 'output-coverage', 'output coverage data', () ->
-    cover_out = path.join __dirname, 'coverage/.last_run.json'
-    done = @async()
-    fs.readFile cover_out, 'utf8', (err, data) ->
-      unless err
-        try
-          coverage = JSON.parse(data)?.result?.covered_percent
-          if coverage
-            grunt.log.writeln "coverage: #{coverage}%"
-            done()
-            return
-      grunt.log.writeln "coverage: not found"
-      done()
   grunt.registerTask 'default', ['bgShell:shotgun','watch']
