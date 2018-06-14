@@ -39,7 +39,7 @@ Please install those through your OS package provider (eg: `sudo apt-get install
 
 ```sh
 $ bundle install # backend dependences (`--path vendor/bundle` to install gems locally)
-$ npm install # build dependencies (installed locally to `./node_modules`)
+$ yarn install # build dependencies (installed locally to `./node_modules`)
 $ bower install # frontend sources (installed locally to `./public/bower_components`)
 ```
 
