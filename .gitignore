@@ -18,3 +18,4 @@ coverage/
 tmp/restart.txt
 public/js/*.js.map
 public/js/*.src.coffee
+public/*

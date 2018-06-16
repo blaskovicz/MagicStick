@@ -1,13 +1,21 @@
-angular.module("MagicStick.directives").directive "formInput", ->
-  scope:
-    label: "@"
-    type: "@"
-    model: "="
-    options: "&"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+import angular from "angular";
+
+angular.module("MagicStick.directives").directive("formInput", () => ({
+  scope: {
+    label: "@",
+    type: "@",
+    model: "=",
+    options: "&",
     errorModel: "="
-  restrict: "E"
-  template: """
-  <div class="form-group" ng-class="{'has-error': errorModel != null}">
+  },
+  restrict: "E",
+  template: `\
+<div class="form-group" ng-class="{'has-error': errorModel != null}">
     <label for="{{label}}" ng-bind="label"></label>
     <span ng-switch="type">
       <span ng-switch-when="date">
@@ -42,13 +50,15 @@ angular.module("MagicStick.directives").directive "formInput", ->
       ng-if="errorModel != null"
       ng-bind="errorModel.join(', ')">
     </span>
-  </div>
-  """
+</div>\
+`,
   controller: [
-    "$scope"
-    ($scope) ->
-      $scope.open = ($event) ->
-        $event.preventDefault()
-        $event.stopPropagation()
-        $scope.opened = true
+    "$scope",
+    $scope =>
+      ($scope.open = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        return ($scope.opened = true);
+      })
   ]
+}));

@@ -1,6 +1,5 @@
 class ViewController < ApplicationController
   PREFIX = 'SINATRA_PUBLIC_ENV_'.freeze
-  JS = JSON.parse(File.read(File.join(__dir__, '..', 'views', 'js.json')))
   get '/' do
     # eg: SINATRA_PUBLIC_ENV_RAYGUN_API_KEY=bar would
     # be set to RAYGUN_API_KEY=bar in @env
@@ -10,7 +9,6 @@ class ViewController < ApplicationController
     end
     @env[:MAGIC_STICK_VERSION] = VERSION
     @env[:RACK_ENV] = ENV['RACK_ENV']
-    @scripts = JS['scripts']
     content_type :html
     erb :index
   end

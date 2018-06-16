@@ -1,0 +1,16 @@
+{
+  "extends": ["eslint:recommended"],
+  "rules": {},
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+  "env": {
+    "commonjs": true,
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "MagicStick": true
+  }
+}

@@ -17,24 +17,18 @@
       });
     </script>
     <link rel="icon" href="/img/magic-wand-32.jpeg" type="image/jpeg">
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
-    <link href="/css/app.css" rel="stylesheet">
-    <link href="/bower_components/angular-toastr/dist/angular-toastr.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <% @scripts.each do |path| %>
-    <script src="<%= path %>"></script>
-    <% end %>
+
     <script>
       var MagicStick = MagicStick || {};
       MagicStick.Env = <%= @env.to_json %>;
     </script>
-    <script src="/js/app.js"></script>
-    <script src="/js/templates.js"></script>
   </head>
   <body ng-app="MagicStick">
     <nav class="navbar navbar-default">
@@ -69,5 +63,7 @@
     <div class="container">
       <ng-view></ng-view>
     </div>
+    <script src="/app.js"></script>
+    <script src="/styles.app.js"></script>
   </body>
 </html>
