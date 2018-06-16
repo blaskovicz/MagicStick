@@ -1,8 +1,7 @@
 const path = require("path");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const webpack = require("webpack");
-const webpackEnv =
-  process.env.ENVIRONMENT || process.env.RACK_ENV || "development";
+const webpackEnv = process.env.WEBPACK_ENV || "development";
 module.exports = {
   entry: path.resolve(__dirname, "frontend", "app.js"),
   mode: webpackEnv,

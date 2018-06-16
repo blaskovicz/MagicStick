@@ -29,7 +29,7 @@ module.exports = function(grunt) {
     webpack: {
       keepalive: false,
       options: {
-        stats: !process.env.NODE_ENV || process.env.NODE_ENV === "development"
+        stats: (process.env.WEBPACK_ENV || "development") === "development"
       },
       app: webpackConfig,
       test: webpackTestConfig
