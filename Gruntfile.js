@@ -205,14 +205,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-htmlhint");
   grunt.loadNpmTasks("grunt-bg-shell");
   grunt.loadNpmTasks("grunt-webpack");
-  grunt.registerTask("build", [
+  grunt.registerTask("build", ["htmlhint", "eslint:app", "webpack:app"]);
+  grunt.registerTask("test", [
     "htmlhint",
     "eslint",
-    "webpack:app",
-    "webpack:test"
-  ]);
-  grunt.registerTask("test", [
-    "build",
+    "webpack:test",
     "karma",
     "karma-simplecov-format",
     "bgShell:rake"
