@@ -6,7 +6,8 @@
   "scripts": {
     "build": "grunt dist",
     "test": "grunt test",
-    "start": "grunt"
+    "start": "grunt",
+    "heroku-postbuild": "grunt dist"
   },
   "repository": {
     "type": "git",
