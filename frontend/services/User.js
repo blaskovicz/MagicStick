@@ -152,9 +152,12 @@ angular.module("MagicStick.services").factory("User", [
         this.avatar_url = data.avatar_url;
         this.catchphrase = data.catchphrase;
         this.roles = {};
-        return Array.from(data.roles).map(
-          role => (this.roles[role.name] = true)
-        );
+        if (!data.roles) {
+          return;
+        }
+        for (let i = 0; i < data.roles.length; i++) {
+          this.roles[data.roles[i].name] = true;
+        }
       }
       logout(quiet) {
         if (quiet == null) {

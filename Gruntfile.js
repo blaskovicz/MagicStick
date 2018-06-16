@@ -44,14 +44,10 @@ module.exports = function(grunt) {
           frameworks: ["jasmine"],
           singleRun: true,
           browsers: ["PhantomJS"],
-          files: [
-            // mocks TODO
-            "public/app.js"
-            //"public/js/tests.js"
-          ],
+          files: ["public/styles.specs.js", "public/specs.js"],
           reporters: ["progress", "coverage"],
           preprocessors: {
-            "public/js/app.js": ["coverage"]
+            "public/specs.js": ["coverage"]
           },
           coverageReporter: {
             reporters: [

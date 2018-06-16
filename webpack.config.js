@@ -1,13 +1,11 @@
-/*eslint no-undef: "error"*/
-
 const path = require("path");
-//const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const webpack = require("webpack");
-
+const webpackEnv =
+  process.env.ENVIRONMENT || process.env.RACK_ENV || "development";
 module.exports = {
   entry: path.resolve(__dirname, "frontend", "app.js"),
-  mode: process.env.ENVIRONMENT || "development",
+  mode: webpackEnv,
   output: {
     path: path.resolve(__dirname, "public"),
     filename: "app.js"
@@ -34,10 +32,7 @@ module.exports = {
     // }),
     new CleanWebpackPlugin(["public"], { exclude: ["img"], verbose: false })
   ],
-  devtool:
-    (process.env.ENVIRONMENT || "development") === "development"
-      ? "eval"
-      : "source-map",
+  devtool: webpackEnv === "development" ? "eval" : "source-map",
   module: {
     rules: [
       {

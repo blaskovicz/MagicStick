@@ -3,14 +3,12 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-import { inject } from "angular-mocks";
+import angular from "angular";
 
 describe("MagicStick.services.User", function() {
-  // coffeelint: disable=max_line_length
   // created with https://jwt.io/
   const validJwt =
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImV4cCI6MTQ4OTI0Njg0OTAsImlzcyI6Im1hZ2ljLXN0aWNrIiwidXNlciI6eyJpZCI6MSwidXNlcm5hbWUiOiJ6YWNoIiwiZW1haWwiOiJlbWFpbEBtYWdpYy1zdGljay5oZXJva3VhcHAuY29tIiwiY2F0Y2hwaHJhc2UiOiJob3dzIGl0IGdvaW4nIGJyb3MiLCJjcmVhdGVkX2F0IjoiMjAxNS0wNC0xOCAxMDo1NDo1NSAtMDQwMCIsInVwZGF0ZWRfYXQiOiIyMDE3LTAzLTExIDA5OjQwOjMxIC0wNTAwIiwibGFzdF9sb2dpbiI6IjIwMTctMDMtMTEgMDk6NDA6MzEgLTA1MDAiLCJuYW1lIjoiWmFjaCBBdHRhY2siLCJhdmF0YXJfY29udGVudF90eXBlIjoiaW1hZ2UvanBlZyIsInJvbGVzIjpbeyJuYW1lIjoiYWRtaW4iLCJkZXNjIjoiYWRtaW4gc3R1ZmYifV0sImF2YXRhcl91cmwiOiIvYXBpL2F1dGgvdXNlcnMvMS9hdmF0YXIifX0.53qx9kNdmzE09S79FbXarWUma3lIvyH1Ae8d_wq2o2M";
-  // coffeelint: enable=max_line_length
   const headers = {
     auth: {
       basic: {
@@ -39,37 +37,39 @@ describe("MagicStick.services.User", function() {
   let $http = null;
   // all the requisite modules must be instantiated
   // before asking to use components attached to them
-  beforeEach(module("MagicStick"));
-  beforeEach(inject(function($injector) {
-    User = $injector.get("User");
-    $httpBackend = $injector.get("$httpBackend");
-    $http = $injector.get("$http");
-    $httpBackend
-      .whenPOST(
-        "/api/auth/login",
-        () => true,
-        h => headers.auth.basic.bad_jwt.Authorization === h.Authorization
-      ) // malformed token
-      .respond(200, { token: "/-___--+===" });
-    $httpBackend
-      .whenPOST(
-        "/api/auth/login",
-        () => true,
-        h =>
-          headers.auth.basic.valid.Authorization !== h.Authorization &&
-          headers.auth.bearer.valid.Authorization !== h.Authorization
-      )
-      .respond(401, { error: "Not authorized" });
-    return $httpBackend
-      .whenPOST(
-        "/api/auth/login",
-        () => true,
-        h =>
-          headers.auth.basic.valid.Authorization === h.Authorization ||
-          headers.auth.bearer.valid.Authorization === h.Authorization
-      )
-      .respond(200, { token: btoa(validJwt) });
-  }));
+  beforeEach(angular.mock.module("MagicStick"));
+  beforeEach(
+    angular.mock.inject(function($injector) {
+      User = $injector.get("User");
+      $httpBackend = $injector.get("$httpBackend");
+      $http = $injector.get("$http");
+      $httpBackend
+        .whenPOST(
+          "/api/auth/login",
+          () => true,
+          h => headers.auth.basic.bad_jwt.Authorization === h.Authorization
+        ) // malformed token
+        .respond(200, { token: "/-___--+===" });
+      $httpBackend
+        .whenPOST(
+          "/api/auth/login",
+          () => true,
+          h =>
+            headers.auth.basic.valid.Authorization !== h.Authorization &&
+            headers.auth.bearer.valid.Authorization !== h.Authorization
+        )
+        .respond(401, { error: "Not authorized" });
+      return $httpBackend
+        .whenPOST(
+          "/api/auth/login",
+          () => true,
+          h =>
+            headers.auth.basic.valid.Authorization === h.Authorization ||
+            headers.auth.bearer.valid.Authorization === h.Authorization
+        )
+        .respond(200, { token: btoa(validJwt) });
+    })
+  );
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     return $httpBackend.verifyNoOutstandingRequest();
