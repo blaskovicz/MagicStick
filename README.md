@@ -39,15 +39,17 @@ Please install those through your OS package provider (eg: `sudo apt-get install
 
 ```sh
 $ bundle install # backend dependences (`--path vendor/bundle` to install gems locally)
-$ yarn install # build dependencies (installed locally to `./node_modules`)
-$ bower install # frontend sources (installed locally to `./public/bower_components`)
+$ yarn install   # frontend and build dependencies (installed locally to `./node_modules`)
 ```
 
 If you run into issues with `$ bundle install` and are using `rbenv`, please
 consult [this post on stackoverflow](http://stackoverflow.com/a/11146496/626810).
 
 ## Set Up Your Development Config
+
+```sh
 $ cp env.sample .env && chmod 0600 .env
+```
 
 You may want to change `DATABASE_URL` and `SITE_BASE_URI`, at a minimum.
 

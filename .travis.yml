@@ -3,10 +3,9 @@ rvms:
     - 2.4.1
 before_script:
     - bundle install
-    - npm install
-    - bower install
+    - yarn install
 script:
-    - grunt test
+    - yarn test
 cache:
   bundler: true
   directories:
