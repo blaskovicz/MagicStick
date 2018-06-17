@@ -9,11 +9,11 @@ module.exports = {
     path: path.resolve(__dirname, "public"),
     filename: "app.js"
   },
-  optimization: {
-    splitChunks: {
-      chunks: "all"
-    }
-  },
+  // optimization: {
+  //   splitChunks: {
+  //     chunks: "all"
+  //   }
+  // },
   plugins: [
     new webpack.ProvidePlugin({
       $: "jquery",
@@ -22,7 +22,12 @@ module.exports = {
     // new MiniCssExtractPlugin({
     //   filename: "[name].css"
     // }),
-    new CleanWebpackPlugin(["public"], { exclude: ["img"], verbose: false })
+    new CleanWebpackPlugin(["public"], { exclude: ["img"], verbose: false }),
+    // existing plugins go here
+    new webpack.SourceMapDevToolPlugin({
+      filename: null, // if no value is provided the sourcemap is inlined
+      test: /\.(js)($|\?)/i // process .js files only
+    })
   ],
   devtool: webpackEnv === "development" ? "eval" : "source-map",
   module: {

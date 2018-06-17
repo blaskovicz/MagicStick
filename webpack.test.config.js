@@ -1,39 +1,31 @@
 const path = require("path");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
 const webpack = require("webpack");
-const webpackEnv = process.env.WEBPACK_ENV || "development";
 module.exports = {
   entry: path.resolve(__dirname, "frontend", "specs.js"),
-  mode: webpackEnv,
-  devtool: "cheap-module-inline-source-map",
+  mode: "development",
   output: {
     path: path.resolve(__dirname, "public"),
     filename: "specs.js"
-  },
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        styles: {
-          name: "styles",
-          test: /\.css$/,
-          chunks: "all",
-          enforce: true
-        }
-      }
-    }
   },
   plugins: [
     new webpack.ProvidePlugin({
       $: "jquery",
       jQuery: "jquery"
     }),
-    // new MiniCssExtractPlugin({
-    //   filename: "[name].css"
-    // }),
-    new CleanWebpackPlugin(["public"], { exclude: ["img"], verbose: false })
+    // existing plugins go here
+    new webpack.SourceMapDevToolPlugin({
+      filename: null, // if no value is provided the sourcemap is inlined
+      test: /\.(js)($|\?)/i // process .js files only
+    })
   ],
+  devtool: "inline-source-map",
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        use: ["source-map-loader"],
+        enforce: "pre"
+      },
       {
         test: /\.html$/,
         use: {
@@ -80,6 +72,16 @@ module.exports = {
         options: {
           limit: 10000
         }
+      },
+      {
+        // delays coverage till after tests are run
+        test: /\.js$/,
+        exclude: /node_modules|\.spec\.js$/,
+        use: {
+          loader: "istanbul-instrumenter-loader",
+          options: { esModules: true }
+        },
+        enforce: "post"
       }
     ]
   }

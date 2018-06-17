@@ -35,48 +35,25 @@ module.exports = function(grunt) {
       test: webpackTestConfig
     },
     eslint: {
-      app: ["frontend/**/*.js", "!frontend/tests/**/*.js"],
-      tests: ["frontend/tests/**/*.js"]
+      app: ["frontend/**/*.js"]
     },
     karma: {
       unit: {
-        options: {
-          frameworks: ["jasmine"],
-          singleRun: true,
-          browsers: ["PhantomJS"],
-          files: ["public/styles.specs.js", "public/specs.js"],
-          reporters: ["progress", "coverage"],
-          preprocessors: {
-            "public/specs.js": ["coverage"]
-          },
-          coverageReporter: {
-            reporters: [
-              {
-                type: "json",
-                subdir: ".", // ./coverage
-                file: ".frontend.json"
-              }
-            ]
-          }
-        }
+        configFile: "karma.config.js"
       }
     },
     watch: {
       html: {
         files: ["public/index.html", "frontend/views/**/*.html"],
-        tasks: ["htmlhint", "webpack:app"]
+        tasks: ["htmlhint", "build:js", "test:js"]
       },
       js: {
-        files: ["frontend/**/*.js", "!frontend/tests/**/*.js"],
-        tasks: ["eslint:app", "webpack:app", "karma", "karma-simplecov-format"]
+        files: ["frontend/**/*.js"],
+        tasks: ["build:js", "test:js"]
       },
       sass: {
         files: "frontend/scss/**/*.scss",
-        tasks: "sass"
-      },
-      "js-tests": {
-        files: ["frontend/tests/**/*.js"],
-        tasks: ["eslint:tests", "js:tests", "karma"]
+        tasks: ["sass", "build:js", "test:js"]
       },
       ruby: {
         files: [
@@ -205,15 +182,24 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-htmlhint");
   grunt.loadNpmTasks("grunt-bg-shell");
   grunt.loadNpmTasks("grunt-webpack");
-  grunt.registerTask("build", ["htmlhint", "eslint:app", "webpack:app"]);
-  grunt.registerTask("test", [
+  grunt.registerTask("build:js", [
     "htmlhint",
     "eslint",
-    "webpack:test",
+    "webpack:app",
+    "webpack:test"
+  ]);
+  grunt.registerTask("build", ["build:js"]);
+  grunt.registerTask("test:js", [
     "karma",
     "karma-simplecov-format",
     "bgShell:rake"
   ]);
-  grunt.registerTask("dist", ["build"]);
-  return grunt.registerTask("default", ["bgShell:shotgun", "watch"]);
+  grunt.registerTask("test:server", ["bgShell:rake"]);
+  grunt.registerTask("test", ["test:js", "test:server"]);
+  grunt.registerTask("dist", ["build:js"]);
+  return grunt.registerTask("default", [
+    "build:js",
+    "bgShell:shotgun",
+    "watch"
+  ]);
 };
